@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Foreground and font are inherited from Window so Button / DataGrid content
+    can override them. An implicit TextBlock foreground would paint primary
+    labels dark even on accent buttons.
+  -->
+  <Style TargetType="TextBlock">
+    <Setter Property="TextWrapping" Value="NoWrap"/>
+  </Style>
+
+  <Style x:Key="TextHeadline" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeHeadline}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+  </Style>
+  <Style x:Key="TextTitle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeTitle}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+  </Style>
+  <Style x:Key="TextMuted" TargetType="TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+  </Style>
+  <Style x:Key="TextCaption" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}"/>
+    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+  </Style>
+  <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Margin" Value="0,0,0,6"/>
+  </Style>
+  <Style x:Key="GridCellText" TargetType="TextBlock">
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+  </Style>
+
+  <Style x:Key="SidebarTextStyle" TargetType="TextBlock">
+    <Setter Property="Margin" Value="14,10,0,10"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+  </Style>
+  <Style x:Key="SidebarSelectedItemStyle" TargetType="Border">
+    <Setter Property="Padding" Value="12,10"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
+    <Setter Property="Background" Value="{DynamicResource SubtleAccentBrush}"/>
+  </Style>
+</ResourceDictionary>

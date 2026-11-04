@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <ProjectReference Include="..\Cavdeck.Application\Cavdeck.Application.csproj" />
+    <PackageReference Include="Velopack" />
+  </ItemGroup>
+</Project>

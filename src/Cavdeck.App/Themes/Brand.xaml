@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Cavdeck V2 / Open Arc. Draw the same vector geometry as the Figma master,
+    rather than letting WPF choose a small embedded frame from the Windows ICO.
+    DrawingImage stays sharp at any DPI/zoom and is shared by the chrome and About.
+    The native EXE / taskbar / Alt+Tab icon remains Assets/Cavdeck.ico.
+    Coordinates follow the original 800 x 800 Figma SVG viewBox.
+  -->
+  <DrawingImage x:Key="CavdeckBrandImage">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#2563EB">
+          <GeometryDrawing.Geometry>
+            <RectangleGeometry Rect="0,0,800,800" RadiusX="171" RadiusY="171"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#FFFFFF"
+                         Geometry="M 610 181 C 550 143 484 124 404 124 C 245 124 118 244 118 400 C 118 555 246 676 405 676 C 489 676 561 652 620 603 L 540 492 C 499 529 456 546 404 546 C 314 546 250 482 250 399 C 250 318 314 255 404 255 C 461 255 506 274 545 303 Z"/>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+</ResourceDictionary>

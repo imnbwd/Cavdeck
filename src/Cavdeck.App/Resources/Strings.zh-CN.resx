@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Header_Connections" xml:space="preserve"><value>连接</value></data>
+  <data name="Label_Language" xml:space="preserve"><value>语言</value></data>
+  <data name="Label_Theme" xml:space="preserve"><value>主题</value></data>
+  <data name="Nav_Workspace" xml:space="preserve"><value>工作区</value></data>
+  <data name="Nav_Connections" xml:space="preserve"><value>连接管理</value></data>
+  <data name="Nav_Favorites" xml:space="preserve"><value>收藏</value></data>
+  <data name="Nav_Recent" xml:space="preserve"><value>最近访问</value></data>
+  <data name="Nav_Transfers" xml:space="preserve"><value>传输任务</value></data>
+  <data name="Nav_Explorer" xml:space="preserve"><value>浏览</value></data>
+  <data name="Nav_Storage" xml:space="preserve"><value>对象存储</value></data>
+  <data name="Nav_EmptyConnections" xml:space="preserve"><value>尚未添加存储连接</value></data>
+  <data name="Empty_Title" xml:space="preserve"><value>欢迎使用 Cavdeck</value></data>
+  <data name="Empty_Description" xml:space="preserve"><value>面向 AWS S3、Cloudflare R2、MinIO 及兼容对象存储的桌面管理工具。</value></data>
+  <data name="Scaffold_Title" xml:space="preserve"><value>项目基础架构已就绪</value></data>
+  <data name="Scaffold_Description" xml:space="preserve"><value>已接入主题切换、实时多语言、MVVM 与 Velopack 更新边界。连接与传输功能尚待开发。</value></data>
+  <data name="Update_NoticeAvailableTitle" xml:space="preserve"><value>发现 Cavdeck 新版本</value></data>
+  <data name="Update_NoticeReadyTitle" xml:space="preserve"><value>Cavdeck 更新已就绪</value></data>
+  <data name="Update_ViewDetails" xml:space="preserve"><value>查看更新</value></data>
+  <data name="Update_TrayAvailable" xml:space="preserve"><value>发现新版本：{0}</value></data>
+  <data name="Update_TrayReady" xml:space="preserve"><value>更新已就绪：{0}</value></data>
+  <data name="Button_CheckUpdates" xml:space="preserve"><value>检查更新</value></data>
+  <data name="Update_Idle" xml:space="preserve"><value>可随时检查是否有新版本。</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>正在检查更新……</value></data>
+  <data name="Update_NotConfigured" xml:space="preserve"><value>请配置 CAVDECK_UPDATE_REPOSITORY 以启用更新检查。</value></data>
+  <data name="Update_NotInstalled" xml:space="preserve"><value>仅官方安装版本支持应用内更新。</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>当前已是最新版本。</value></data>
+  <data name="Update_Downloaded" xml:space="preserve"><value>更新已下载。安全重启体验完成后才会开放安装入口。</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>检查或下载更新失败，请稍后重试。</value></data>
+  <data name="Settings_SaveFailed" xml:space="preserve"><value>无法保存偏好设置。</value></data>
+  <data name="Footer_NoConnections" xml:space="preserve"><value>当前无连接</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>浅色</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>深色</value></data>
+  <data name="Theme_System" xml:space="preserve"><value>自动</value></data>
+  <data name="Dialog_Ok" xml:space="preserve"><value>确定</value></data>
+  <data name="Dialog_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Dialog_Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Toast_Dismiss" xml:space="preserve"><value>关闭通知</value></data>
+  <data name="Window_Minimize" xml:space="preserve"><value>最小化</value></data>
+  <data name="Window_Maximize" xml:space="preserve"><value>最大化</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>还原</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Window_SystemMenu" xml:space="preserve"><value>系统菜单</value></data>
+  <data name="Tab_AllTabs" xml:space="preserve"><value>所有已打开的标签页</value></data>
+  <data name="Tab_Duplicate" xml:space="preserve"><value>复制标签页</value></data>
+  <data name="Tab_UnsavedChanges" xml:space="preserve"><value>有未保存的更改</value></data>
+  <data name="Tab_UnsavedConnectionTitle" xml:space="preserve"><value>放弃未保存的连接更改？</value></data>
+  <data name="Tab_UnsavedConnectionMessage" xml:space="preserve"><value>此连接配置有未保存的修改。如需保存，请返回编辑页面完成保存后再关闭标签页。</value></data>
+  <data name="Tab_DiscardChanges" xml:space="preserve"><value>放弃更改</value></data>
+  <data name="Tab_KeepEditing" xml:space="preserve"><value>继续编辑</value></data>
+  <data name="Tab_RestoreMissingConnection" xml:space="preserve"><value>部分标签页无法恢复原位置，因为对应连接已不存在。</value></data>
+  <data name="Tab_LimitReached" xml:space="preserve"><value>已达到页签数量上限</value></data>
+  <data name="Tab_NewTip" xml:space="preserve"><value>新建标签页 (Ctrl+T)</value></data>
+  <data name="Tab_CloseTip" xml:space="preserve"><value>关闭标签页 (Ctrl+W)</value></data>
+  <data name="Tab_CloseWindowTip" xml:space="preserve"><value>关闭窗口 (Ctrl+W)</value></data>
+  <data name="Sidebar_CollapseTip" xml:space="preserve"><value>隐藏侧栏 (Ctrl+B)</value></data>
+  <data name="Sidebar_ExpandTip" xml:space="preserve"><value>显示侧栏 (Ctrl+B)</value></data>
+  <data name="Appearance_Title" xml:space="preserve"><value>外观</value></data>
+  <data name="Appearance_Hint" xml:space="preserve"><value>语言和主题</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>设置</value></data>
+  <data name="Settings_Description" xml:space="preserve"><value>调整 Cavdeck 在这台电脑上的使用偏好。</value></data>
+  <data name="Settings_AppearanceGroup" xml:space="preserve"><value>外观与语言</value></data>
+  <data name="About_Group" xml:space="preserve"><value>关于 Cavdeck</value></data>
+  <data name="About_UpdatesGroup" xml:space="preserve"><value>软件更新</value></data>
+  <data name="About_ViewLicense" xml:space="preserve"><value>查看许可证</value></data>
+  <data name="About_Description" xml:space="preserve"><value>一款现代化、免费开源的 Windows S3 客户端。</value></data>
+  <data name="About_VersionFormat" xml:space="preserve"><value>版本 {0}</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>应用更新</value></data>
+  <data name="Settings_FollowSystem" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="Settings_CurrentValue" xml:space="preserve"><value>当前：{0}</value></data>
+  <data name="Settings_English" xml:space="preserve"><value>英语</value></data>
+  <data name="Settings_Chinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Diagnostics_Group" xml:space="preserve"><value>诊断</value></data>
+  <data name="Diagnostics_Title" xml:space="preserve"><value>本地错误日志</value></data>
+  <data name="Diagnostics_Description" xml:space="preserve"><value>诊断报告包含应用信息和错误编号，不包含文件名、路径、账户信息、请求内容或凭据。日志最多在本机保留七天。</value></data>
+  <data name="Diagnostics_Copy" xml:space="preserve"><value>复制诊断报告</value></data>
+  <data name="Diagnostics_OpenLogs" xml:space="preserve"><value>打开日志文件夹</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>已复制诊断报告。</value></data>
+  <data name="Diagnostics_Preparing" xml:space="preserve"><value>正在生成诊断报告……</value></data>
+  <data name="Diagnostics_Opening" xml:space="preserve"><value>正在打开日志文件夹……</value></data>
+  <data name="Diagnostics_CopyFailed" xml:space="preserve"><value>无法复制诊断报告。</value></data>
+  <data name="Diagnostics_OpenFailed" xml:space="preserve"><value>无法打开日志文件夹。</value></data>
+  <data name="Diagnostics_ErrorId" xml:space="preserve"><value>错误编号：{0}</value></data>
+  <data name="Brand_Name" xml:space="preserve"><value>Cavdeck</value></data>
+  <data name="Diagnostics_StartupFailedTitle" xml:space="preserve"><value>Cavdeck 启动失败</value></data>
+  <data name="Diagnostics_StartupFailedMessage" xml:space="preserve"><value>Cavdeck 无法启动。错误编号：{0}
+日志：{1}</value></data>
+  <data name="Diagnostics_FatalTitle" xml:space="preserve"><value>Cavdeck 需要关闭</value></data>
+  <data name="Diagnostics_FatalMessage" xml:space="preserve"><value>发生意外错误，Cavdeck 需要关闭。错误编号：{0}。重新打开后可在设置中复制诊断报告。</value></data>
+  <data name="Status_NoItems" xml:space="preserve"><value>没有项目</value></data>
+  <data name="Status_NoTransfers" xml:space="preserve"><value>0 个传输</value></data>
+  <data name="Status_TabLimit" xml:space="preserve"><value>最多可同时打开 {0} 个标签页，请先关闭一个已有标签页后重试。</value></data>
+  <data name="Empty_FavoritesTitle" xml:space="preserve"><value>还没有收藏</value></data>
+  <data name="Empty_FavoritesDescription" xml:space="preserve"><value>打开连接、存储桶或文件夹后，点击路径旁的星标即可收藏。</value></data>
+  <data name="Empty_RecentTitle" xml:space="preserve"><value>还没有最近访问</value></data>
+  <data name="Empty_RecentDescription" xml:space="preserve"><value>打开过的连接、存储桶和文件夹会显示在这里。</value></data>
+  <data name="Empty_TransferHistoryTitle" xml:space="preserve"><value>暂无传输历史</value></data>
+  <data name="Empty_TransferHistoryDescription" xml:space="preserve"><value>已完成和已取消的传输任务会显示在这里。</value></data>
+  <data name="Empty_TransfersTitle" xml:space="preserve"><value>没有传输任务</value></data>
+  <data name="Empty_TransfersDescription" xml:space="preserve"><value>上传、下载和复制任务会显示在这里。</value></data>
+  <data name="Nav_ConnectionsTip" xml:space="preserve"><value>连接管理。按住 Ctrl 单击可在新标签页打开。</value></data>
+  <data name="Nav_FavoritesTip" xml:space="preserve"><value>收藏</value></data>
+  <data name="Nav_RecentTip" xml:space="preserve"><value>最近访问</value></data>
+  <data name="Nav_TransfersTip" xml:space="preserve"><value>传输任务</value></data>
+  <data name="Connection_ListSummary" xml:space="preserve"><value>{0} 个连接</value></data>
+  <data name="Connection_Add" xml:space="preserve"><value>添加连接</value></data>
+  <data name="Connection_Back" xml:space="preserve"><value>全部连接</value></data>
+  <data name="Connection_NewTitle" xml:space="preserve"><value>新建连接</value></data>
+  <data name="Connection_EditTitle" xml:space="preserve"><value>编辑连接</value></data>
+  <data name="Connection_EmptyTitle" xml:space="preserve"><value>添加对象存储</value></data>
+  <data name="Connection_EmptyDescription" xml:space="preserve"><value>连接 Cloudflare R2、Amazon S3 或 MinIO。访问密钥只保存在这台电脑的 Windows 凭据管理器里。</value></data>
+  <data name="Connection_Provider" xml:space="preserve"><value>存储服务</value></data>
+  <data name="Connection_Test" xml:space="preserve"><value>测试</value></data>
+  <data name="Connection_Testing" xml:space="preserve"><value>正在测试…</value></data>
+  <data name="Connection_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Connection_Saving" xml:space="preserve"><value>正在保存…</value></data>
+  <data name="Connection_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="Connection_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Connection_DeleteTitle" xml:space="preserve"><value>删除这个连接？</value></data>
+  <data name="Connection_DeleteMessage" xml:space="preserve"><value>将从这台电脑移除“{0}”及其已保存的密钥。存储桶里的文件不会被删除。</value></data>
+  <data name="Connection_SavedTitle" xml:space="preserve"><value>连接已保存</value></data>
+  <data name="Connection_SavedMessage" xml:space="preserve"><value>{0} 已可以使用。</value></data>
+  <data name="Connection_Name" xml:space="preserve"><value>连接名称</value></data>
+  <data name="Connection_NamePlaceholder" xml:space="preserve"><value>例如：我的 R2</value></data>
+  <data name="Connection_AccountId" xml:space="preserve"><value>Account ID</value></data>
+  <data name="Connection_AccountPlaceholder" xml:space="preserve"><value>Cloudflare 账户 ID</value></data>
+  <data name="Connection_Region" xml:space="preserve"><value>区域</value></data>
+  <data name="Connection_RegionPlaceholder" xml:space="preserve"><value>us-east-1</value></data>
+  <data name="Connection_Endpoint" xml:space="preserve"><value>服务地址</value></data>
+  <data name="Connection_EndpointPlaceholder" xml:space="preserve"><value>https://s3.example.com</value></data>
+  <data name="Connection_AccessKey" xml:space="preserve"><value>Access Key ID</value></data>
+  <data name="Connection_AccessKeyPlaceholder" xml:space="preserve"><value>访问密钥 ID</value></data>
+  <data name="Connection_Secret" xml:space="preserve"><value>Secret Access Key</value></data>
+  <data name="Connection_SecretPlaceholder" xml:space="preserve"><value>秘密访问密钥</value></data>
+  <data name="Connection_SecretKeep" xml:space="preserve"><value>秘密密钥留空则继续使用已保存的密钥。</value></data>
+  <data name="Connection_ShowSecret" xml:space="preserve"><value>显示</value></data>
+  <data name="Connection_HideSecret" xml:space="preserve"><value>隐藏</value></data>
+  <data name="Connection_CredentialNote" xml:space="preserve"><value>密钥保存在当前 Windows 用户的凭据管理器中，不会写入设置文件。</value></data>
+  <data name="Connection_Advanced" xml:space="preserve"><value>高级选项</value></data>
+  <data name="Connection_AdvancedHide" xml:space="preserve"><value>收起高级选项</value></data>
+  <data name="Connection_ReadOnly" xml:space="preserve"><value>只读连接</value></data>
+  <data name="Connection_ReadOnlyHint" xml:space="preserve"><value>Cavdeck 不会用这个连接上传或删除。这不能代替服务端的权限限制。</value></data>
+  <data name="Connection_Bucket" xml:space="preserve"><value>限定存储桶</value></data>
+  <data name="Connection_BucketPlaceholder" xml:space="preserve"><value>留空则可列出所有存储桶</value></data>
+  <data name="Connection_BucketHint" xml:space="preserve"><value>密钥不能列出存储桶时，填入它可以访问的那个。</value></data>
+  <data name="Connection_Prefix" xml:space="preserve"><value>键前缀</value></data>
+  <data name="Connection_PrefixPlaceholder" xml:space="preserve"><value>images/</value></data>
+  <data name="Connection_PrefixHint" xml:space="preserve"><value>只显示以这个前缀开头的对象。</value></data>
+  <data name="Connection_PathStyle" xml:space="preserve"><value>使用路径式地址</value></data>
+  <data name="Connection_PathStyleHint" xml:space="preserve"><value>MinIO 和多数兼容服务需要开启。Amazon S3 通常使用虚拟主机地址。</value></data>
+  <data name="Connection_HttpWarning" xml:space="preserve"><value>这个地址使用 HTTP，传输过程不加密。</value></data>
+  <data name="Connection_ProviderHint_R2" xml:space="preserve"><value>填写 Account ID 即可。端点会自动生成，区域使用 auto。</value></data>
+  <data name="Connection_ProviderHint_Aws" xml:space="preserve"><value>填写区域。服务地址留空时使用 Amazon 的默认端点。</value></data>
+  <data name="Connection_ProviderHint_Minio" xml:space="preserve"><value>填写服务器地址和端口，例如 http://127.0.0.1:9000。</value></data>
+  <data name="Connection_ProviderHint_Compatible" xml:space="preserve"><value>填写任何 S3 兼容服务的地址。默认使用路径式访问。</value></data>
+  <data name="Connection_PreviewEmpty" xml:space="preserve"><value>填好必要信息后，这里会显示实际使用的端点。</value></data>
+  <data name="Connection_Preview" xml:space="preserve"><value>端点 {0} · 区域 {1}</value></data>
+  <data name="Connection_PreviewAws" xml:space="preserve"><value>Amazon 区域端点 · {0}</value></data>
+  <data name="Provider_R2" xml:space="preserve"><value>Cloudflare R2</value></data>
+  <data name="Provider_Aws" xml:space="preserve"><value>Amazon S3</value></data>
+  <data name="Provider_Minio" xml:space="preserve"><value>MinIO</value></data>
+  <data name="Provider_Compatible" xml:space="preserve"><value>S3 兼容</value></data>
+  <data name="Connection_BadgeReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="Connection_BadgeBucket" xml:space="preserve"><value>存储桶 {0}</value></data>
+  <data name="Connection_BadgePrefix" xml:space="preserve"><value>前缀 {0}</value></data>
+  <data name="Connection_TestSuccessBuckets" xml:space="preserve"><value>已连接，可以看到 {0} 个存储桶。</value></data>
+  <data name="Connection_TestSuccessBucketOne" xml:space="preserve"><value>已连接，可以看到 1 个存储桶。</value></data>
+  <data name="Connection_TestSuccessBucket" xml:space="preserve"><value>已连接到存储桶 {0}。</value></data>
+  <data name="Connection_TestSuccessBucketPrefix" xml:space="preserve"><value>已连接到存储桶 {0}，前缀可以访问。</value></data>
+  <data name="Connection_TestSuccessEmpty" xml:space="preserve"><value>已连接。这个账号下还没有存储桶。</value></data>
+  <data name="Connection_Failure_InvalidCredentials" xml:space="preserve"><value>密钥被拒绝</value></data>
+  <data name="Connection_Failure_InvalidCredentialsHint" xml:space="preserve"><value>访问密钥或秘密密钥不正确。如果密钥本身无误，区域或端点不匹配也会导致签名失败。</value></data>
+  <data name="Connection_Failure_AccessDenied" xml:space="preserve"><value>权限不足</value></data>
+  <data name="Connection_Failure_AccessDeniedHint" xml:space="preserve"><value>密钥已经通过认证，但这项操作没有被允许。可以改成只访问有权限的存储桶和前缀。</value></data>
+  <data name="Connection_Failure_Endpoint" xml:space="preserve"><value>端点或区域不正确</value></data>
+  <data name="Connection_Failure_EndpointHint" xml:space="preserve"><value>无法按这个地址访问服务。请检查主机、端口和区域。</value></data>
+  <data name="Connection_Failure_BucketNotFound" xml:space="preserve"><value>找不到存储桶</value></data>
+  <data name="Connection_Failure_BucketNotFoundHint" xml:space="preserve"><value>存储桶不存在，或者当前密钥看不到它。</value></data>
+  <data name="Connection_Failure_Network" xml:space="preserve"><value>网络没有响应</value></data>
+  <data name="Connection_Failure_NetworkHint" xml:space="preserve"><value>服务没有在限定时间内回应。请检查网络、代理和防火墙。</value></data>
+  <data name="Connection_Failure_CredentialMissing" xml:space="preserve"><value>没有已保存的密钥</value></data>
+  <data name="Connection_Failure_CredentialMissingHint" xml:space="preserve"><value>这台电脑上找不到该连接的密钥。请重新输入秘密密钥。</value></data>
+  <data name="Connection_Failure_InvalidConfiguration" xml:space="preserve"><value>连接配置无效</value></data>
+  <data name="Connection_Failure_InvalidConfigurationHint" xml:space="preserve"><value>请检查存储桶、前缀和地址。</value></data>
+  <data name="Connection_Failure_Unsupported" xml:space="preserve"><value>存储服务不支持此操作</value></data>
+  <data name="Connection_Failure_UnsupportedHint" xml:space="preserve"><value>请检查此存储服务支持哪些操作。</value></data>
+  <data name="Connection_Failure_ReadOnly" xml:space="preserve"><value>这个连接是只读的</value></data>
+  <data name="Connection_Failure_ReadOnlyHint" xml:space="preserve"><value>只读连接不会上传或删除对象。</value></data>
+  <data name="Connection_Failure_Unknown" xml:space="preserve"><value>服务返回了意外错误</value></data>
+  <data name="Connection_Failure_UnknownHint" xml:space="preserve"><value>请检查连接设置并重试。如有技术错误标识，将在下方显示。</value></data>
+  <data name="Connection_Failure_Cancelled" xml:space="preserve"><value>测试已取消</value></data>
+  <data name="Connection_Failure_CancelledHint" xml:space="preserve"><value>服务回应之前，测试被取消了。</value></data>
+  <data name="Connection_TechnicalCode" xml:space="preserve"><value>错误代码 {0}</value></data>
+  <data name="Connection_TechnicalHttp" xml:space="preserve"><value>HTTP {0}</value></data>
+  <data name="Connection_TechnicalRequest" xml:space="preserve"><value>请求 ID {0}</value></data>
+  <data name="Connection_CopyDiagnostic" xml:space="preserve"><value>复制诊断信息</value></data>
+  <data name="Connection_Copied" xml:space="preserve"><value>诊断信息已复制</value></data>
+  <data name="Connection_CopyFailed" xml:space="preserve"><value>无法复制诊断信息</value></data>
+  <data name="Connection_Issue_NameRequired" xml:space="preserve"><value>请填写连接名称。</value></data>
+  <data name="Connection_Issue_NameInvalid" xml:space="preserve"><value>名称不能超过 80 个字符。</value></data>
+  <data name="Connection_Issue_AccountRequired" xml:space="preserve"><value>请填写 Cloudflare Account ID。</value></data>
+  <data name="Connection_Issue_AccountInvalid" xml:space="preserve"><value>只填写账户 ID，不要带上完整网址。</value></data>
+  <data name="Connection_Issue_RegionRequired" xml:space="preserve"><value>请填写区域。</value></data>
+  <data name="Connection_Issue_RegionInvalid" xml:space="preserve"><value>区域格式类似 us-east-1。</value></data>
+  <data name="Connection_Issue_EndpointRequired" xml:space="preserve"><value>请填写服务地址。</value></data>
+  <data name="Connection_Issue_EndpointInvalid" xml:space="preserve"><value>使用 http 或 https 地址，不要带路径。</value></data>
+  <data name="Connection_Issue_EndpointUserInfo" xml:space="preserve"><value>不要把密钥写在地址里。</value></data>
+  <data name="Connection_Issue_AccessKeyRequired" xml:space="preserve"><value>请填写 Access Key ID。</value></data>
+  <data name="Connection_Issue_AccessKeyInvalid" xml:space="preserve"><value>访问密钥 ID 不能包含空格。</value></data>
+  <data name="Connection_Issue_SecretRequired" xml:space="preserve"><value>请填写 Secret Access Key。</value></data>
+  <data name="Connection_Issue_BucketInvalid" xml:space="preserve"><value>存储桶名称不能包含空格或斜杠。</value></data>
+  <data name="Connection_Issue_PrefixInvalid" xml:space="preserve"><value>前缀不能包含 ..，也不能以斜杠开头。</value></data>
+  <data name="Connection_LoadFailed" xml:space="preserve"><value>无法读取已保存的连接。</value></data>
+  <data name="Connection_SaveFailed" xml:space="preserve"><value>无法保存连接。</value></data>
+  <data name="Footer_OneConnection" xml:space="preserve"><value>1 个连接</value></data>
+  <data name="Footer_ConnectionCount" xml:space="preserve"><value>{0} 个连接</value></data>
+  <data name="Explorer_Open" xml:space="preserve"><value>打开</value></data>
+  <data name="Tab_CloseOthers" xml:space="preserve"><value>关闭其他标签页</value></data>
+  <data name="Tab_RestoreClosed" xml:space="preserve"><value>重新打开已关闭的标签页 (Ctrl+Shift+T)</value></data>
+  <data name="Explorer_PickTitle" xml:space="preserve"><value>打开一个连接</value></data>
+  <data name="Explorer_PickDescription" xml:space="preserve"><value>选择已保存的连接，浏览其中的存储桶和对象。</value></data>
+  <data name="Explorer_Filter" xml:space="preserve"><value>筛选已加载项，或搜索当前前缀</value></data>
+  <data name="Explorer_SearchScope" xml:space="preserve"><value>搜索范围</value></data>
+  <data name="Explorer_ScopeLoaded" xml:space="preserve"><value>已加载</value></data>
+  <data name="Explorer_ScopePrefix" xml:space="preserve"><value>前缀</value></data>
+  <data name="Explorer_ScopeBucket" xml:space="preserve"><value>整个 Bucket</value></data>
+  <data name="Explorer_FilterLoaded" xml:space="preserve"><value>筛选已加载项</value></data>
+  <data name="Explorer_KeyPrefix" xml:space="preserve"><value>按 Key 前缀查询</value></data>
+  <data name="Explorer_ScanBucket" xml:space="preserve"><value>扫描整个存储桶</value></data>
+  <data name="Explorer_SearchPlaceholder" xml:space="preserve"><value>搜索文件或目录 (Ctrl+F)</value></data>
+  <data name="Explorer_Search" xml:space="preserve"><value>搜索</value></data>
+  <data name="Explorer_LoadedFilterHint" xml:space="preserve"><value>仅筛选当前文件夹已加载的对象；加载更多后可包含其他对象。</value></data>
+  <data name="Explorer_BucketFilterHint" xml:space="preserve"><value>即时筛选已加载的存储桶。</value></data>
+  <data name="Explorer_KeyPrefixHint" xml:space="preserve"><value>列举当前文件夹下以输入内容开头的 Key；区分大小写，会发起远端请求。</value></data>
+  <data name="Explorer_BucketScanHint" xml:space="preserve"><value>扫描此连接可访问的全部 Key，查找包含输入内容的对象；可能较慢并产生请求费用。</value></data>
+  <data name="Explorer_KeyPrefixNoMatchesHint" xml:space="preserve"><value>这里没有以该内容开头的 Key。可缩短前缀再试。</value></data>
+  <data name="Explorer_KeyPrefixProgress" xml:space="preserve"><value>正在列举 {0} · 已检查 {1} 个对象 · {2} 次列举请求 · {3} 个匹配。</value></data>
+  <data name="Explorer_KeyPrefixLoading" xml:space="preserve"><value>正在列举以该前缀开头的 Key…</value></data>
+  <data name="Explorer_KeyPrefixComplete" xml:space="preserve"><value>已完成 {0} 的 Key 前缀查询 · 检查 {1} 个对象 · {2} 次列举请求 · {3} 个匹配。</value></data>
+  <data name="Explorer_KeyPrefixIncomplete" xml:space="preserve"><value>在 {0} 达到 2,000 个结果上限 · 检查 {1} 个对象 · {2} 次列举请求。结果不完整。</value></data>
+  <data name="Explorer_New" xml:space="preserve"><value>新建</value></data>
+  <data name="Explorer_NewTextFile" xml:space="preserve"><value>新建文本文件</value></data>
+  <data name="Explorer_NewTextFileMessage" xml:space="preserve"><value>在当前文件夹创建一个空白文本文件。</value></data>
+  <data name="Explorer_More" xml:space="preserve"><value>更多</value></data>
+  <data name="Explorer_UploadFilesTip" xml:space="preserve"><value>上传文件到当前文件夹</value></data>
+  <data name="Explorer_UploadFiles" xml:space="preserve"><value>上传文件...</value></data>
+  <data name="Explorer_UploadFolder" xml:space="preserve"><value>上传文件夹...</value></data>
+  <data name="Explorer_RenameTip" xml:space="preserve"><value>重命名 (F2)</value></data>
+  <data name="Explorer_DeleteTip" xml:space="preserve"><value>删除 (Del)</value></data>
+  <data name="Explorer_SearchPrefix" xml:space="preserve"><value>搜索此前缀</value></data>
+  <data name="Explorer_SearchCostHint" xml:space="preserve"><value>扫描此前缀及子文件夹；每次请求最多列举 1,000 个对象，云服务商可能收取请求费用。</value></data>
+  <data name="Explorer_SearchLoading" xml:space="preserve"><value>正在扫描此前缀及其子文件夹…</value></data>
+  <data name="Explorer_SearchNoMatches" xml:space="preserve"><value>没有匹配的对象</value></data>
+  <data name="Explorer_SearchNoMatchesHint" xml:space="preserve"><value>扫描已完成。可尝试其他名称或缩小前缀范围。</value></data>
+  <data name="Explorer_CancelScan" xml:space="preserve"><value>取消扫描</value></data>
+  <data name="Explorer_SearchProgress" xml:space="preserve"><value>正在搜索 {0} 及其子文件夹 · 已检查 {1} 个对象 · {2} 次列举请求 · {3} 个匹配。请求可能产生存储费用。</value></data>
+  <data name="Explorer_SearchComplete" xml:space="preserve"><value>已完成搜索 {0} 及其子文件夹 · 检查 {1} 个对象 · {2} 次列举请求 · {3} 个匹配。</value></data>
+  <data name="Explorer_SearchIncomplete" xml:space="preserve"><value>已暂停扫描 {0} · 已检查 {1} 个对象 · {2} 次请求 · {3} 个匹配。结果不完整，可以继续搜索。</value></data>
+  <data name="Explorer_PreparingOperation" xml:space="preserve"><value>正在预检 · 已检查 {0} 个对象 · {1} 次列举请求 · {2} 次目标检查</value></data>
+  <data name="Explorer_DeletePreview" xml:space="preserve"><value>确定从 {1} 删除 {0} 个对象吗？预检进行了 {2} 次列举请求。只会删除此次预检中的对象，此操作无法撤销。</value></data>
+  <data name="Explorer_RenamePreview" xml:space="preserve"><value>确定将 {0} 个对象重命名到 {1} 吗？发现 {2} 个目标冲突。预检进行了 {3} 次列举请求和 {4} 次存在性检查。只会移动此次预检中的对象。</value></data>
+  <data name="Explorer_PreviewChanged" xml:space="preserve"><value>预检后目标位置发生变化，尚未移动对象。请重新检查并确认。</value></data>
+  <data name="Explorer_FailureDetails" xml:space="preserve"><value>完整失败对象报告</value></data>
+  <data name="Explorer_ConflictDetails" xml:space="preserve"><value>目标位置已存在的对象</value></data>
+  <data name="Explorer_CopyReport" xml:space="preserve"><value>复制完整报告</value></data>
+  <data name="Explorer_Refresh" xml:space="preserve"><value>刷新 (F5)</value></data>
+  <data name="Explorer_RefreshMenu" xml:space="preserve"><value>刷新</value></data>
+  <data name="Explorer_Up" xml:space="preserve"><value>返回上一级 (Backspace)</value></data>
+  <data name="Explorer_Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="Explorer_Loading" xml:space="preserve"><value>正在加载…</value></data>
+  <data name="Explorer_LoadMore" xml:space="preserve"><value>加载更多</value></data>
+  <data name="Explorer_ReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="Explorer_NewFolder" xml:space="preserve"><value>新建文件夹</value></data>
+  <data name="Explorer_NewFolderTitle" xml:space="preserve"><value>新建文件夹</value></data>
+  <data name="Explorer_NewFolderMessage" xml:space="preserve"><value>文件夹是对象键的前缀。即使里面没有文件，它也会显示出来。</value></data>
+  <data name="Explorer_Create" xml:space="preserve"><value>创建</value></data>
+  <data name="Explorer_NameLabel" xml:space="preserve"><value>名称</value></data>
+  <data name="Explorer_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="Explorer_Size" xml:space="preserve"><value>大小</value></data>
+  <data name="Explorer_Modified" xml:space="preserve"><value>修改时间</value></data>
+  <data name="Explorer_Kind" xml:space="preserve"><value>类型</value></data>
+  <data name="Explorer_KindFolder" xml:space="preserve"><value>文件夹</value></data>
+  <data name="Explorer_KindFile" xml:space="preserve"><value>文件</value></data>
+  <data name="Explorer_KindImage" xml:space="preserve"><value>图片</value></data>
+  <data name="Explorer_KindVideo" xml:space="preserve"><value>视频</value></data>
+  <data name="Explorer_KindAudio" xml:space="preserve"><value>音频</value></data>
+  <data name="Explorer_KindCode" xml:space="preserve"><value>代码</value></data>
+  <data name="Explorer_KindData" xml:space="preserve"><value>数据</value></data>
+  <data name="Explorer_KindText" xml:space="preserve"><value>文本</value></data>
+  <data name="Explorer_KindDocument" xml:space="preserve"><value>文档</value></data>
+  <data name="Explorer_KindPdf" xml:space="preserve"><value>PDF</value></data>
+  <data name="Explorer_KindArchive" xml:space="preserve"><value>压缩包</value></data>
+  <data name="Explorer_KindSheet" xml:space="preserve"><value>表格</value></data>
+  <data name="Explorer_KindSlides" xml:space="preserve"><value>演示文稿</value></data>
+  <data name="Explorer_KindFont" xml:space="preserve"><value>字体</value></data>
+  <data name="Explorer_KindProgram" xml:space="preserve"><value>程序</value></data>
+  <data name="Explorer_ViewList" xml:space="preserve"><value>列表</value></data>
+  <data name="Explorer_ViewIcons" xml:space="preserve"><value>图标</value></data>
+  <data name="Explorer_GridComfortable" xml:space="preserve"><value>舒适网格</value></data>
+  <data name="Explorer_GridCompact" xml:space="preserve"><value>紧凑网格</value></data>
+  <data name="Explorer_ShowDetails" xml:space="preserve"><value>显示详情面板</value></data>
+  <data name="Explorer_HideDetails" xml:space="preserve"><value>收起详情面板</value></data>
+  <data name="Explorer_NameCopied" xml:space="preserve"><value>已复制文件名</value></data>
+  <data name="Explorer_Region" xml:space="preserve"><value>区域</value></data>
+  <data name="Explorer_Buckets" xml:space="preserve"><value>存储桶</value></data>
+  <data name="Explorer_Objects" xml:space="preserve"><value>对象</value></data>
+  <data name="Explorer_CopyDetailName" xml:space="preserve"><value>复制名称</value></data>
+  <data name="Explorer_DetailsBucket" xml:space="preserve"><value>存储桶</value></data>
+  <data name="Explorer_DetailsCurrentFolder" xml:space="preserve"><value>当前目录</value></data>
+  <data name="Explorer_DetailsSelectionBreakdown" xml:space="preserve"><value>{0} 个文件 · {1} 个文件夹</value></data>
+  <data name="Explorer_Details" xml:space="preserve"><value>详细信息</value></data>
+  <data name="Explorer_Location" xml:space="preserve"><value>位置</value></data>
+  <data name="Explorer_Prefix" xml:space="preserve"><value>前缀</value></data>
+  <data name="Explorer_ObjectKey" xml:space="preserve"><value>对象键</value></data>
+  <data name="Explorer_Technical" xml:space="preserve"><value>文件属性</value></data>
+  <data name="Explorer_CopyName" xml:space="preserve"><value>复制文件名</value></data>
+  <data name="Explorer_ValueCopied" xml:space="preserve"><value>已复制到剪贴板</value></data>
+  <data name="Explorer_ETagHint" xml:space="preserve"><value>由存储服务返回的对象标记，不一定是 MD5 校验值。</value></data>
+  <data name="Explorer_ContentTypeHint" xml:space="preserve"><value>文件的 MIME 类型（HTTP Content-Type）。</value></data>
+  <data name="Explorer_CopyETag" xml:space="preserve"><value>复制 ETag</value></data>
+  <data name="Explorer_CopyContentType" xml:space="preserve"><value>复制 Content-Type</value></data>
+  <data name="Explorer_Bytes" xml:space="preserve"><value>字节</value></data>
+  <data name="Explorer_Key" xml:space="preserve"><value>对象键</value></data>
+  <data name="Explorer_ETag" xml:space="preserve"><value>ETag</value></data>
+  <data name="Explorer_ContentType" xml:space="preserve"><value>内容类型</value></data>
+  <data name="Explorer_HeaderUnavailable" xml:space="preserve"><value>无法读取</value></data>
+  <data name="Explorer_UriLabel" xml:space="preserve"><value>S3 URI</value></data>
+  <data name="Explorer_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Explorer_DeleteOneTitle" xml:space="preserve"><value>删除 {0}？</value></data>
+  <data name="Explorer_DeleteManyTitle" xml:space="preserve"><value>删除 {0} 项？</value></data>
+  <data name="Explorer_DeleteFileMessage" xml:space="preserve"><value>对象会从存储桶中移除，且无法撤销。</value></data>
+  <data name="Explorer_DeleteFolderMessage" xml:space="preserve"><value>删除文件夹会移除该前缀下的全部对象，且无法撤销。</value></data>
+  <data name="Explorer_Rename" xml:space="preserve"><value>重命名</value></data>
+  <data name="Explorer_RenameTitle" xml:space="preserve"><value>重命名</value></data>
+  <data name="Explorer_RenameMessage" xml:space="preserve"><value>会先复制出新对象，复制成功后才删除原来的对象。</value></data>
+  <data name="Explorer_Copy" xml:space="preserve"><value>复制</value></data>
+  <data name="Explorer_Cut" xml:space="preserve"><value>剪切</value></data>
+  <data name="Explorer_Paste" xml:space="preserve"><value>粘贴</value></data>
+  <data name="Explorer_CutUploadTitle" xml:space="preserve"><value>上传已剪切的文件？</value></data>
+  <data name="Explorer_CutUploadMessage" xml:space="preserve"><value>这些文件是在 Windows 资源管理器中剪切的。Cavdeck 可以上传副本，但不会移动或删除本地原文件。</value></data>
+  <data name="Explorer_UploadCopies" xml:space="preserve"><value>上传副本</value></data>
+  <data name="Explorer_CopyKey" xml:space="preserve"><value>复制对象键</value></data>
+  <data name="Explorer_CopyUri" xml:space="preserve"><value>复制 S3 URI</value></data>
+  <data name="Explorer_CopyReady" xml:space="preserve"><value>已准备在 Cavdeck 中复制</value></data>
+  <data name="Explorer_CopyTo" xml:space="preserve"><value>复制到…</value></data>
+  <data name="Explorer_CopyToSummary" xml:space="preserve"><value>已选择 {0} 个文件、{1} 个文件夹</value></data>
+  <data name="Explorer_CopyToConnection" xml:space="preserve"><value>目标连接</value></data>
+  <data name="Explorer_CopyToBucket" xml:space="preserve"><value>存储桶</value></data>
+  <data name="Explorer_CopyToFolder" xml:space="preserve"><value>文件夹</value></data>
+  <data name="Explorer_CopyToConflict" xml:space="preserve"><value>目标对象已存在时</value></data>
+  <data name="Explorer_CopyToUp" xml:space="preserve"><value>上一级</value></data>
+  <data name="Explorer_CopyToNoWritable" xml:space="preserve"><value>没有可写的目标连接。</value></data>
+  <data name="Explorer_CopyToNoBuckets" xml:space="preserve"><value>此连接没有可用的存储桶。</value></data>
+  <data name="Explorer_CopyToEmpty" xml:space="preserve"><value>这里没有子文件夹，可以复制到当前文件夹。</value></data>
+  <data name="Explorer_CopyToRelayHint" xml:space="preserve"><value>文件将经过这台电脑传输，可能产生网络流量和云服务费用。</value></data>
+  <data name="Transfer_CrossMove" xml:space="preserve"><value>移动</value></data>
+  <data name="Transfer_CrossMoving" xml:space="preserve"><value>正在移动</value></data>
+  <data name="Transfer_CrossRemoving" xml:space="preserve"><value>正在移除源文件</value></data>
+  <data name="Explorer_CrossMoveBatchQueued" xml:space="preserve"><value>移动批次已加入队列</value></data>
+  <data name="Transfer_CrossCopy" xml:space="preserve"><value>复制</value></data>
+  <data name="Transfer_CrossCopying" xml:space="preserve"><value>正在复制</value></data>
+  <data name="Transfer_CrossVerifying" xml:space="preserve"><value>正在校验</value></data>
+  <data name="Transfer_CrossChecksumVerified" xml:space="preserve"><value>SHA-256 校验通过</value></data>
+  <data name="Explorer_CrossBatchQueued" xml:space="preserve"><value>复制批次已加入队列</value></data>
+  <data name="Explorer_CrossBatchQueuedHint" xml:space="preserve"><value>可在“传输”中查看每个对象的进度和结果。</value></data>
+  <data name="Transfer_BatchTitle" xml:space="preserve"><value>复制批次</value></data>
+  <data name="Transfer_BatchProgress" xml:space="preserve"><value>已添加 {0} · 已复制 {1} · 已跳过 {2} · 失败 {3} · 剩余 {4}</value></data>
+  <data name="Transfer_BatchScanning" xml:space="preserve"><value>正在扫描源文件夹</value></data>
+  <data name="Transfer_BatchScanComplete" xml:space="preserve"><value>扫描完成</value></data>
+  <data name="Transfer_BatchScanFailed" xml:space="preserve"><value>文件夹扫描需要处理</value></data>
+  <data name="Transfer_RetryBatch" xml:space="preserve"><value>重试批次</value></data>
+  <data name="Explorer_CrossCutUnsupported" xml:space="preserve"><value>暂不支持跨连接剪切，请改用复制。</value></data>
+  <data name="Explorer_SourceConnectionMissing" xml:space="preserve"><value>源连接已不可用。</value></data>
+  <data name="Explorer_CutReady" xml:space="preserve"><value>已准备在 Cavdeck 中移动</value></data>
+  <data name="Explorer_ClipboardCount" xml:space="preserve"><value>{0} 项可粘贴到这个连接，包括其他标签页。</value></data>
+  <data name="Explorer_CopyNothingToDo" xml:space="preserve"><value>没有需要复制或移动的对象</value></data>
+  <data name="Explorer_PasteMoveCount" xml:space="preserve"><value>移动到此处 ({0})</value></data>
+  <data name="Explorer_CrossMoveQueuedHint" xml:space="preserve"><value>可在“传输”中查看进度。只有目标校验成功后才会移除源对象。</value></data>
+  <data name="Transfer_MoveBatchTitle" xml:space="preserve"><value>移动批次</value></data>
+  <data name="Transfer_MoveBatchProgress" xml:space="preserve"><value>已添加 {0} · 已移动 {1} · 已跳过 {2} · 失败 {3} · 剩余 {4}</value></data>
+  <data name="Explorer_PasteCount" xml:space="preserve"><value>粘贴 ({0})</value></data>
+  <data name="Explorer_SelectLoaded" xml:space="preserve"><value>全选已加载项</value></data>
+  <data name="Explorer_ClearSelection" xml:space="preserve"><value>清除选择</value></data>
+  <data name="Explorer_CopyPlanning" xml:space="preserve"><value>正在准备操作…</value></data>
+  <data name="Explorer_CopyChecking" xml:space="preserve"><value>正在检查目标 · {0}/{1}</value></data>
+  <data name="Explorer_CopyProgress" xml:space="preserve"><value>正在复制 · {0}/{1}</value></data>
+  <data name="Explorer_MoveProgress" xml:space="preserve"><value>正在删除已移动源对象 · {0}/{1}</value></data>
+  <data name="Explorer_DeleteProgress" xml:space="preserve"><value>正在删除 · {0}/{1}</value></data>
+  <data name="Explorer_StopOperation" xml:space="preserve"><value>停止</value></data>
+  <data name="Explorer_CopyCanceled" xml:space="preserve"><value>已停止。已完成的更改仍然保留；请刷新确认后再重试。</value></data>
+  <data name="Explorer_KeyCopied" xml:space="preserve"><value>已复制对象键</value></data>
+  <data name="Explorer_UriCopied" xml:space="preserve"><value>已复制 S3 URI</value></data>
+  <data name="Explorer_CopyFailed" xml:space="preserve"><value>无法写入剪贴板</value></data>
+  <data name="Explorer_ConflictTitle" xml:space="preserve"><value>有些对象已经存在</value></data>
+  <data name="Explorer_ConflictMessage" xml:space="preserve"><value>目标位置已有 {0} 个对象。覆盖会替换它们；跳过会保留这些对象，并复制其余项。</value></data>
+  <data name="Explorer_Overwrite" xml:space="preserve"><value>覆盖</value></data>
+  <data name="Explorer_Skip" xml:space="preserve"><value>跳过</value></data>
+  <data name="Explorer_NameEmpty" xml:space="preserve"><value>请填写名称。</value></data>
+  <data name="Explorer_NameSeparator" xml:space="preserve"><value>名称不能包含 / 或 \。</value></data>
+  <data name="Explorer_NameReserved" xml:space="preserve"><value>名称不能是 . 或 ..</value></data>
+  <data name="Explorer_NameControl" xml:space="preserve"><value>名称不能包含控制字符。</value></data>
+  <data name="Explorer_NameTooLong" xml:space="preserve"><value>这个名称会让对象键过长。</value></data>
+  <data name="Explorer_NameExists" xml:space="preserve"><value>这个名称已被使用</value></data>
+  <data name="Explorer_NameExistsMessage" xml:space="preserve"><value>请换一个名称。已有对象不会被改动。</value></data>
+  <data name="Explorer_IntoItself" xml:space="preserve"><value>不能把文件夹复制到它自己里面。</value></data>
+  <data name="Explorer_CopyUnsupported" xml:space="preserve"><value>这个存储服务不能在服务端复制对象。</value></data>
+  <data name="Explorer_PartialTitle" xml:space="preserve"><value>完成，但有错误</value></data>
+  <data name="Explorer_ResultPartial" xml:space="preserve"><value>{0} 项成功，{1} 项跳过，{2} 项失败。</value></data>
+  <data name="Explorer_ResultDone" xml:space="preserve"><value>{0} 项成功，{1} 项跳过。</value></data>
+  <data name="Explorer_EmptyTitle" xml:space="preserve"><value>这个前缀是空的</value></data>
+  <data name="Explorer_EmptyDescription" xml:space="preserve"><value>这里还没有对象。新建文件夹会创建一个空前缀。</value></data>
+  <data name="Explorer_NoBucketsTitle" xml:space="preserve"><value>没有存储桶</value></data>
+  <data name="Explorer_NoBucketsDescription" xml:space="preserve"><value>这个密钥看不到任何存储桶。编辑连接，把它限制到密钥能够打开的存储桶。</value></data>
+  <data name="Explorer_NoMatches" xml:space="preserve"><value>已加载的名称里没有匹配</value></data>
+  <data name="Explorer_NoMatchesHint" xml:space="preserve"><value>筛选只检查已经加载的项目。可以加载更多，或进入某个前缀。</value></data>
+  <data name="Explorer_StatusBuckets" xml:space="preserve"><value>{0} 个存储桶</value></data>
+  <data name="Explorer_StatusItems" xml:space="preserve"><value>{0} 项</value></data>
+  <data name="Explorer_StatusMore" xml:space="preserve"><value>{0} 项 · 还可以加载</value></data>
+  <data name="Explorer_StatusSelected" xml:space="preserve"><value>已选 {0} 项</value></data>
+  <data name="Explorer_StatusSelectedLoaded" xml:space="preserve"><value>已从已加载项中选中 {0} 项 · 仍可加载更多</value></data>
+  <data name="Transfer_Upload" xml:space="preserve"><value>上传</value></data>
+  <data name="Transfer_UploadFolder" xml:space="preserve"><value>上传文件夹</value></data>
+  <data name="Transfer_Download" xml:space="preserve"><value>下载</value></data>
+  <data name="Transfer_PickFiles" xml:space="preserve"><value>选择要上传的文件</value></data>
+  <data name="Transfer_PickFolder" xml:space="preserve"><value>选择要上传的文件夹</value></data>
+  <data name="Transfer_PickDestination" xml:space="preserve"><value>选择下载保存位置</value></data>
+  <data name="Transfer_DropHint" xml:space="preserve"><value>松开即可上传</value></data>
+  <data name="Transfer_ConflictTitle" xml:space="preserve"><value>如果文件已经存在</value></data>
+  <data name="Transfer_ConflictMessage" xml:space="preserve"><value>这个选择对整批任务生效。除非选择覆盖，否则已有文件不会被改动。</value></data>
+  <data name="Transfer_ConflictDetectedMessage" xml:space="preserve"><value>目标位置已存在“{0}”。请选择如何处理本批次的同名文件。覆盖可能导致原有内容丢失。</value></data>
+  <data name="Transfer_RememberChoice" xml:space="preserve"><value>记住此选择，用于以后的传输</value></data>
+  <data name="Transfer_CheckingConflicts" xml:space="preserve"><value>正在检查同名文件…</value></data>
+  <data name="Transfer_NoticeSkipped" xml:space="preserve"><value>已跳过 {0} 个同名文件</value></data>
+  <data name="Transfer_ConflictCheckFailed" xml:space="preserve"><value>无法检查目标位置是否存在同名文件，传输未开始。</value></data>
+  <data name="Transfer_ConflictPreferenceNotSaved" xml:space="preserve"><value>无法保存传输偏好</value></data>
+  <data name="Transfer_Skip" xml:space="preserve"><value>跳过已有文件</value></data>
+  <data name="Transfer_Rename" xml:space="preserve"><value>两边都保留</value></data>
+  <data name="Transfer_Overwrite" xml:space="preserve"><value>覆盖</value></data>
+  <data name="Transfer_Start" xml:space="preserve"><value>开始</value></data>
+  <data name="Transfer_Queued" xml:space="preserve"><value>已加入 {0} 个任务</value></data>
+  <data name="Transfer_NotQueued" xml:space="preserve"><value>{0} 个任务无法加入队列</value></data>
+  <data name="Transfer_Rejected" xml:space="preserve"><value>传输没有开始</value></data>
+  <data name="Transfer_ReadOnly" xml:space="preserve"><value>这个连接是只读的。</value></data>
+  <data name="Transfer_Summary" xml:space="preserve"><value>{0} 个进行中 · {1} 个排队</value></data>
+  <data name="Transfer_Footer" xml:space="preserve"><value>{0} 个进行中 · {1} 个排队</value></data>
+  <data name="Transfer_Concurrency" xml:space="preserve"><value>同时传输数</value></data>
+  <data name="Transfer_ConcurrencyHelp" xml:space="preserve">
+    <value>同时运行的上传、下载和复制任务数量。设置得越高，占用的网络资源可能越多。</value>
+  </data>
+  <data name="Transfer_ConcurrencySaveFailed" xml:space="preserve">
+    <value>无法保存传输设置，已恢复之前的数值。</value>
+  </data>
+  <data name="Transfer_ActionFailed" xml:space="preserve">
+    <value>无法完成该传输操作，请重试。</value>
+  </data>
+  <data name="Transfer_Active" xml:space="preserve"><value>当前任务</value></data>
+  <data name="Transfer_History" xml:space="preserve"><value>历史</value></data>
+  <data name="Transfer_Pause" xml:space="preserve"><value>暂停</value></data>
+  <data name="Transfer_Resume" xml:space="preserve"><value>继续</value></data>
+  <data name="Transfer_Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="Transfer_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Transfer_QueuedState" xml:space="preserve"><value>排队</value></data>
+  <data name="Transfer_Uploading" xml:space="preserve"><value>正在上传</value></data>
+  <data name="Transfer_Downloading" xml:space="preserve"><value>正在下载</value></data>
+  <data name="Transfer_Paused" xml:space="preserve"><value>已暂停</value></data>
+  <data name="Transfer_Waiting" xml:space="preserve"><value>等待重试</value></data>
+  <data name="Transfer_Skipped" xml:space="preserve"><value>已跳过</value></data>
+  <data name="Transfer_Completed" xml:space="preserve"><value>已完成</value></data>
+  <data name="Transfer_SizeVerified" xml:space="preserve"><value>大小已校验</value></data>
+  <data name="Transfer_ChecksumVerified" xml:space="preserve"><value>校验和已验证</value></data>
+  <data name="Transfer_Failed" xml:space="preserve"><value>失败</value></data>
+  <data name="Transfer_Cancelled" xml:space="preserve"><value>已取消</value></data>
+  <data name="Transfer_FailureNetwork" xml:space="preserve"><value>网络中断，会自动重试。</value></data>
+  <data name="Transfer_FailureThrottled" xml:space="preserve"><value>存储服务要求放慢速度。</value></data>
+  <data name="Transfer_FailureDenied" xml:space="preserve"><value>没有权限。</value></data>
+  <data name="Transfer_FailureMissing" xml:space="preserve"><value>找不到这个文件。</value></data>
+  <data name="Transfer_FailureConflict" xml:space="preserve"><value>文件在别处发生了变化，因此没有覆盖。</value></data>
+  <data name="Transfer_FailureIntegrity" xml:space="preserve"><value>传输内容和原文件不一致。</value></data>
+  <data name="Transfer_FailureLocal" xml:space="preserve"><value>本地文件已经不在了。</value></data>
+  <data name="Transfer_FailureBusy" xml:space="preserve"><value>文件正在被占用。</value></data>
+  <data name="Transfer_FailureDisk" xml:space="preserve"><value>磁盘空间不足。</value></data>
+  <data name="Transfer_FailureConnection" xml:space="preserve"><value>这个连接已经不可用。</value></data>
+  <data name="Transfer_FailurePath" xml:space="preserve"><value>路径无效。</value></data>
+  <data name="Transfer_FailureUnknown" xml:space="preserve"><value>传输失败。</value></data>
+  <data name="Transfer_CloseTitle" xml:space="preserve"><value>还有未完成的传输</value></data>
+  <data name="Transfer_CloseMessage" xml:space="preserve"><value>还有 {0} 个传输没有完成。现在关闭会保留进度，下次打开时继续能恢复的部分。</value></data>
+  <data name="Transfer_CloseAnyway" xml:space="preserve"><value>关闭</value></data>
+  <data name="Transfer_Finished" xml:space="preserve"><value>{0} 已完成</value></data>
+  <data name="Transfer_CouldNotFinish" xml:space="preserve"><value>{0} 没有完成</value></data>
+  <data name="Preview_Content" xml:space="preserve"><value>内容</value></data>
+  <data name="Preview_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Preview_Preview" xml:space="preserve"><value>预览</value></data>
+  <data name="Preview_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="Preview_SaveOpen" xml:space="preserve"><value>保存并打开</value></data>
+  <data name="Preview_DiscardOpen" xml:space="preserve"><value>丢弃并打开</value></data>
+  <data name="Preview_SaveContinue" xml:space="preserve"><value>保存并继续</value></data>
+  <data name="Preview_DiscardContinue" xml:space="preserve"><value>丢弃并继续</value></data>
+  <data name="Preview_UnsavedGeneric" xml:space="preserve"><value>{0} 有未保存的修改。继续前要如何处理？</value></data>
+  <data name="Preview_UnsavedSelect" xml:space="preserve"><value>{0} 有未保存的修改。选择 {1} 前要如何处理？</value></data>
+  <data name="Preview_SaveSelect" xml:space="preserve"><value>保存并选择</value></data>
+  <data name="Preview_DiscardSelect" xml:space="preserve"><value>丢弃并选择</value></data>
+  <data name="Preview_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Preview_UnsavedTarget" xml:space="preserve"><value>{0} 有未保存的修改。打开 {1} 前要如何处理？</value></data>
+  <data name="Preview_NextSelection" xml:space="preserve"><value>下一项</value></data>
+  <data name="Preview_Saving" xml:space="preserve"><value>正在保存…</value></data>
+  <data name="Preview_ReloadFailed" xml:space="preserve"><value>无法加载最新版本，本地草稿仍在。</value></data>
+  <data name="Preview_DownloadLatest" xml:space="preserve"><value>下载最新版</value></data>
+  <data name="Preview_KeepDraft" xml:space="preserve"><value>保留草稿</value></data>
+  <data name="Preview_NoVersion" xml:space="preserve"><value>无法验证远端版本</value></data>
+  <data name="Preview_NoVersionDetail" xml:space="preserve"><value>存储服务未提供 ETag。可重新加载确认最新文件，或明确选择覆盖。本地草稿仍在。</value></data>
+  <data name="Preview_SaveTip" xml:space="preserve"><value>保存 (Ctrl+S)</value></data>
+  <data name="Preview_Revert" xml:space="preserve"><value>还原</value></data>
+  <data name="Preview_Discard" xml:space="preserve"><value>不保存</value></data>
+  <data name="Preview_Stay" xml:space="preserve"><value>继续编辑</value></data>
+  <data name="Preview_Unsaved" xml:space="preserve"><value>这个文件有未保存的修改。</value></data>
+  <data name="Preview_Saved" xml:space="preserve"><value>已保存</value></data>
+  <data name="Preview_Dirty" xml:space="preserve"><value>未保存</value></data>
+  <data name="Preview_ReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="Preview_Loading" xml:space="preserve"><value>正在打开…</value></data>
+  <data name="Preview_TooLarge" xml:space="preserve"><value>这个文件有 {0}，在这里打开不安全。</value></data>
+  <data name="Preview_External" xml:space="preserve"><value>此文件类型暂不支持预览，请使用其他应用打开。</value></data>
+  <data name="Preview_ExternalCopy" xml:space="preserve"><value>其他程序打开的是副本，修改不会写回存储桶。</value></data>
+  <data name="Preview_Shell" xml:space="preserve"><value>用系统程序打开</value></data>
+  <data name="Preview_ShellOpened" xml:space="preserve"><value>已打开副本</value></data>
+  <data name="Preview_ShellFailed" xml:space="preserve"><value>无法打开副本</value></data>
+  <data name="Preview_Download" xml:space="preserve"><value>下载</value></data>
+  <data name="Preview_NotText" xml:space="preserve"><value>这不是可以回存的文本。</value></data>
+  <data name="Preview_ImageFailed" xml:space="preserve"><value>无法显示这张图片。</value></data>
+  <data name="Preview_Conflict" xml:space="preserve"><value>远端文件已变化</value></data>
+  <data name="Preview_ConflictDetail" xml:space="preserve"><value>重新加载会丢掉这边的修改。覆盖会替换远端对象。</value></data>
+  <data name="Preview_ConditionalSaveUnsupported" xml:space="preserve"><value>保存需要明确选择覆盖</value></data>
+  <data name="Preview_ConditionalSaveUnsupportedDetail" xml:space="preserve"><value>此存储服务无法在保存时检查远端文件是否变化。重新加载会丢弃当前编辑；选择覆盖会在不检查变化的情况下替换远端文件。</value></data>
+  <data name="Preview_Reload" xml:space="preserve"><value>重新加载</value></data>
+  <data name="Preview_Overwrite" xml:space="preserve"><value>覆盖远端</value></data>
+  <data name="Preview_Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="Preview_OpenFailed" xml:space="preserve"><value>无法打开这个文件。</value></data>
+  <data name="Preview_SaveFailed" xml:space="preserve"><value>无法保存这个文件。</value></data>
+  <data name="Connection_Failure_PreconditionFailed" xml:space="preserve"><value>对象已被修改</value></data>
+  <data name="Connection_Failure_PreconditionFailedHint" xml:space="preserve"><value>可以重新加载，或再次保存以覆盖远端。</value></data>
+  <data name="Share_Menu" xml:space="preserve"><value>分享链接…</value></data>
+  <data name="Share_Title" xml:space="preserve"><value>分享链接</value></data>
+  <data name="Share_Kind" xml:space="preserve"><value>链接类型</value></data>
+  <data name="Share_ChooseHint" xml:space="preserve"><value>选择他人访问此对象的方式。</value></data>
+  <data name="Share_Temporary" xml:space="preserve"><value>限时下载链接</value></data>
+  <data name="Share_Public" xml:space="preserve"><value>公开 URL</value></data>
+  <data name="Share_Expires" xml:space="preserve"><value>有效期</value></data>
+  <data name="Share_PublicBase" xml:space="preserve"><value>Bucket 公开网址</value></data>
+  <data name="Share_PublicHint" xml:space="preserve"><value>输入此 Bucket 的 HTTPS 根网址，例如 https://cdn.example.com。Bucket 必须已开放公开读取；此操作不会修改访问权限。</value></data>
+  <data name="Share_TemporaryHint" xml:space="preserve"><value>获得链接的人可在到期前下载对象。即使配置了公开域名，此链接仍使用 S3 API 域名。</value></data>
+  <data name="Share_InvalidBase" xml:space="preserve"><value>请输入不含查询参数或片段的有效 HTTPS 网址。</value></data>
+  <data name="Share_Create" xml:space="preserve"><value>生成链接</value></data>
+  <data name="Share_PublicStatus" xml:space="preserve"><value>公开 · 无预定过期时间</value></data>
+  <data name="Share_ExpiryStatus" xml:space="preserve"><value>临时 · 到期时间 {0}</value></data>
+  <data name="Share_Url" xml:space="preserve"><value>分享网址</value></data>
+  <data name="Share_PublicCaution" xml:space="preserve"><value>仅当 Bucket 的公开域名和对象权限允许访问时，此网址才可用。</value></data>
+  <data name="Share_Sensitive" xml:space="preserve"><value>请将此链接作为敏感信息处理。凭据撤销或访问规则变化后，它可能提前失效。</value></data>
+  <data name="Share_Ready" xml:space="preserve"><value>链接已生成</value></data>
+  <data name="Share_Copy" xml:space="preserve"><value>复制链接</value></data>
+  <data name="Share_Copied" xml:space="preserve"><value>链接已复制</value></data>
+  <data name="Share_Failed" xml:space="preserve"><value>无法生成链接</value></data>
+  <data name="Share_15Minutes" xml:space="preserve"><value>15 分钟</value></data>
+  <data name="Share_1Hour" xml:space="preserve"><value>1 小时</value></data>
+  <data name="Share_24Hours" xml:space="preserve"><value>24 小时</value></data>
+  <data name="Share_7Days" xml:space="preserve"><value>7 天</value></data>
+  <data name="Places_AddFavorite" xml:space="preserve"><value>收藏当前位置</value></data>
+  <data name="Places_ToggleFavorite" xml:space="preserve"><value>切换存储桶收藏</value></data>
+  <data name="Places_RemoveFavorite" xml:space="preserve"><value>取消收藏</value></data>
+  <data name="Places_RemoveRecent" xml:space="preserve"><value>从最近访问中移除</value></data>
+  <data name="Places_OpenNewTab" xml:space="preserve"><value>在新标签页打开</value></data>
+  <data name="Places_ClearRecent" xml:space="preserve"><value>清空最近访问</value></data>
+  <data name="Places_ClearRecentConfirm" xml:space="preserve"><value>从本机移除所有最近访问的位置？</value></data>
+  <data name="Places_FavoritesHint" xml:space="preserve"><value>保存在本机的常用位置</value></data>
+  <data name="Places_RecentHint" xml:space="preserve"><value>最近访问的 50 个位置</value></data>
+  <data name="Places_AllBuckets" xml:space="preserve"><value>全部存储桶</value></data>
+  <data name="Places_MissingConnection" xml:space="preserve"><value>此连接已不可用</value></data>
+  <data name="Places_SaveFailed" xml:space="preserve"><value>无法保存访问位置</value></data>
+  <data name="Places_StatusCount" xml:space="preserve"><value>{0} 个位置</value></data>
+  <data name="Places_Browse" xml:space="preserve"><value>浏览连接</value></data>
+  <data name="Places_Connection" xml:space="preserve"><value>连接</value></data>
+  <data name="Places_Location" xml:space="preserve"><value>位置</value></data>
+  <data name="Places_Visited" xml:space="preserve"><value>访问时间</value></data>
+  <data name="Connection_OpenNewTab" xml:space="preserve"><value>在新标签页打开</value></data>
+  <data name="Nav_StorageTip" xml:space="preserve"><value>对象存储</value></data>
+  <data name="Transfer_FailedMarkTip" xml:space="preserve"><value>有传输任务失败</value></data>
+  <data name="Tray_UnfinishedTitle" xml:space="preserve"><value>仍有传输任务未完成</value></data>
+  <data name="Tray_UnfinishedMessage" xml:space="preserve"><value>当前有 {0} 个正在传输、{1} 个排队或等待重试、{2} 个已暂停。退出 Cavdeck 将停止这些任务。</value></data>
+  <data name="Tray_ExplicitExitMessage" xml:space="preserve"><value>仍有未完成的传输任务。退出将停止这些任务。</value></data>
+  <data name="Tray_KeepBackground" xml:space="preserve"><value>继续后台传输</value></data>
+  <data name="Tray_ExitApplication" xml:space="preserve"><value>退出 Cavdeck</value></data>
+  <data name="Tray_Unavailable" xml:space="preserve"><value>系统托盘不可用。请保持窗口打开，或退出 Cavdeck。</value></data>
+  <data name="Tray_Open" xml:space="preserve"><value>打开 Cavdeck</value></data>
+  <data name="Tray_Transfers" xml:space="preserve"><value>传输任务</value></data>
+  <data name="Tray_Connections" xml:space="preserve"><value>连接管理</value></data>
+  <data name="Tray_Favorites" xml:space="preserve"><value>收藏夹</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="Tray_Status" xml:space="preserve"><value>{0} 个传输中 · {1} 个等待中 · {2} 个已暂停 · {3} 个失败</value></data>
+  <data name="Tray_StatusIdle" xml:space="preserve"><value>暂无活动传输</value></data>
+  <data name="Tray_TooltipIdle" xml:space="preserve"><value>Cavdeck · 空闲</value></data>
+  <data name="Tray_TooltipBusy" xml:space="preserve"><value>Cavdeck · {0} 个传输中，{1} 个等待中</value></data>
+  <data name="Tray_TooltipFailed" xml:space="preserve"><value>Cavdeck · {0} 个传输失败</value></data>
+  <data name="Tray_SettingsGroup" xml:space="preserve"><value>窗口与后台运行</value></data>
+  <data name="Tray_CloseLabel" xml:space="preserve"><value>关闭窗口时</value></data>
+  <data name="Tray_CloseHelp" xml:space="preserve"><value>退出时如有未完成任务会先询问；隐藏后传输继续执行。</value></data>
+  <data name="Tray_CloseExit" xml:space="preserve"><value>退出 Cavdeck</value></data>
+  <data name="Tray_CloseHide" xml:space="preserve"><value>隐藏到系统托盘</value></data>
+  <data name="Tray_ActivationFailed" xml:space="preserve"><value>Cavdeck 已在运行，但无法唤醒现有窗口。</value></data>
+  <data name="Settings_BrowseGroup" xml:space="preserve"><value>文件浏览</value></data>
+  <data name="Settings_BrowserView" xml:space="preserve"><value>默认浏览方式</value></data>
+  <data name="Settings_BrowserViewHelp" xml:space="preserve"><value>选择文件列表的默认显示方式。</value></data>
+  <data name="Settings_GridDensity" xml:space="preserve"><value>图标间距</value></data>
+  <data name="Settings_GridDensityHelp" xml:space="preserve"><value>调整图标视图的排列密度。</value></data>
+  <data name="Settings_Comfortable" xml:space="preserve"><value>舒适</value></data>
+  <data name="Settings_Compact" xml:space="preserve"><value>紧凑</value></data>
+  <data name="Settings_DetailsPane" xml:space="preserve"><value>详情面板</value></data>
+  <data name="Settings_DetailsPaneHelp" xml:space="preserve"><value>在选择文件时显示右侧详情区域。</value></data>
+  <data name="Settings_Show" xml:space="preserve"><value>显示</value></data>
+  <data name="Settings_TransferGroup" xml:space="preserve"><value>下载与传输</value></data>
+  <data name="Settings_DownloadDestination" xml:space="preserve"><value>下载保存方式</value></data>
+  <data name="Settings_DownloadDestinationHelp" xml:space="preserve"><value>指定常用目录，或在每次下载时选择位置。</value></data>
+  <data name="Settings_AskEveryTime" xml:space="preserve"><value>每次询问</value></data>
+  <data name="Settings_AskOnConflict" xml:space="preserve"><value>仅在冲突时询问</value></data>
+  <data name="Settings_UseDefaultFolder" xml:space="preserve"><value>使用指定目录</value></data>
+  <data name="Settings_DownloadFolder" xml:space="preserve"><value>默认下载目录</value></data>
+  <data name="Settings_DownloadFolderHelp" xml:space="preserve"><value>选择后直接下载到该目录；目录不可用时仍会询问。</value></data>
+  <data name="Settings_ChooseFolder" xml:space="preserve"><value>选择文件夹…</value></data>
+  <data name="Settings_DownloadNotSelected" xml:space="preserve"><value>未选择目录</value></data>
+  <data name="Settings_InvalidDownloadDirectory" xml:space="preserve"><value>请选择存在且可访问的文件夹。</value></data>
+  <data name="Settings_Conflict" xml:space="preserve"><value>同名文件已存在时</value></data>
+  <data name="Settings_ConflictHelp" xml:space="preserve"><value>适用于上传和下载。仅在出现同名文件时询问；覆盖始终需要明确选择。</value></data>
+  <data name="Settings_Concurrency" xml:space="preserve"><value>同时传输数</value></data>
+  <data name="Settings_ConcurrencyHelp" xml:space="preserve"><value>同时运行的上传、下载和复制任务数。</value></data>
+  <data name="Nav_MoreConnectionActions" xml:space="preserve"><value>更多操作</value></data>
+  <data name="Nav_LoadingConnections" xml:space="preserve"><value>正在加载连接…</value></data>
+  <data name="Nav_RetryConnections" xml:space="preserve"><value>重试</value></data>
+  <data name="Explorer_ScopeFolder" xml:space="preserve"><value>当前文件夹</value></data>
+  <data name="Explorer_SearchFolder" xml:space="preserve"><value>搜索当前文件夹及子文件夹</value></data>
+  <data name="Explorer_FolderScanHint" xml:space="preserve"><value>扫描当前文件夹及其子文件夹，按文件或文件夹名称查找；可能产生云存储请求费用。</value></data>
+  <data name="Explorer_ClearSearch" xml:space="preserve"><value>清除搜索</value></data>
+  <data name="Explorer_ContinueSearch" xml:space="preserve"><value>继续搜索</value></data>
+  <data name="Explorer_StopSearch" xml:space="preserve"><value>停止搜索</value></data>
+  <data name="Explorer_SearchReady" xml:space="preserve"><value>准备搜索</value></data>
+  <data name="Explorer_SearchReadyHint" xml:space="preserve"><value>按 Enter 或点击“搜索”，开始扫描所选范围。</value></data>
+  <data name="Explorer_SearchPartialEmpty" xml:space="preserve"><value>扫描部分尚无匹配</value></data>
+  <data name="Explorer_SearchPartialEmptyHint" xml:space="preserve"><value>搜索未完成；可继续扫描、修改关键词或缩小范围。</value></data>
+  <data name="Explorer_SearchFailed" xml:space="preserve"><value>搜索未完成：{0} · 已检查 {1} 个对象 · {2} 次请求 · {3} 个匹配。可重试。</value></data>
+  <data name="Explorer_SearchStopped" xml:space="preserve"><value>已停止搜索 {0} · 已检查 {1} 个对象 · {2} 次请求 · {3} 个匹配。</value></data>
+  <data name="Explorer_SearchDisplayLimit" xml:space="preserve"><value>已达到结果展示上限（6,000 项）。建议缩小范围或细化关键词。</value></data>
+  <data name="Explorer_BucketsNoMatches" xml:space="preserve"><value>没有匹配的存储桶</value></data>
+  <data name="Explorer_BucketsNoMatchesHint" xml:space="preserve"><value>尝试修改关键词，或清除筛选以显示全部存储桶。</value></data>
+  <data name="Transfer_FilterLabel" xml:space="preserve"><value>筛选传输任务</value></data>
+  <data name="Transfer_FilterAll" xml:space="preserve"><value>全部状态</value></data>
+  <data name="Transfer_FilterRunning" xml:space="preserve"><value>进行中</value></data>
+  <data name="Transfer_FilterQueued" xml:space="preserve"><value>排队中</value></data>
+  <data name="Transfer_FilterPaused" xml:space="preserve"><value>已暂停</value></data>
+  <data name="Transfer_FilterFailed" xml:space="preserve"><value>失败</value></data>
+  <data name="Transfer_FilterCompleted" xml:space="preserve"><value>已完成</value></data>
+  <data name="Transfer_FilterCancelled" xml:space="preserve"><value>已取消</value></data>
+  <data name="Transfer_ShowItems" xml:space="preserve"><value>展开批次任务</value></data>
+  <data name="Transfer_HideItems" xml:space="preserve"><value>收起批次任务</value></data>
+  <data name="Transfer_ShowDetails" xml:space="preserve"><value>显示传输详情</value></data>
+  <data name="Transfer_HideDetails" xml:space="preserve"><value>收起传输详情</value></data>
+  <data name="Transfer_Source" xml:space="preserve"><value>来源</value></data>
+  <data name="Transfer_Destination" xml:space="preserve"><value>目标</value></data>
+  <data name="Transfer_NoticeCompleted" xml:space="preserve"><value>{0} 个传输任务已完成</value></data>
+  <data name="Transfer_NoticeFailed" xml:space="preserve"><value>{0} 个传输任务未能完成</value></data>
+  <data name="Empty_TransferFilteredTitle" xml:space="preserve"><value>没有符合条件的任务</value></data>
+  <data name="Empty_TransferFilteredDescription" xml:space="preserve"><value>可切换状态筛选，查看其他传输任务。</value></data>
+  <data name="Transfer_BatchOlderItemsHint" xml:space="preserve"><value>当前没有可展开的近期任务，批次统计仍包含较早的任务。</value></data>
+  <data name="Preview_PdfDownloading" xml:space="preserve"><value>正在下载 PDF 以供预览…</value></data>
+  <data name="Preview_PdfProgress" xml:space="preserve"><value>已下载 {0} / {1} · {2}%</value></data>
+  <data name="Preview_PdfCancel" xml:space="preserve"><value>取消预览</value></data>
+  <data name="Preview_PdfCanceled" xml:space="preserve"><value>已取消 PDF 预览。可以重试或下载文件。</value></data>
+  <data name="Preview_PdfFailed" xml:space="preserve"><value>PDF 阅读器不可用。可重试、下载或使用其他程序打开。</value></data>
+  <data name="Preview_PdfDownloadFailed" xml:space="preserve"><value>PDF 预览下载失败。可重试或下载文件。</value></data>
+  <data name="Preview_ExpandPane" xml:space="preserve"><value>展开预览</value></data>
+  <data name="Preview_RestorePane" xml:space="preserve"><value>恢复分栏</value></data>
+  <data name="Preview_UnsavedStatus" xml:space="preserve"><value>有未保存的修改</value></data>
+  <data name="Preview_OpenExternalTip" xml:space="preserve"><value>用系统程序打开本地副本（修改不会自动同步）</value></data>
+  <data name="Preview_Downloading" xml:space="preserve"><value>正在下载预览文件…</value></data>
+  <data name="Preview_DownloadProgress" xml:space="preserve"><value>已下载 {0} / {1} · {2}%</value></data>
+  <data name="Preview_CancelDownload" xml:space="preserve"><value>取消预览</value></data>
+  <data name="Preview_DownloadCanceled" xml:space="preserve"><value>已取消预览，可重试或下载文件。</value></data>
+  <data name="Preview_DownloadFailed" xml:space="preserve"><value>预览文件下载失败，可重试或下载文件。</value></data>
+  <data name="Settings_TabGeneral" xml:space="preserve"><value>常规</value></data>
+  <data name="Settings_TabBrowsing" xml:space="preserve"><value>浏览</value></data>
+  <data name="Settings_TabTransfers" xml:space="preserve"><value>传输</value></data>
+  <data name="Settings_TabAbout" xml:space="preserve"><value>关于</value></data>
+  <data name="Settings_TabShortcuts" xml:space="preserve"><value>快捷键</value></data>
+  <data name="Shortcuts_GlobalGroup" xml:space="preserve"><value>快速唤起</value></data>
+  <data name="Shortcuts_GlobalTitle" xml:space="preserve"><value>全局快捷键</value></data>
+  <data name="Shortcuts_GlobalHelp" xml:space="preserve"><value>从任何位置将 Cavdeck 唤起到前台，包括隐藏到系统托盘时。仅在 Cavdeck 运行期间有效。</value></data>
+  <data name="Shortcuts_Enable" xml:space="preserve"><value>启用</value></data>
+  <data name="Shortcuts_Combination" xml:space="preserve"><value>按键组合</value></data>
+  <data name="Shortcuts_ChangeHotkey" xml:space="preserve"><value>点击录入新快捷键</value></data>
+  <data name="Shortcuts_CaptureHelp" xml:space="preserve"><value>点击组合键后，按 Ctrl+Alt 或 Ctrl+Shift 加字母、数字或可用的功能键。按 Esc 取消；按 Tab 移动焦点。不支持 Windows 键组合。</value></data>
+  <data name="Shortcuts_Recording" xml:space="preserve"><value>请按下组合键…</value></data>
+  <data name="Shortcuts_StatusDisabled" xml:space="preserve"><value>已关闭 · 当前不会注册全局快捷键。</value></data>
+  <data name="Shortcuts_StatusActive" xml:space="preserve"><value>已启用 · 按下组合键可打开或切换至 Cavdeck。</value></data>
+  <data name="Shortcuts_StatusUnavailable" xml:space="preserve"><value>未生效 · 快捷键注册失败，请更换组合键，或关闭后重新启用。</value></data>
+  <data name="Shortcuts_InvalidGesture" xml:space="preserve"><value>请选择 Ctrl+Alt 或 Ctrl+Shift 加字母、数字或可用的功能键，不能使用保留的系统或应用快捷键。</value></data>
+  <data name="Shortcuts_RegistrationConflict" xml:space="preserve"><value>不可用 · 该组合键可能已被 Windows 或其他应用占用；如有原先已生效的快捷键，则保持不变。</value></data>
+  <data name="Shortcuts_ReferenceGroup" xml:space="preserve"><value>键盘快捷键</value></data>
+  <data name="Shortcuts_ReferenceHelp" xml:space="preserve"><value>按使用场景分类的快捷键说明。此列表只读；文件操作仅在当前选择和权限允许时生效。</value></data>
+  <data name="Shortcuts_GroupTabs" xml:space="preserve"><value>标签页与工作区</value></data>
+  <data name="Shortcuts_GroupExplorer" xml:space="preserve"><value>文件与目录</value></data>
+  <data name="Shortcuts_GroupEditing" xml:space="preserve"><value>编辑与返回</value></data>
+  <data name="Shortcuts_NewTab" xml:space="preserve"><value>新建标签页</value></data>
+  <data name="Shortcuts_ReopenTab" xml:space="preserve"><value>恢复关闭的标签页</value></data>
+  <data name="Shortcuts_CloseTab" xml:space="preserve"><value>关闭当前标签页</value></data>
+  <data name="Shortcuts_NextTab" xml:space="preserve"><value>下一个标签页</value></data>
+  <data name="Shortcuts_PreviousTab" xml:space="preserve"><value>上一个标签页</value></data>
+  <data name="Shortcuts_SelectTab" xml:space="preserve"><value>切换到第 1–8 个标签页</value></data>
+  <data name="Shortcuts_LastTab" xml:space="preserve"><value>切换到最后一个标签页</value></data>
+  <data name="Shortcuts_Sidebar" xml:space="preserve"><value>展开／折叠侧栏</value></data>
+  <data name="Shortcuts_Search" xml:space="preserve"><value>定位文件搜索框</value></data>
+  <data name="Shortcuts_Refresh" xml:space="preserve"><value>刷新当前目录</value></data>
+  <data name="Shortcuts_ParentFolder" xml:space="preserve"><value>返回上级目录</value></data>
+  <data name="Shortcuts_Open" xml:space="preserve"><value>打开选中项</value></data>
+  <data name="Shortcuts_Rename" xml:space="preserve"><value>重命名选中项</value></data>
+  <data name="Shortcuts_Delete" xml:space="preserve"><value>删除选中项</value></data>
+  <data name="Shortcuts_Copy" xml:space="preserve"><value>复制选中项</value></data>
+  <data name="Shortcuts_Cut" xml:space="preserve"><value>剪切选中项</value></data>
+  <data name="Shortcuts_Paste" xml:space="preserve"><value>粘贴到当前目录</value></data>
+  <data name="Shortcuts_SavePreview" xml:space="preserve"><value>保存文本预览中的编辑</value></data>
+  <data name="Shortcuts_Back" xml:space="preserve"><value>关闭菜单／退出设置／收起展开的预览</value></data>
+  <data name="Connection_TestUnexpectedHint" xml:space="preserve"><value>连接测试未能完成。请检查连接设置后重试。</value></data>
+  <data name="Transfer_BatchScanError" xml:space="preserve"><value>文件夹扫描失败，请重试该批次。</value></data>
+  <data name="Transfer_UnknownState" xml:space="preserve"><value>未知状态</value></data>
+  <data name="About_ResourcesGroup" xml:space="preserve"><value>资源与支持</value></data>
+  <data name="About_ProjectPage" xml:space="preserve"><value>项目主页</value></data>
+  <data name="About_Documentation" xml:space="preserve"><value>使用文档</value></data>
+  <data name="About_ReportIssue" xml:space="preserve"><value>反馈问题</value></data>
+  <data name="About_PrivacyLicenseGroup" xml:space="preserve"><value>隐私与许可</value></data>
+  <data name="About_PrivacyTitle" xml:space="preserve"><value>数据由你掌控</value></data>
+  <data name="About_PrivacySummary" xml:space="preserve"><value>偏好设置和日志保存在本机，凭据由 Windows 凭据管理器安全存储。诊断报告仅在你主动选择时分享；检查更新时会连接 GitHub Releases。</value></data>
+  <data name="About_LicenseTitle" xml:space="preserve"><value>软件许可</value></data>
+  <data name="About_LicenseSummary" xml:space="preserve"><value>采用 GNU GPL-3.0-or-later 开源，允许商业使用。软件免费，捐赠完全自愿。</value></data>
+  <data name="About_OpenLinkFailed" xml:space="preserve"><value>无法打开链接。请检查默认浏览器设置后重试。</value></data>
+  <data name="Settings_RestoreTabs" xml:space="preserve"><value>恢复上次打开的标签页</value></data>
+  <data name="Settings_RestoreTabsHelp" xml:space="preserve"><value>下次启动时恢复标签页及存储位置。关闭后从连接列表开始；当前标签页不会被关闭。</value></data>
+  <data name="Settings_TransferCompletionNotice" xml:space="preserve"><value>传输完成通知</value></data>
+  <data name="Settings_TransferCompletionNoticeHelp" xml:space="preserve"><value>成功或跳过传输时显示应用内聚合通知。失败提醒始终保留。</value></data>
+  <data name="Settings_Enable" xml:space="preserve"><value>开启</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>正在下载更新……{0}%</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>发现新版本 {0}。</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>版本 {0} 已下载，重新启动即可安装。</value></data>
+  <data name="Update_DownloadButton" xml:space="preserve"><value>下载更新</value></data>
+  <data name="Update_RestartNow" xml:space="preserve"><value>重启并更新</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>稍后</value></data>
+  <data name="Update_AutoCheck" xml:space="preserve"><value>自动检查更新</value></data>
+  <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Cavdeck 启动后检查更新，不会中断当前操作。</value></data>
+  <data name="Update_BackgroundDownload" xml:space="preserve"><value>后台下载更新</value></data>
+  <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>自动下载可用更新，安装前仍需你的确认。</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>仍有未完成的传输任务</value></data>
+  <data name="Update_TransfersMessage" xml:space="preserve"><value>重启更新前，请完成或取消所有排队中、运行中、等待重试和已暂停的传输任务。</value></data>
+  <data name="Update_RestartTitle" xml:space="preserve"><value>安装 Cavdeck 更新</value></data>
+  <data name="Update_RestartMessage" xml:space="preserve"><value>Cavdeck 将保存工作区、关闭程序、安装已下载的更新，然后重新启动。是否继续？</value></data>
+  <data name="Update_SaveFailed" xml:space="preserve"><value>无法保存工作区。已取消更新，Cavdeck 将继续运行。</value></data>
+  <data name="Update_InstallFailed" xml:space="preserve"><value>无法启动更新程序。Cavdeck 将关闭，你可以重新打开后重试。</value></data>
+  <data name="Connection_DeleteImpact" xml:space="preserve"><value>将关闭 {0} 个关联页签，并取消 {1} 个传输任务或扫描。不会删除远程文件。</value></data>
+  <data name="Connection_ChangeTitle" xml:space="preserve"><value>更新连接</value></data>
+  <data name="Connection_ChangeTransfers" xml:space="preserve"><value>保存此更改将取消 {0} 个关联传输任务或扫描。已发送到服务器的请求可能已经完成。是否继续？</value></data>
+  <data name="Connection_RefreshFailed" xml:space="preserve"><value>连接已保存，但部分页签未能刷新，请刷新后重试。</value></data>
+  <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>此连接现为只读。未保存的草稿已保留在此处，请在放弃修改或关闭前复制草稿。</value></data>
+  <data name="Preview_CopyDraft" xml:space="preserve"><value>复制草稿</value></data>
+  <data name="Connection_ReconnectPending" xml:space="preserve"><value>连接已更新。请先处理未保存的草稿，再刷新以重新连接。重连前无法操作文件。</value></data>
+  <data name="Transfer_DropDestination" xml:space="preserve"><value>上传位置：{0}</value></data>
+  <data name="Transfer_ClearFailed" xml:space="preserve"><value>清除失败</value></data>
+  <data name="Transfer_ClearHistory" xml:space="preserve"><value>清空历史</value></data>
+  <data name="Transfer_ClearFailedTitle" xml:space="preserve"><value>清除失败的传输记录？</value></data>
+  <data name="Transfer_ClearHistoryTitle" xml:space="preserve"><value>清空已结束的传输历史？</value></data>
+  <data name="Transfer_ClearRecordsMessage" xml:space="preserve"><value>仅移除本机传输记录，不会删除本地文件或远程对象。正在进行的任务及尚需清理分段上传的记录会保留。</value></data>
+  <data name="Transfer_RemoveRecords" xml:space="preserve"><value>移除记录</value></data>
+  <data name="Transfer_RemoveRecord" xml:space="preserve"><value>移除记录</value></data>
+  <data name="Transfer_RemovedCount" xml:space="preserve"><value>已移除 {0} 条传输记录。</value></data>
+  <data name="Transfer_NothingRemovable" xml:space="preserve"><value>没有可安全移除的记录。仍需清理分段上传的任务会保留。</value></data>
+  <data name="Transfer_ErrorUnavailable" xml:space="preserve"><value>无可用信息</value></data>
+  <data name="Transfer_FailureDetails" xml:space="preserve"><value>失败详情</value></data>
+  <data name="Transfer_FailureCategory" xml:space="preserve"><value>错误类别：</value></data>
+  <data name="Transfer_ErrorCode" xml:space="preserve"><value>错误代码：</value></data>
+  <data name="Transfer_Attempts" xml:space="preserve"><value>尝试次数：</value></data>
+  <data name="Transfer_Retryable" xml:space="preserve"><value>可重试：</value></data>
+  <data name="Transfer_Yes" xml:space="preserve"><value>是</value></data>
+  <data name="Transfer_No" xml:space="preserve"><value>否</value></data>
+  <data name="Transfer_AdvicePermission" xml:space="preserve"><value>检查连接凭证、写入权限和存储桶访问权限，然后重试。</value></data>
+  <data name="Transfer_AdviceNetwork" xml:space="preserve"><value>检查网络连接和服务端点，服务恢复后重试。</value></data>
+  <data name="Transfer_AdviceLocal" xml:space="preserve"><value>确认本地文件仍存在且可访问，然后重试。</value></data>
+  <data name="Transfer_AdviceConflict" xml:space="preserve"><value>源文件或目标位置发生变化，请检查冲突处理策略后重试。</value></data>
+  <data name="Transfer_AdviceGeneral" xml:space="preserve"><value>查看错误代码和连接设置，排除问题后重试。</value></data>
+  <data name="Transfer_FailurePrivacy" xml:space="preserve"><value>原始错误消息可能包含本地路径、签名链接或凭证，已隐藏以保护隐私。</value></data>
+  <data name="Transfer_CopyFailure" xml:space="preserve"><value>复制诊断摘要</value></data>
+  <data name="Transfer_FailureCopied" xml:space="preserve"><value>已复制诊断摘要。</value></data>
+  <data name="Explorer_SortedAscending" xml:space="preserve"><value>升序排列</value></data>
+  <data name="Explorer_SortedDescending" xml:space="preserve"><value>降序排列</value></data>
+  <data name="Ui_ActionFailed" xml:space="preserve"><value>操作未能完成，请重试。</value></data>
+  <data name="Config_RecoveryTitle" xml:space="preserve"><value>配置恢复提醒</value></data>
+  <data name="Config_SettingsBackupRestored" xml:space="preserve"><value>设置已从有效备份恢复。备份或保留的原始文件位置：
+{0}</value></data>
+  <data name="Config_SettingsDefaults" xml:space="preserve"><value>设置文件损坏，且没有有效备份。已临时使用默认设置；损坏文件保留在：
+{0}</value></data>
+  <data name="Config_ConnectionsBackupRestored" xml:space="preserve"><value>连接配置已从有效备份恢复。备份或保留的原始文件位置：
+{0}</value></data>
+  <data name="Config_ConnectionsUnavailable" xml:space="preserve"><value>无法加载已保存的连接。未删除或覆盖连接信息，请检查原始文件和备份：
+{0}
+修复后请重试，在此之前请勿修改连接。</value></data>
+  <data name="Toast_DismissNamed" xml:space="preserve"><value>关闭通知：{0}</value></data>
+  <data name="Toast_ToneInformation" xml:space="preserve"><value>提示</value></data>
+  <data name="Toast_ToneSuccess" xml:space="preserve"><value>成功</value></data>
+  <data name="Toast_ToneWarning" xml:space="preserve"><value>警告</value></data>
+  <data name="Toast_ToneError" xml:space="preserve"><value>错误</value></data>
+  <data name="Toast_CopyDiagnostics" xml:space="preserve"><value>复制诊断信息</value></data>
+  <data name="Toast_CopyHelpText" xml:space="preserve"><value>复制已脱敏的诊断报告，不包含文件名、路径、账户信息或凭据。</value></data>
+  <data name="Toast_Copied" xml:space="preserve"><value>已复制诊断报告。</value></data>
+  <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>查看失败传输</value></data>
+</root>

@@ -1,0 +1,116 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters">
+  <!-- Resolve the tray's converter locally; ShellWindow resources are not in scope. -->
+  <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+  <!-- Keep the shared menu templates and scope tray sizing to this menu. -->
+  <Style x:Key="TrayContextMenuStyle" TargetType="ContextMenu"
+         BasedOn="{StaticResource {x:Type ContextMenu}}">
+    <Setter Property="MinWidth" Value="296"/>
+    <Setter Property="MaxWidth" Value="320"/>
+    <Setter Property="Padding" Value="6"/>
+    <Setter Property="UseLayoutRounding" Value="True"/>
+    <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI"/>
+    <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+  </Style>
+  <Style x:Key="TrayMenuItemStyle" TargetType="MenuItem"
+         BasedOn="{StaticResource {x:Type MenuItem}}">
+    <Setter Property="MinHeight" Value="36"/>
+    <Setter Property="Padding" Value="13,0"/>
+    <Setter Property="FocusVisualStyle">
+      <Setter.Value>
+        <Style TargetType="Control">
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate>
+                <Border Margin="2" BorderThickness="1.5" CornerRadius="{DynamicResource RadiusFocus}"
+                        BorderBrush="{DynamicResource FocusBorderBrush}"/>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style x:Key="TrayHeaderStyle" TargetType="Separator">
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Separator">
+          <Grid Margin="12,6,12,8" MinHeight="42">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="32"/>
+              <ColumnDefinition Width="10"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Source="{DynamicResource CavdeckBrandImage}" Width="32" Height="32"
+                   AutomationProperties.Name="{Binding BrandName}"/>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+              <TextBlock Text="{Binding BrandName}" FontWeight="SemiBold"
+                         Foreground="{DynamicResource PrimaryTextBrush}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                <Ellipse Width="7" Height="7" Margin="0,0,6,0" VerticalAlignment="Center">
+                  <Ellipse.Style>
+                    <Style TargetType="Ellipse">
+                      <Setter Property="Fill" Value="{DynamicResource MutedTextBrush}"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasTransfers}" Value="True">
+                          <Setter Property="Fill" Value="{DynamicResource SuccessTextBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding HasFailures}" Value="True">
+                          <Setter Property="Fill" Value="{DynamicResource DangerTextBrush}"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Ellipse.Style>
+                </Ellipse>
+                <TextBlock Text="{Binding Status, Mode=OneWay}"
+                           Foreground="{DynamicResource MutedTextBrush}"
+                           FontSize="{DynamicResource FontSizeSmall}" TextWrapping="Wrap"
+                           MaxWidth="228"/>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <ContextMenu x:Key="TrayContextMenu" Style="{StaticResource TrayContextMenuStyle}">
+    <Separator Style="{StaticResource TrayHeaderStyle}"
+               AutomationProperties.Name="{Binding Status, Mode=OneWay}"/>
+    <Separator Style="{DynamicResource ContextMenuSeparatorStyle}"/>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding OpenText, Mode=OneWay}"
+              Command="{Binding OpenCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconTrayOpen}"/></MenuItem.Icon>
+    </MenuItem>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding TransfersText, Mode=OneWay}"
+              InputGestureText="{Binding TransferCount, Mode=OneWay}"
+              Command="{Binding TransfersCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconTransfers}"/></MenuItem.Icon>
+    </MenuItem>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding ConnectionsText, Mode=OneWay}"
+              Command="{Binding ConnectionsCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconConnections}"/></MenuItem.Icon>
+    </MenuItem>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding FavoritesText, Mode=OneWay}"
+              Command="{Binding FavoritesCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconStar}"/></MenuItem.Icon>
+    </MenuItem>
+    <Separator Style="{DynamicResource ContextMenuSeparatorStyle}"/>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding UpdateText, Mode=OneWay}"
+              Command="{Binding UpdatesCommand, Mode=OneWay}"
+              Visibility="{Binding HasUpdate, Converter={StaticResource BoolVis}}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconInfo}"/></MenuItem.Icon>
+    </MenuItem>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding SettingsText, Mode=OneWay}"
+              Command="{Binding SettingsCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconSettings}"/></MenuItem.Icon>
+    </MenuItem>
+    <Separator Style="{DynamicResource ContextMenuSeparatorStyle}"/>
+    <MenuItem Style="{StaticResource TrayMenuItemStyle}" Header="{Binding ExitText, Mode=OneWay}"
+              Command="{Binding ExitCommand, Mode=OneWay}">
+      <MenuItem.Icon><Path Style="{DynamicResource TrayIconStyle}" Data="{DynamicResource IconTrayExit}"/></MenuItem.Icon>
+    </MenuItem>
+  </ContextMenu>
+</ResourceDictionary>

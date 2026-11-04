@@ -1,0 +1,223 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+                    xmlns:explorer="clr-namespace:Cavdeck.App.Features.Explorer"
+                    xmlns:domain="clr-namespace:Cavdeck.Domain.Storage;assembly=Cavdeck.Domain">
+  <Style x:Key="FileGlyph" TargetType="Path">
+    <Setter Property="Width" Value="16"/>
+    <Setter Property="Height" Value="16"/>
+    <Setter Property="Stretch" Value="Uniform"/>
+    <Setter Property="StrokeThickness" Value="1.5"/>
+    <Setter Property="StrokeStartLineCap" Value="Round"/>
+    <Setter Property="StrokeEndLineCap" Value="Round"/>
+    <Setter Property="StrokeLineJoin" Value="Round"/>
+    <Setter Property="Fill" Value="Transparent"/>
+    <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+    <!-- Every unrecognized extension must still look like a file, not an empty frame. -->
+    <Setter Property="Data" Value="{DynamicResource IconGenericFile}"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Folder}">
+        <Setter Property="Data" Value="{DynamicResource IconFolderFileGlyph}"/>
+        <Setter Property="Stroke" Value="{DynamicResource AccentBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Image}">
+        <Setter Property="Data" Value="{DynamicResource IconImage}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileImageBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Video}">
+        <Setter Property="Data" Value="{DynamicResource IconVideo}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileVideoBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Audio}">
+        <Setter Property="Data" Value="{DynamicResource IconAudio}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileAudioBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Code}">
+        <Setter Property="Data" Value="{DynamicResource IconCode}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCodeBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Data}">
+        <Setter Property="Data" Value="{DynamicResource IconData}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileDataBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Text}">
+        <Setter Property="Data" Value="{DynamicResource IconText}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Document}">
+        <Setter Property="Data" Value="{DynamicResource IconDocument}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Pdf}">
+        <Setter Property="Data" Value="{DynamicResource IconPdf}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FilePdfBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Archive}">
+        <Setter Property="Data" Value="{DynamicResource IconArchive}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileArchiveBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Spreadsheet}">
+        <Setter Property="Data" Value="{DynamicResource IconSheet}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileSheetBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Presentation}">
+        <Setter Property="Data" Value="{DynamicResource IconSlides}"/>
+        <Setter Property="Stroke" Value="{DynamicResource AccentTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Font}">
+        <Setter Property="Data" Value="{DynamicResource IconFont}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding FileKind}" Value="{x:Static domain:ObjectFileKind.Program}">
+        <Setter Property="Data" Value="{DynamicResource IconProgram}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <!-- Extension-specific cues override the broader type glyphs above. -->
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Json}">
+        <Setter Property="Data" Value="{DynamicResource IconJson}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileDataBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Xml}">
+        <Setter Property="Data" Value="{DynamicResource IconXml}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCodeBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Markdown}">
+        <Setter Property="Data" Value="{DynamicResource IconMarkdown}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Word}">
+        <Setter Property="Data" Value="{DynamicResource IconWord}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileWordBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Excel}">
+        <Setter Property="Data" Value="{DynamicResource IconExcel}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileExcelBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.PowerPoint}">
+        <Setter Property="Data" Value="{DynamicResource IconPowerPoint}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FilePresentationBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.PlainText}">
+        <Setter Property="Data" Value="{DynamicResource IconText}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Executable}">
+        <Setter Property="Data" Value="{DynamicResource IconExecutable}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileExecutableBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Csv}">
+        <Setter Property="Data" Value="{DynamicResource IconCsv}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileExcelBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Yaml}">
+        <Setter Property="Data" Value="{DynamicResource IconYaml}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileDataBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Python}">
+        <Setter Property="Data" Value="{DynamicResource IconPython}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FilePythonBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.C}">
+        <Setter Property="Data" Value="{DynamicResource IconC}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCodeBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Cpp}">
+        <Setter Property="Data" Value="{DynamicResource IconCpp}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCodeBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.CSharp}">
+        <Setter Property="Data" Value="{DynamicResource IconCSharp}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCSharpBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.JavaScript}">
+        <Setter Property="Data" Value="{DynamicResource IconJavaScript}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileJavaScriptBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.TypeScript}">
+        <Setter Property="Data" Value="{DynamicResource IconTypeScript}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileCodeBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Java}">
+        <Setter Property="Data" Value="{DynamicResource IconJava}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FilePresentationBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Html}">
+        <Setter Property="Data" Value="{DynamicResource IconXml}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FilePresentationBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Css}">
+        <Setter Property="Data" Value="{DynamicResource IconData}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileSheetBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Shell}">
+        <Setter Property="Data" Value="{DynamicResource IconProgram}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileExecutableBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Sql}">
+        <Setter Property="Data" Value="{DynamicResource IconSql}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileDataBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Go}">
+        <Setter Property="Data" Value="{DynamicResource IconGo}"/>
+        <Setter Property="Stroke" Value="{DynamicResource FileDataBrush}"/>
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IconKind}" Value="{x:Static explorer:FileIconKind.Rust}">
+        <Setter Property="Data" Value="{DynamicResource IconRust}"/>
+        <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Width follows the available viewport; height and icon size follow the saved density. -->
+  <Style x:Key="IconTile" TargetType="ListBoxItem">
+    <Setter Property="Width" Value="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+    <Setter Property="Height" Value="{Binding DataContext.Explorer.TileHeight, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+    <Setter Property="Margin" Value="4"/>
+    <Setter Property="Padding" Value="8,14,8,10"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Setter Property="ToolTip" Value="{Binding Name}"/>
+    <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ListBoxItem">
+          <Border x:Name="Tile" Background="{DynamicResource SurfaceBrush}" CornerRadius="8"
+                  BorderThickness="1" BorderBrush="{DynamicResource SurfaceBrush}"
+                  Padding="{TemplateBinding Padding}"
+                  SnapsToDevicePixels="True">
+            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Tile" Property="Background" Value="{DynamicResource HoverBrush}"/>
+              <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Tile" Property="Background" Value="{DynamicResource SelectedBrush}"/>
+              <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentTextBrush}"/>
+              <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            </Trigger>
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsSelected" Value="True"/>
+                <Condition Property="Selector.IsSelectionActive" Value="False"/>
+              </MultiTrigger.Conditions>
+              <Setter TargetName="Tile" Property="Background" Value="{DynamicResource HoverBrush}"/>
+              <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource AccentTextBrush}"/>
+            </MultiTrigger>
+            <DataTrigger Binding="{Binding Path=(controls:FocusCue.Visible), RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+              <Setter TargetName="Tile" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

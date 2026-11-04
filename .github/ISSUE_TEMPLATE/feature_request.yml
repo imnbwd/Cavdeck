@@ -1,0 +1,53 @@
+name: Feature request
+description: Propose a useful improvement to Cavdeck's Windows S3 workflow.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Explain the user's problem and the outcome you want, not just an implementation idea.
+        Keep private bucket names, credentials, presigned URLs, and sensitive screenshots out of public Issues.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you trying to accomplish, and what is difficult today?
+      placeholder: "When I ..., I need ... because ..."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired behavior
+      description: Describe what a good user experience would look like.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and trade-offs (optional)
+      description: Existing workarounds, potential risks/costs, or provider limitations.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Relevant area
+      options:
+        - Connections and providers
+        - Explorer and navigation
+        - Transfers and file operations
+        - Preview and editing
+        - Sharing and links
+        - Settings and accessibility
+        - Installation and updates
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I checked for existing requests and removed sensitive data from this issue.
+          required: true

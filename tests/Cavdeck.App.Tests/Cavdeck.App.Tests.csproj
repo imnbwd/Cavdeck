@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cavdeck.App\Cavdeck.App.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src\Cavdeck.App\Resources\Strings*.resx" Link="Localization\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Themes\Icons.xaml" Link="FileIconGeometries.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Themes\Brand.xaml" Link="CavdeckBrand.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\App.xaml" Link="CavdeckApp.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\DataGrid.xaml" Link="CavdeckDataGrid.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\Window.xaml" Link="CavdeckWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\Inputs.xaml" Link="CavdeckInputs.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\Surfaces.xaml" Link="CavdeckSurfaces.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\Menus.xaml" Link="CavdeckMenus.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Views\ShellWindow.xaml" Link="CavdeckShellWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Explorer\ExplorerView.xaml" Link="CavdeckExplorerView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Preview\PreviewPane.xaml" Link="CavdeckPreviewPane.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Preview\PreviewProgressView.xaml" Link="CavdeckPreviewProgressView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Controls\ToastHost.xaml" Link="CavdeckToastHost.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Controls\AppDialog.xaml" Link="CavdeckAppDialog.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Controls\LoadingView.xaml" Link="CavdeckLoadingView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Connections\ConnectionsView.xaml" Link="CavdeckConnectionsView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Transfers\TransfersView.xaml" Link="CavdeckTransfersView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Explorer\CopyDestinationPicker.xaml" Link="CavdeckCopyPicker.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Places\PlacesView.xaml" Link="CavdeckPlacesView.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Views\DesignCatalogWindow.xaml" Link="CavdeckDesignCatalog.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Styles\TrayMenu.xaml" Link="CavdeckTrayMenu.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Settings\SettingsView.xaml" Link="CavdeckSettings.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Explorer\FileGlyph.xaml" Link="FileGlyphStyles.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Themes\Colors.Light.xaml" Link="Colors.Light.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Themes\Colors.Dark.xaml" Link="Colors.Dark.xaml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

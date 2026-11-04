@@ -1,0 +1,409 @@
+<UserControl x:Class="Cavdeck.App.Features.Transfers.TransfersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters"
+             xmlns:transfers="clr-namespace:Cavdeck.App.Features.Transfers"
+             xmlns:domain="clr-namespace:Cavdeck.Domain.Transfers;assembly=Cavdeck.Domain">
+  <UserControl.Resources>
+    <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+    <Style x:Key="TransferAction" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinWidth" Value="72"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Border Grid.Row="0" Style="{StaticResource PageToolbar}">
+      <Grid x:Name="TransferToolbarLayout" VerticalAlignment="Center" SizeChanged="OnToolbarSizeChanged">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Border Grid.Column="0" Background="{DynamicResource SurfaceMutedBrush}"
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusMedium}" Padding="3">
+        <StackPanel Orientation="Horizontal">
+        <Button Content="{Binding Texts[Transfer_Active]}"
+                Height="32" MinWidth="72"
+                 Command="{Binding Transfers.ShowActiveCommand}"
+                AutomationProperties.Name="{Binding Texts[Transfer_Active]}">
+          <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Transfers.ShowActive}" Value="True">
+                  <Setter Property="FontWeight" Value="SemiBold"/>
+                  <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                  <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+        </Button>
+        <Button Content="{Binding Texts[Transfer_History]}"
+                Height="32" MinWidth="72"
+                Command="{Binding Transfers.ShowHistoryCommand}"
+                AutomationProperties.Name="{Binding Texts[Transfer_History]}">
+          <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Transfers.ShowHistory}" Value="True">
+                  <Setter Property="FontWeight" Value="SemiBold"/>
+                  <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                  <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+        </Button>
+      </StackPanel>
+      </Border>
+      <TextBlock x:Name="TransferSummary" Grid.Column="1" Text="{Binding Transfers.SummaryText}" VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis" ToolTip="{Binding Transfers.SummaryText}"
+                 Margin="12,0" Foreground="{DynamicResource MutedTextBrush}"/>
+      <StackPanel x:Name="TransferFilters" Grid.Column="2" Orientation="Horizontal" Margin="0,0,12,0">
+        <ComboBox Width="128" Height="32"
+                  ItemsSource="{Binding Transfers.CurrentFilters}" DisplayMemberPath="Label"
+                  SelectedItem="{Binding Transfers.SelectedCurrentFilter, Mode=TwoWay}"
+                  Visibility="{Binding Transfers.ShowActive, Converter={StaticResource BoolVis}}"
+                  ToolTip="{Binding Texts[Transfer_FilterLabel]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_FilterLabel]}"/>
+        <ComboBox Width="128" Height="32"
+                  ItemsSource="{Binding Transfers.HistoryFilters}" DisplayMemberPath="Label"
+                  SelectedItem="{Binding Transfers.SelectedHistoryFilter, Mode=TwoWay}"
+                  Visibility="{Binding Transfers.ShowHistory, Converter={StaticResource BoolVis}}"
+                  ToolTip="{Binding Texts[Transfer_FilterLabel]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_FilterLabel]}"/>
+        <Button Content="{Binding Texts[Transfer_ClearFailed]}"
+                Style="{StaticResource TransferAction}" Margin="6,0,0,0"
+                Command="{Binding Transfers.ClearFailedCommand}"
+                Visibility="{Binding Transfers.ShowClearFailed, Converter={StaticResource BoolVis}}"
+                AutomationProperties.Name="{Binding Texts[Transfer_ClearFailed]}"/>
+        <Button Content="{Binding Texts[Transfer_ClearHistory]}"
+                Style="{StaticResource TransferAction}" Margin="6,0,0,0"
+                Command="{Binding Transfers.ClearFinishedCommand}"
+                Visibility="{Binding Transfers.ShowClearFinished, Converter={StaticResource BoolVis}}"
+                AutomationProperties.Name="{Binding Texts[Transfer_ClearHistory]}"/>
+      </StackPanel>
+      <StackPanel x:Name="TransferConcurrency" Grid.Column="3" Orientation="Horizontal"
+                  Visibility="{Binding Transfers.ShowActive, Converter={StaticResource BoolVis}}">
+        <TextBlock Text="{Binding Texts[Transfer_Concurrency]}" VerticalAlignment="Center" Margin="0,0,8,0"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   ToolTip="{Binding Texts[Transfer_ConcurrencyHelp]}"/>
+        <ComboBox Width="72" Height="32"
+                  ItemsSource="{Binding Transfers.ConcurrencyChoices}"
+                  SelectedItem="{Binding Transfers.Concurrency, Mode=TwoWay}"
+                  ToolTip="{Binding Texts[Transfer_ConcurrencyHelp]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_Concurrency]}"/>
+      </StackPanel>
+    </Grid>
+    </Border>
+
+    <StackPanel Grid.Row="1" Style="{StaticResource PageEmptyHost}"
+                TextBlock.TextAlignment="Center"
+                Visibility="{Binding Transfers.IsEmpty, Converter={StaticResource BoolVis}}">
+      <Border Style="{StaticResource PageEmptyIcon}">
+        <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconTransfers}"/>
+      </Border>
+      <TextBlock Text="{Binding Transfers.EmptyTitle}" Style="{StaticResource PageEmptyTitle}"/>
+      <TextBlock Text="{Binding Transfers.EmptyDescription}" Style="{StaticResource PageEmptyDescription}"/>
+    </StackPanel>
+
+
+    <!-- One virtualizing scroll surface for both cross-connection batches and individual jobs. -->
+    <ListBox Grid.Row="1" ItemsSource="{Binding Transfers.DisplayItems}"
+             Margin="{DynamicResource PageContentMargin}"
+             BorderThickness="0" Background="{DynamicResource WindowBackgroundBrush}"
+             Foreground="{DynamicResource PrimaryTextBrush}" Padding="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             ScrollViewer.CanContentScroll="True"
+             VirtualizingPanel.IsVirtualizing="True"
+             VirtualizingPanel.VirtualizationMode="Recycling"
+             Visibility="{Binding Transfers.IsEmpty, Converter={StaticResource BoolVis}, ConverterParameter=invert}"
+             AutomationProperties.Name="{Binding Texts[Nav_Transfers]}">
+      <ListBox.Resources>
+        <DataTemplate DataType="{x:Type transfers:CrossBatchRowViewModel}">
+          <Border Style="{StaticResource SurfaceCard}">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*" MinWidth="0"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Style="{StaticResource IconButton}"
+                        Width="32" Height="32" MinWidth="32" MinHeight="32"
+                        Margin="0,0,6,0" CommandParameter="{Binding Id}"
+                        Command="{Binding DataContext.Transfers.ToggleBatchCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        ToolTip="{Binding ExpandHint}" AutomationProperties.Name="{Binding ExpandHint}">
+                  <Path>
+                    <Path.Style>
+                      <Style TargetType="Path" BasedOn="{StaticResource IconGlyph}">
+                        <Setter Property="Data" Value="{StaticResource IconChevronDown}"/>
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                            <Setter Property="Data" Value="{StaticResource IconChevronRight}"/>
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </Path.Style>
+                  </Path>
+                </Button>
+                <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}" VerticalAlignment="Center"/>
+                <Button Grid.Column="2"
+                        Content="{Binding DataContext.Texts[Transfer_RetryBatch], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        Style="{StaticResource TransferAction}" Margin="8,0,0,0"
+                        Command="{Binding DataContext.Transfers.RetryBatchCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        CommandParameter="{Binding Id}"
+                        Visibility="{Binding CanRetry, Converter={StaticResource BoolVis}}"/>
+              </Grid>
+              <TextBlock Grid.Row="1" Text="{Binding RouteText}" Margin="38,2,0,0"
+                         TextTrimming="CharacterEllipsis" ToolTip="{Binding RouteText}"
+                         Foreground="{DynamicResource MutedTextBrush}"/>
+              <TextBlock Grid.Row="2" Text="{Binding ScanStatus}" Margin="38,4,0,0"
+                         Foreground="{DynamicResource MutedTextBrush}"/>
+              <StackPanel Grid.Row="3" Margin="38,3,0,0">
+                <TextBlock Text="{Binding Detail}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+                <TextBlock Text="{Binding Error}" ToolTip="{Binding TechnicalError}" Margin="0,3,0,0" TextWrapping="Wrap"
+                           Foreground="{DynamicResource DangerTextBrush}"/>
+              </StackPanel>
+              <StackPanel Grid.Row="4" Margin="38,8,0,0">
+                <ProgressBar Style="{StaticResource ThemedProgressBar}" Height="4" Minimum="0" Maximum="100"
+                             Visibility="{Binding ShowBatchProgress, Converter={StaticResource BoolVis}}"
+                             Value="{Binding ProgressPercent, Mode=OneWay}"
+                             IsIndeterminate="{Binding IsProgressIndeterminate, Mode=OneWay}"
+                             Foreground="{DynamicResource AccentBrush}"
+                             Background="{DynamicResource SurfaceMutedBrush}"
+                             AutomationProperties.Name="{Binding Detail}"/>
+                <TextBlock Margin="0,6,0,0"
+                           Text="{Binding DataContext.Texts[Transfer_BatchOlderItemsHint], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                           Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"
+                           Visibility="{Binding ShowUnavailableHint, Converter={StaticResource BoolVis}}"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type transfers:TransferRowViewModel}">
+          <Border Style="{StaticResource SurfaceCard}" Margin="{Binding ChildMargin}">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*" MinWidth="0"/>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Path Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center">
+                  <Path.Style>
+                    <Style TargetType="Path" BasedOn="{StaticResource IconGlyph}">
+                      <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+                      <Setter Property="Data" Value="{StaticResource IconTransfers}"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding Kind}" Value="{x:Static domain:TransferKind.Upload}">
+                          <Setter Property="Data" Value="{StaticResource IconUpload}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Kind}" Value="{x:Static domain:TransferKind.Download}">
+                          <Setter Property="Data" Value="{StaticResource IconDownload}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Kind}" Value="{x:Static domain:TransferKind.Copy}">
+                          <Setter Property="Data" Value="{StaticResource IconCopy}"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Path.Style>
+                </Path>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                           ToolTip="{Binding Name}"/>
+                <TextBlock Grid.Column="2" Text="{Binding Progress, StringFormat={}{0:0}%}"
+                           Margin="12,0,8,0" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedTextBrush}"
+                           Visibility="{Binding ShowPercentage, Converter={StaticResource BoolVis}}"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                  <Button Style="{StaticResource IconButton}" Width="32" Height="32" MinWidth="32" MinHeight="32"
+                          Command="{Binding DataContext.Transfers.ToggleDetailsCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          ToolTip="{Binding DetailsHint}" AutomationProperties.Name="{Binding DetailsHint}">
+                    <Path>
+                      <Path.Style>
+                        <Style TargetType="Path" BasedOn="{StaticResource IconGlyph}">
+                          <Setter Property="Data" Value="{StaticResource IconChevronDown}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDetailsExpanded}" Value="False">
+                              <Setter Property="Data" Value="{StaticResource IconChevronRight}"/>
+                            </DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Path.Style>
+                    </Path>
+                  </Button>
+                  <Button Style="{StaticResource IconButton}" Width="32" Height="32" MinWidth="32" MinHeight="32"
+                          Command="{Binding DataContext.Transfers.PauseCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          ToolTip="{Binding DataContext.Texts[Transfer_Pause], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          AutomationProperties.Name="{Binding DataContext.Texts[Transfer_Pause], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Visibility="{Binding CanPause, Converter={StaticResource BoolVis}}">
+                    <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconPause}"/>
+                  </Button>
+                  <Button Style="{StaticResource IconButton}" Width="32" Height="32" MinWidth="32" MinHeight="32"
+                          Command="{Binding DataContext.Transfers.ResumeCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          ToolTip="{Binding DataContext.Texts[Transfer_Resume], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          AutomationProperties.Name="{Binding DataContext.Texts[Transfer_Resume], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Visibility="{Binding CanResume, Converter={StaticResource BoolVis}}">
+                    <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconResume}"/>
+                  </Button>
+                  <Button Style="{StaticResource TransferAction}" Margin="0,0,4,0"
+                          Content="{Binding DataContext.Texts[Transfer_Retry], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Command="{Binding DataContext.Transfers.RetryCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          Visibility="{Binding CanRetry, Converter={StaticResource BoolVis}}"/>
+                  <Button Style="{StaticResource IconButton}" Width="32" Height="32" MinWidth="32" MinHeight="32"
+                          Command="{Binding DataContext.Transfers.CancelCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          ToolTip="{Binding DataContext.Texts[Transfer_Cancel], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          AutomationProperties.Name="{Binding DataContext.Texts[Transfer_Cancel], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Visibility="{Binding CanCancel, Converter={StaticResource BoolVis}}">
+                    <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+                  </Button>
+                  <Button Style="{StaticResource IconButton}" Width="32" Height="32" MinWidth="32" MinHeight="32"
+                          Command="{Binding DataContext.Transfers.RemoveRecordCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          ToolTip="{Binding DataContext.Texts[Transfer_RemoveRecord], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          AutomationProperties.Name="{Binding DataContext.Texts[Transfer_RemoveRecord], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Visibility="{Binding CanRemoveRecord, Converter={StaticResource BoolVis}}">
+                    <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconTrash}"/>
+                  </Button>
+                </StackPanel>
+              </Grid>
+              <StackPanel Grid.Row="1" Margin="0,3,0,0">
+                <TextBlock Text="{Binding StatusText}" TextTrimming="CharacterEllipsis">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFailure}" Value="True">
+                          <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding DetailText}" Margin="0,2,0,0"
+                           TextWrapping="Wrap" Foreground="{DynamicResource PrimaryTextBrush}"/>
+              </StackPanel>
+              <ProgressBar Style="{StaticResource ThemedProgressBar}" Grid.Row="2" Height="4" Margin="0,8,0,0" Minimum="0" Maximum="100"
+                           Value="{Binding Progress, Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate}"
+                           Foreground="{DynamicResource AccentBrush}"
+                           Background="{DynamicResource SurfaceMutedBrush}"
+                           Visibility="{Binding ShowProgress, Converter={StaticResource BoolVis}}"/>
+              <TextBlock Grid.Row="3" Text="{Binding RouteText}" Margin="0,7,0,0"
+                         TextTrimming="CharacterEllipsis" ToolTip="{Binding RouteText}"
+                         Foreground="{DynamicResource MutedTextBrush}"/>
+              <StackPanel Grid.Row="4" Margin="0,8,0,0"
+                          Visibility="{Binding IsDetailsExpanded, Converter={StaticResource BoolVis}}">
+                <TextBlock Text="{Binding DataContext.Texts[Transfer_Source], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                           Foreground="{DynamicResource MutedTextBrush}"/>
+                <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" Margin="0,2,0,6"
+                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+                <TextBlock Text="{Binding DataContext.Texts[Transfer_Destination], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                           Foreground="{DynamicResource MutedTextBrush}"/>
+                <TextBlock Text="{Binding DestinationPath}" TextWrapping="Wrap" Margin="0,2,0,0"
+                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+                <StackPanel Margin="0,12,0,0"
+                            Visibility="{Binding IsFailure, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding DataContext.Texts[Transfer_FailureDetails], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                             FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                  <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="{Binding DataContext.Texts[Transfer_FailureCategory], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                               Foreground="{DynamicResource MutedTextBrush}"/>
+                    <TextBlock Text="{Binding FailureCategory}" Margin="8,0,0,0"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock Text="{Binding DataContext.Texts[Transfer_ErrorCode], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                               Foreground="{DynamicResource MutedTextBrush}"/>
+                    <TextBlock Text="{Binding FailureCode}" Margin="8,0,0,0"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock Text="{Binding DataContext.Texts[Transfer_Attempts], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                               Foreground="{DynamicResource MutedTextBrush}"/>
+                    <TextBlock Text="{Binding FailureAttempts}" Margin="8,0,18,0"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <TextBlock Text="{Binding DataContext.Texts[Transfer_Retryable], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                               Foreground="{DynamicResource MutedTextBrush}"/>
+                    <TextBlock Text="{Binding FailureRetryable}" Margin="8,0,0,0"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding FailureAdvice}" Margin="0,8,0,0" TextWrapping="Wrap"
+                             Foreground="{DynamicResource MutedTextBrush}"/>
+                  <TextBlock Text="{Binding DataContext.Texts[Transfer_FailurePrivacy], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                             Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}"/>
+                  <Button Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left"
+                          Padding="12,6" Margin="0,8,0,0"
+                          Content="{Binding DataContext.Texts[Transfer_CopyFailure], RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          Command="{Binding DataContext.Transfers.CopyFailureCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                          CommandParameter="{Binding Id}"
+                          AutomationProperties.Name="{Binding DataContext.Texts[Transfer_CopyFailure], RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                </StackPanel>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ListBox.Resources>
+      <ListBox.ItemContainerStyle>
+        <Style TargetType="ListBoxItem">
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+          <Setter Property="Padding" Value="0"/>
+          <Setter Property="Margin" Value="0,0,0,8"/>
+          <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate TargetType="ListBoxItem">
+                <Border x:Name="FocusOutline" BorderBrush="Transparent" BorderThickness="2"
+                        CornerRadius="8" SnapsToDevicePixels="True">
+                  <ContentPresenter/>
+                </Border>
+                <ControlTemplate.Triggers>
+                  <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter TargetName="FocusOutline" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
+                  </Trigger>
+                </ControlTemplate.Triggers>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </ListBox.ItemContainerStyle>
+    </ListBox>
+  </Grid>
+</UserControl>

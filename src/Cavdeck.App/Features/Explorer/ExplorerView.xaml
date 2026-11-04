@@ -1,0 +1,1296 @@
+<UserControl x:Class="Cavdeck.App.Features.Explorer.ExplorerView"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+             xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters"
+             xmlns:explorer="clr-namespace:Cavdeck.App.Features.Explorer"
+             xmlns:preview="clr-namespace:Cavdeck.App.Features.Preview"
+             Focusable="True"
+             PreviewKeyDown="Root_PreviewKeyDown"
+             GotKeyboardFocus="Root_GotKeyboardFocus"
+             ContextMenuOpening="Root_ContextMenuOpening">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="FileGlyph.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+    <explorer:GridFileNameConverter x:Key="GridFileName"/>
+    <ContextMenu x:Key="CurrentDirectoryMenu" x:Shared="False"
+                 DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+      <MenuItem Header="{Binding Explorer.PasteLabel}" InputGestureText="Ctrl+V"
+                Command="{Binding Explorer.PasteCommand}" IsEnabled="{Binding Explorer.CanPasteToCurrentDirectory}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconPaste}"/></MenuItem.Icon>
+      </MenuItem>
+      <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+      <MenuItem Header="{Binding Texts[Explorer_UploadFiles]}" Click="UploadFiles_Click"
+                IsEnabled="{Binding Explorer.CanWriteToCurrentDirectory}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconUpload}"/></MenuItem.Icon>
+      </MenuItem>
+      <MenuItem Header="{Binding Texts[Explorer_UploadFolder]}" Click="UploadFolder_Click"
+                IsEnabled="{Binding Explorer.CanWriteToCurrentDirectory}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconUploadFolder}"/></MenuItem.Icon>
+      </MenuItem>
+      <MenuItem Header="{Binding Texts[Explorer_New]}" IsEnabled="{Binding Explorer.CanWriteToCurrentDirectory}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconNewFolder}"/></MenuItem.Icon>
+        <MenuItem Header="{Binding Texts[Explorer_NewFolder]}" Command="{Binding Explorer.NewFolderCommand}">
+          <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconNewFolder}"/></MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="{Binding Texts[Explorer_NewTextFile]}" Command="{Binding Explorer.NewTextFileCommand}">
+          <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconText}"/></MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+      <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+      <MenuItem Header="{Binding Texts[Explorer_RefreshMenu]}" InputGestureText="F5"
+                Command="{Binding Explorer.RefreshCommand}" IsEnabled="{Binding Explorer.CanRefresh}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconRefresh}"/></MenuItem.Icon>
+      </MenuItem>
+      <MenuItem Header="{Binding Explorer.FavoriteTip}" Command="{Binding Explorer.ToggleFavoriteCommand}"
+                IsEnabled="{Binding Explorer.CanFavorite}">
+        <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
+      </MenuItem>
+    </ContextMenu>
+    <Style x:Key="ExplorerToolbarButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Padding" Value="10,0"/>
+    </Style>
+    <Style x:Key="ExplorerToolbarGhost" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Padding" Value="8,0"/>
+    </Style>
+    <Style x:Key="ExplorerUploadPart" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Padding" Value="10,0"/>
+      <Setter Property="controls:ChromeAssist.HoverBackground" Value="{DynamicResource AccentHoverBrush}"/>
+      <Setter Property="controls:ChromeAssist.FocusBrush" Value="{DynamicResource OnAccentBrush}"/>
+    </Style>
+    <Style x:Key="ExplorerTool" TargetType="Button" BasedOn="{StaticResource IconButton}">
+      <Setter Property="Width" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinWidth" Value="32"/>
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    </Style>
+    <Style x:Key="CrumbButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+          <Setter Property="FontWeight" Value="SemiBold"/>
+          <Setter Property="Cursor" Value="Arrow"/>
+          <Setter Property="Focusable" Value="False"/>
+          <Setter Property="IsHitTestVisible" Value="False"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="ExplorerFilter" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="Width" Value="180"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+    </Style>
+    <Style x:Key="ViewModeButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+      <Setter Property="Width" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinWidth" Value="32"/>
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style x:Key="SideModeButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="MinWidth" Value="28"/>
+      <Setter Property="Padding" Value="10,0"/>
+      <Setter Property="Margin" Value="0,0,4,0"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+    </Style>
+    <!-- Copy controls stay in the Tab order but appear on hover or keyboard focus. -->
+    <Style x:Key="DetailCopyButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="MinWidth" Value="28"/>
+      <Setter Property="MinHeight" Value="28"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}" Value="True">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="IsHitTestVisible" Value="True"/>
+        </DataTrigger>
+        <Trigger Property="IsKeyboardFocused" Value="True">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="IsHitTestVisible" Value="True"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <!-- Inline bucket action: preserve a fixed slot but reveal the empty star only on hover/focus. -->
+    <Style x:Key="BucketFavoriteButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="MinWidth" Value="28"/>
+      <Setter Property="MinHeight" Value="28"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="IsHitTestVisible" Value="True"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="True">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="IsHitTestVisible" Value="True"/>
+        </DataTrigger>
+        <Trigger Property="IsKeyboardFocused" Value="True">
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="IsHitTestVisible" Value="True"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="ExplorerDropIconTile" TargetType="ListBoxItem" BasedOn="{StaticResource IconTile}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
+          <Setter Property="Background" Value="{DynamicResource SubtleAccentBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+          <Setter Property="BorderThickness" Value="2"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="DetailLabel" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+    </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0"
+          Visibility="{Binding Explorer.HasConnection, Converter={StaticResource BoolVis}}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Border Grid.Row="0" Style="{StaticResource WorkspaceHeader}">
+        <Grid VerticalAlignment="Center">
+          <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,-8,0">
+          <Button Style="{StaticResource ExplorerTool}"
+                  Command="{Binding Explorer.UpCommand}"
+                  IsEnabled="{Binding Explorer.CanGoUp}"
+                  ToolTip="{Binding Texts[Explorer_Up]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Up]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconFolderUp}"/>
+          </Button>
+          <Button Style="{StaticResource ExplorerTool}"
+                  Command="{Binding Explorer.RefreshCommand}"
+                  IsEnabled="{Binding Explorer.CanRefresh}"
+                  ToolTip="{Binding Texts[Explorer_Refresh]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Refresh]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconRefresh}"/>
+          </Button>
+        </StackPanel>
+
+        <Border Grid.Column="1" Grid.ColumnSpan="2" Height="32" Margin="12,0,0,0" Padding="2,0" CornerRadius="6"
+                VerticalAlignment="Center" SnapsToDevicePixels="True"
+                Background="{DynamicResource InputBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                ToolTip="{Binding Explorer.PathText}"
+                AutomationProperties.Name="{Binding Explorer.PathText}">
+          <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Right" Height="20" Margin="4,0" Padding="8,0" CornerRadius="4"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource WarningSubtleBrush}"
+                    Visibility="{Binding Explorer.IsReadOnly, Converter={StaticResource BoolVis}}">
+              <TextBlock Text="{Binding Texts[Explorer_ReadOnly]}"
+                         FontSize="{DynamicResource FontSizeSmall}"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource WarningTextBrush}"/>
+            </Border>
+            <ScrollViewer x:Name="CrumbScroll" Focusable="False"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Disabled"
+                          PreviewMouseWheel="CrumbScroll_PreviewMouseWheel"
+                          SizeChanged="CrumbScroll_SizeChanged">
+              <ItemsControl ItemsSource="{Binding Explorer.Crumbs}" VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center">
+                      <Path Style="{StaticResource IconGlyph}"
+                            Data="{StaticResource IconChevronRight}"
+                            Stroke="{DynamicResource MutedTextBrush}"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding ShowSeparator, Converter={StaticResource BoolVis}}"/>
+                      <Button Style="{StaticResource CrumbButton}"
+                              Command="{Binding DataContext.Explorer.OpenCrumbCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"
+                              ToolTip="{Binding Label}"
+                              AutomationProperties.Name="{Binding Label}">
+                        <TextBlock Text="{Binding Label}" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" MaxWidth="280"/>
+                      </Button>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
+
+        </Grid>
+      </Border>
+      <Border Grid.Row="1" Style="{StaticResource WorkspaceToolbar}">
+        <Grid x:Name="ToolbarRow" MinHeight="32" VerticalAlignment="Center"
+              SizeChanged="ToolbarRow_SizeChanged">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Explorer.HasSelection}" Value="True">
+                  <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                 <DataTrigger Binding="{Binding Explorer.ToolbarShowActions}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <Border x:Name="UploadSplitButton" Background="{DynamicResource AccentBrush}" CornerRadius="6"
+                  Visibility="{Binding Explorer.ShowWriteActions, Converter={StaticResource BoolVis}}"
+                  IsEnabled="{Binding Explorer.CanWrite}">
+          <StackPanel Orientation="Horizontal">
+          <Button Style="{StaticResource ExplorerUploadPart}" Click="UploadFiles_Click"
+                  ToolTip="{Binding Texts[Explorer_UploadFilesTip]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_Upload]}">
+            <StackPanel Orientation="Horizontal">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconUpload}" Margin="0,0,8,0"/>
+              <TextBlock Text="{Binding Texts[Transfer_Upload]}"/>
+            </StackPanel>
+          </Button>
+          <Border Width="1" Margin="0,7" Background="{DynamicResource OnAccentBrush}" Opacity="0.3"/>
+          <Button x:Name="UploadOptionsButton" Style="{StaticResource ExplorerUploadPart}" Width="28" Padding="0"
+                  Click="UploadOptions_Click" ToolTip="{Binding Texts[Transfer_UploadFolder]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_UploadFolder]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconChevronDown}"/>
+            <Button.ContextMenu>
+              <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Transfer_UploadFolder]}" Click="UploadFolder_Click"
+                          IsEnabled="{Binding Explorer.CanWrite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconUploadFolder}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </Button.ContextMenu>
+          </Button>
+          </StackPanel>
+          </Border>
+          <Button x:Name="NewButton" Style="{StaticResource ExplorerToolbarButton}" Margin="6,0,0,0"
+                  Click="New_Click"
+                  Visibility="{Binding Explorer.ShowWriteActions, Converter={StaticResource BoolVis}}"
+                  IsEnabled="{Binding Explorer.CanWrite}"
+                  ToolTip="{Binding Texts[Explorer_NewFolder]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_NewFolder]}">
+            <StackPanel Orientation="Horizontal">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconNewFolder}" Margin="0,0,8,0"/>
+              <TextBlock Text="{Binding Texts[Explorer_New]}"/>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconChevronDown}" Margin="6,0,0,0"/>
+            </StackPanel>
+            <Button.ContextMenu>
+              <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Explorer_NewFolder]}" Command="{Binding Explorer.NewFolderCommand}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconNewFolder}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_NewTextFile]}" Command="{Binding Explorer.NewTextFileCommand}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconText}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </Button.ContextMenu>
+          </Button>
+          <StackPanel Orientation="Horizontal" Visibility="{Binding Explorer.ToolbarShowDefaultCommands, Converter={StaticResource BoolVis}}">
+            <Border Width="1" Height="20" Margin="12,0,2,0" VerticalAlignment="Center"
+                    Background="{DynamicResource BorderBrush}"/>
+          <Button Content="{Binding Explorer.PasteLabel}" Style="{StaticResource ExplorerToolbarButton}"
+                  Margin="8,0,0,0" Command="{Binding Explorer.PasteCommand}"
+                  IsEnabled="{Binding Explorer.CanPaste}"
+                  Visibility="{Binding Explorer.ShowPaste, Converter={StaticResource BoolVis}}"/>
+          </StackPanel>
+          <Button x:Name="MoreButton" Style="{StaticResource ExplorerToolbarGhost}" Margin="6,0,0,0" Width="32" Padding="0"
+                  Click="More_Click" IsEnabled="{Binding Explorer.CanFavorite}"
+                  ToolTip="{Binding Texts[Explorer_More]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_More]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconMoreHorizontal}"/>
+            <Button.ContextMenu>
+              <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Explorer_SelectLoaded]}" Click="SelectAll_Click"
+                          IsEnabled="{Binding Explorer.CanSelectAll}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Paste]}" InputGestureText="Ctrl+V"
+                          Command="{Binding Explorer.PasteCommand}" IsEnabled="{Binding Explorer.CanPaste}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconPaste}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Explorer.FavoriteTip}"
+                          Command="{Binding Explorer.ToggleFavoriteCommand}"
+                          IsEnabled="{Binding Explorer.CanFavorite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </Button.ContextMenu>
+          </Button>
+
+        </StackPanel>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Setter Property="Visibility" Value="Collapsed"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Explorer.HasSelection}" Value="True">
+                  <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                 <DataTrigger Binding="{Binding Explorer.ToolbarShowActions}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <Button Style="{StaticResource ExplorerToolbarGhost}" Click="Download_Click"
+                  IsEnabled="{Binding Explorer.CanDownload}" ToolTip="{Binding Texts[Transfer_Download]}"
+                  AutomationProperties.Name="{Binding Texts[Transfer_Download]}">
+            <StackPanel Orientation="Horizontal">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconDownload}"/>
+              <TextBlock Text="{Binding Texts[Transfer_Download]}" Margin="6,0,0,0"
+                         Visibility="{Binding Explorer.ToolbarShowDefaultExtras, Converter={StaticResource BoolVis}}"/>
+            </StackPanel>
+          </Button>
+          <Button Style="{StaticResource ExplorerToolbarGhost}" Margin="4,0,0,0"
+                  Command="{Binding Explorer.CopyCommand}" IsEnabled="{Binding Explorer.CanCopy}"
+                  ToolTip="{Binding Texts[Explorer_Copy]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Copy]}">
+            <StackPanel Orientation="Horizontal">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+              <TextBlock Text="{Binding Texts[Explorer_Copy]}" Margin="6,0,0,0"
+                         Visibility="{Binding Explorer.ToolbarShowDefaultExtras, Converter={StaticResource BoolVis}}"/>
+            </StackPanel>
+          </Button>
+          <StackPanel Orientation="Horizontal" Visibility="{Binding Explorer.ToolbarShowExtendedActions, Converter={StaticResource BoolVis}}">
+          <Button Content="{Binding Texts[Explorer_Cut]}" Style="{StaticResource ExplorerToolbarGhost}"
+                  Margin="4,0,0,0" Command="{Binding Explorer.CutCommand}"
+                  IsEnabled="{Binding Explorer.CanCut}"/>
+          <Button Content="{Binding Explorer.PasteLabel}" Style="{StaticResource ExplorerToolbarGhost}"
+                  Margin="4,0,0,0" Command="{Binding Explorer.PasteCommand}"
+                  IsEnabled="{Binding Explorer.CanPaste}"
+                  Visibility="{Binding Explorer.ShowPaste, Converter={StaticResource BoolVis}}"/>
+          <Button Content="{Binding Texts[Explorer_Rename]}" Style="{StaticResource ExplorerToolbarGhost}"
+                  Margin="4,0,0,0" Command="{Binding Explorer.RenameCommand}"
+                  Visibility="{Binding Explorer.CanRename, Converter={StaticResource BoolVis}}"/>
+          <Button Content="{Binding Texts[Share_Menu]}" Style="{StaticResource ExplorerToolbarGhost}"
+                  Margin="4,0,0,0" Command="{Binding Explorer.ShareLinkCommand}"
+                  Visibility="{Binding Explorer.CanShareLink, Converter={StaticResource BoolVis}}"/>
+          </StackPanel>
+          <Button x:Name="SelectionMoreButton" Style="{StaticResource ExplorerToolbarGhost}" Width="32" Padding="0"
+                  Margin="4,0,0,0" Click="SelectionMore_Click" IsEnabled="{Binding Explorer.CanFavorite}"
+                  ToolTip="{Binding Texts[Explorer_More]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_More]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconMoreHorizontal}"/>
+            <Button.ContextMenu>
+              <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Explorer_Cut]}" InputGestureText="Ctrl+X" Command="{Binding Explorer.CutCommand}"
+                          IsEnabled="{Binding Explorer.CanCut}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconCut}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Paste]}" InputGestureText="Ctrl+V" Command="{Binding Explorer.PasteCommand}"
+                          IsEnabled="{Binding Explorer.CanPaste}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconPaste}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Rename]}" InputGestureText="F2" Command="{Binding Explorer.RenameCommand}"
+                          IsEnabled="{Binding Explorer.CanRename}"/>
+                <MenuItem Header="{Binding Texts[Share_Menu]}" Command="{Binding Explorer.ShareLinkCommand}"
+                          IsEnabled="{Binding Explorer.CanShareLink}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconShare}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_CopyKey]}" Command="{Binding Explorer.CopyKeyCommand}"/>
+                <MenuItem Header="{Binding Texts[Explorer_CopyUri]}" Command="{Binding Explorer.CopyUriCommand}"/>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Transfer_Upload]}" Click="UploadFiles_Click"
+                          IsEnabled="{Binding Explorer.CanWrite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconUpload}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Transfer_UploadFolder]}" Click="UploadFolder_Click"
+                          IsEnabled="{Binding Explorer.CanWrite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconUploadFolder}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_NewFolder]}" Command="{Binding Explorer.NewFolderCommand}"
+                          IsEnabled="{Binding Explorer.CanWrite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconNewFolder}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_NewTextFile]}" Command="{Binding Explorer.NewTextFileCommand}"
+                          IsEnabled="{Binding Explorer.CanWrite}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconText}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Delete]}" InputGestureText="Del" Command="{Binding Explorer.DeleteCommand}"
+                          IsEnabled="{Binding Explorer.CanDelete}" controls:MenuAssist.IsDanger="True">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuDangerIconStyle}" Data="{StaticResource IconTrash}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </Button.ContextMenu>
+          </Button>
+          <Button Style="{StaticResource ExplorerToolbarGhost}" Width="32" Padding="0"
+                  Margin="4,0,0,0" Click="ClearSelection_Click"
+                  ToolTip="{Binding Texts[Explorer_ClearSelection]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_ClearSelection]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+          </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button Style="{StaticResource ExplorerTool}" Margin="0,0,4,0"
+                  Visibility="{Binding Explorer.ToolbarShowSearchButton, Converter={StaticResource BoolVis}}"
+                  Click="ToolbarSearch_Click" ToolTip="{Binding Texts[Explorer_SearchPlaceholder]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Search]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconSearch}"/>
+          </Button>
+          <Button Style="{StaticResource ExplorerTool}" Margin="0,0,4,0"
+                  Visibility="{Binding Explorer.ToolbarShowCloseSearchButton, Converter={StaticResource BoolVis}}"
+                  Click="ToolbarSearch_Click" ToolTip="{Binding Texts[Explorer_SearchPlaceholder]}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Search]}">
+            <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+          </Button>
+          <Grid Margin="0,0,8,0"
+                Visibility="{Binding Explorer.ToolbarShowSearchInput, Converter={StaticResource BoolVis}}">
+            <StackPanel Orientation="Horizontal">
+              <TextBox x:Name="SearchInput" Style="{StaticResource ExplorerFilter}"
+                       Text="{Binding Explorer.Filter, UpdateSourceTrigger=PropertyChanged, Delay=180}"
+                       KeyDown="Filter_KeyDown"
+                       controls:InputAssist.Placeholder="{Binding Texts[Explorer_SearchPlaceholder]}"
+                       ToolTip="{Binding Explorer.SearchScopeHint}"
+                       AutomationProperties.Name="{Binding Texts[Explorer_SearchPlaceholder]}"/>
+              <Button Style="{StaticResource ExplorerTool}" Width="28" Margin="2,0,0,0"
+                      Visibility="{Binding Explorer.HasFilter, Converter={StaticResource BoolVis}}"
+                      Command="{Binding Explorer.ClearSearchCommand}"
+                      ToolTip="{Binding Texts[Explorer_ClearSearch]}"
+                      AutomationProperties.Name="{Binding Texts[Explorer_ClearSearch]}">
+                <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+              </Button>
+              <Button x:Name="SearchScopeButton" Style="{StaticResource GhostButton}" Height="32"
+                      Margin="4,0,0,0" Click="SearchScope_Click"
+                      Visibility="{Binding Explorer.ShowObjects, Converter={StaticResource BoolVis}}"
+                      ToolTip="{Binding Explorer.SearchScopeHint}"
+                      AutomationProperties.Name="{Binding Texts[Explorer_SearchScope]}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding Explorer.SearchScopeLabel}" VerticalAlignment="Center"
+                             MaxWidth="108" TextTrimming="CharacterEllipsis"/>
+                  <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconChevronDown}" Margin="4,0,0,0"/>
+                </StackPanel>
+                <Button.ContextMenu>
+                  <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                           DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                    <MenuItem Header="{Binding Texts[Explorer_FilterLoaded]}" Tag="0" Click="SearchScopeItem_Click"/>
+                    <MenuItem Header="{Binding Texts[Explorer_SearchFolder]}" Tag="3" Click="SearchScopeItem_Click"/>
+                    <MenuItem Header="{Binding Texts[Explorer_KeyPrefix]}" Tag="1" Click="SearchScopeItem_Click"/>
+                    <MenuItem Header="{Binding Texts[Explorer_ScanBucket]}" Tag="2" Click="SearchScopeItem_Click"/>
+                  </ContextMenu>
+                </Button.ContextMenu>
+              </Button>
+              <Button Content="{Binding Texts[Explorer_Search]}" Style="{StaticResource ExplorerToolbarButton}"
+                      Margin="4,0,0,0" IsEnabled="{Binding Explorer.CanRunSearch}"
+                      Visibility="{Binding Explorer.ShowSearchAction, Converter={StaticResource BoolVis}}"
+                      Command="{Binding Explorer.RunSearchCommand}"
+                      ToolTip="{Binding Explorer.SearchScopeHint}"
+                      AutomationProperties.Name="{Binding Texts[Explorer_Search]}"/>
+            </StackPanel>
+          </Grid>
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                      Visibility="{Binding Explorer.ToolbarShowActions, Converter={StaticResource BoolVis}}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                        Visibility="{Binding Explorer.ShowObjects, Converter={StaticResource BoolVis}}">
+            <Button Margin="0,0,4,0"
+                    Command="{Binding Explorer.UseListViewCommand}"
+                    ToolTip="{Binding Texts[Explorer_ViewList]}"
+                    AutomationProperties.Name="{Binding Texts[Explorer_ViewList]}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource ViewModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.IsIconView}" Value="False">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconViewList}"/>
+            </Button>
+            <Button Command="{Binding Explorer.UseIconViewCommand}"
+                    ToolTip="{Binding Texts[Explorer_ViewIcons]}"
+                    AutomationProperties.Name="{Binding Texts[Explorer_ViewIcons]}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource ViewModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.IsIconView}" Value="True">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconViewIcons}"/>
+            </Button>
+            <Button Margin="8,0,0,0" Command="{Binding Explorer.ToggleGridDensityCommand}"
+                    Visibility="{Binding Explorer.IsIconView, Converter={StaticResource BoolVis}}"
+                    ToolTip="{Binding Explorer.GridDensityTip}"
+                    AutomationProperties.Name="{Binding Explorer.GridDensityTip}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource ViewModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.IsCompactGrid}" Value="True">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconGridDensity}"/>
+            </Button>
+            <Button Margin="4,0,0,0" Command="{Binding Explorer.ToggleDetailsPaneCommand}"
+                    ToolTip="{Binding Explorer.DetailsPaneTip}"
+                    AutomationProperties.Name="{Binding Explorer.DetailsPaneTip}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource ViewModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.DetailsPaneEnabled}" Value="True">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconSidebar}"/>
+            </Button>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <StackPanel Grid.Row="1">
+      <Border Padding="16,8" Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+              Visibility="{Binding Explorer.ShowSearchStatus, Converter={StaticResource BoolVis}}">
+        <DockPanel LastChildFill="True">
+          <Button DockPanel.Dock="Right" Content="{Binding Texts[Explorer_ContinueSearch]}"
+                  Style="{StaticResource GhostButton}" Margin="8,0,0,0"
+                  Visibility="{Binding Explorer.CanContinueSearch, Converter={StaticResource BoolVis}}"
+                  Command="{Binding Explorer.ContinueSearchCommand}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_ContinueSearch]}"/>
+          <Button DockPanel.Dock="Right" Content="{Binding Texts[Explorer_StopSearch]}"
+                  Style="{StaticResource GhostButton}" Margin="12,0,0,0"
+                  Visibility="{Binding Explorer.CanCancelSearch, Converter={StaticResource BoolVis}}"
+                  Command="{Binding Explorer.CancelSearchCommand}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_StopSearch]}"/>
+          <TextBlock Text="{Binding Explorer.SearchStatusText}" TextWrapping="Wrap"
+                     Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"
+                     AutomationProperties.LiveSetting="Polite"/>
+        </DockPanel>
+      </Border>
+      <Border Padding="16,8" Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+              Visibility="{Binding Explorer.ShowOperationStatus, Converter={StaticResource BoolVis}}">
+        <DockPanel LastChildFill="True">
+          <Button DockPanel.Dock="Right" Content="{Binding Texts[Explorer_CancelScan]}"
+                  Style="{StaticResource GhostButton}" Margin="12,0,0,0"
+                  Command="{Binding Explorer.CancelOperationCommand}"
+                  AutomationProperties.Name="{Binding Texts[Explorer_CancelScan]}"/>
+          <TextBlock Text="{Binding Explorer.OperationStatusText}" VerticalAlignment="Center"
+                     Foreground="{DynamicResource PrimaryTextBrush}"
+                     AutomationProperties.LiveSetting="Polite"/>
+        </DockPanel>
+      </Border>
+      <Border Padding="16,8" Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+              Visibility="{Binding Explorer.ShowMutationStatus, Converter={StaticResource BoolVis}}">
+        <DockPanel LastChildFill="True">
+          <Button DockPanel.Dock="Right" Content="{Binding Texts[Explorer_StopOperation]}"
+                  Style="{StaticResource GhostButton}" Margin="12,0,0,0"
+                  Command="{Binding Explorer.CancelMutationCommand}"/>
+          <TextBlock Text="{Binding Explorer.MutationStatusText}" VerticalAlignment="Center"
+                     Foreground="{DynamicResource PrimaryTextBrush}"
+                     AutomationProperties.LiveSetting="Polite"/>
+        </DockPanel>
+      </Border>
+    </StackPanel>
+
+    <Grid x:Name="BrowserArea" Grid.Row="2" SizeChanged="BrowserArea_SizeChanged">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition x:Name="SideColumn" Width="0" MinWidth="0"/>
+      </Grid.ColumnDefinitions>
+
+      <Grid x:Name="FileBrowserPane" Grid.Column="0" AllowDrop="True"
+            PreviewDragEnter="Browser_PreviewDragOver"
+            PreviewDragOver="Browser_PreviewDragOver"
+            PreviewDragLeave="Browser_PreviewDragLeave"
+            PreviewDrop="Browser_PreviewDrop">
+        <StackPanel Style="{StaticResource PageEmptyHost}"
+                    TextBlock.TextAlignment="Center"
+                    Visibility="{Binding Explorer.ShowEmptyConnection, Converter={StaticResource BoolVis}}">
+          <Border Style="{StaticResource PageEmptyIcon}">
+            <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconConnections}"/>
+          </Border>
+          <TextBlock Text="{Binding Texts[Explorer_PickTitle]}" Style="{StaticResource PageEmptyTitle}"/>
+          <TextBlock Text="{Binding Texts[Explorer_PickDescription]}" Style="{StaticResource PageEmptyDescription}"/>
+          <Button Content="{Binding Texts[Nav_Connections]}" Style="{StaticResource PrimaryButton}"
+                  Margin="0,20,0,0" HorizontalAlignment="Center"
+                  Command="{Binding ShowConnectionsCommand}"
+                  AutomationProperties.Name="{Binding Texts[Nav_Connections]}"/>
+        </StackPanel>
+
+        <controls:LoadingView Margin="24,20"
+                              Message="{Binding Texts[Explorer_Loading]}"
+                              Visibility="{Binding Explorer.ShowLoading, Converter={StaticResource BoolVis}}"/>
+        <controls:LoadingView Margin="24,20"
+                              Message="{Binding Explorer.SearchLoadingText}"
+                              Visibility="{Binding Explorer.ShowSearchLoading, Converter={StaticResource BoolVis}}"/>
+
+        <Border Margin="16" Padding="16" CornerRadius="8" Background="{DynamicResource DangerSubtleBrush}"
+                HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="480"
+                Visibility="{Binding Explorer.ShowError, Converter={StaticResource BoolVis}}">
+          <StackPanel>
+            <TextBlock Text="{Binding Explorer.Error}" TextWrapping="Wrap" LineHeight="20"
+                       Foreground="{DynamicResource DangerTextBrush}"/>
+            <Button Content="{Binding Texts[Explorer_Retry]}" Style="{StaticResource SecondaryButton}"
+                    Margin="0,12,0,0" HorizontalAlignment="Left"
+                    Command="{Binding Explorer.RefreshCommand}"
+                    AutomationProperties.Name="{Binding Texts[Explorer_Retry]}"/>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Style="{StaticResource PageEmptyHost}"
+                    TextBlock.TextAlignment="Center"
+                    Visibility="{Binding Explorer.ShowEmptyBuckets, Converter={StaticResource BoolVis}}">
+          <Border Style="{StaticResource PageEmptyIcon}">
+            <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconFolder}"/>
+          </Border>
+          <TextBlock Text="{Binding Texts[Explorer_NoBucketsTitle]}" Style="{StaticResource PageEmptyTitle}"/>
+          <TextBlock Text="{Binding Texts[Explorer_NoBucketsDescription]}" Style="{StaticResource PageEmptyDescription}"/>
+        </StackPanel>
+
+        <Grid x:Name="EmptyObjectsArea" Background="{DynamicResource SurfaceBrush}"
+              Visibility="{Binding Explorer.ShowEmptyObjects, Converter={StaticResource BoolVis}}"
+              ContextMenu="{StaticResource CurrentDirectoryMenu}"
+              ContextMenuOpening="EmptyObjects_ContextMenuOpening">
+          <StackPanel Style="{StaticResource PageEmptyHost}" TextBlock.TextAlignment="Center">
+            <Border Style="{StaticResource PageEmptyIcon}">
+              <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconFolder}"/>
+            </Border>
+            <TextBlock Text="{Binding Texts[Explorer_EmptyTitle]}" Style="{StaticResource PageEmptyTitle}"/>
+            <TextBlock Text="{Binding Texts[Explorer_EmptyDescription]}" Style="{StaticResource PageEmptyDescription}"/>
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Style="{StaticResource PageEmptyHost}"
+                    TextBlock.TextAlignment="Center"
+                    Visibility="{Binding Explorer.ShowSearchPrompt, Converter={StaticResource BoolVis}}">
+          <Border Style="{StaticResource PageEmptyIcon}">
+            <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconSearch}"/>
+          </Border>
+          <TextBlock Text="{Binding Texts[Explorer_SearchReady]}" Style="{StaticResource PageEmptyTitle}"/>
+          <TextBlock Text="{Binding Texts[Explorer_SearchReadyHint]}" Style="{StaticResource PageEmptyDescription}"/>
+        </StackPanel>
+
+        <StackPanel Style="{StaticResource PageEmptyHost}"
+                    TextBlock.TextAlignment="Center"
+                    Visibility="{Binding Explorer.ShowSearchPartialEmpty, Converter={StaticResource BoolVis}}">
+          <Border Style="{StaticResource PageEmptyIcon}">
+            <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconSearch}"/>
+          </Border>
+          <TextBlock Text="{Binding Texts[Explorer_SearchPartialEmpty]}" Style="{StaticResource PageEmptyTitle}"/>
+          <TextBlock Text="{Binding Texts[Explorer_SearchPartialEmptyHint]}" Style="{StaticResource PageEmptyDescription}"/>
+        </StackPanel>
+
+        <StackPanel Style="{StaticResource PageEmptyHost}"
+                    TextBlock.TextAlignment="Center"
+                    Visibility="{Binding Explorer.ShowNoMatches, Converter={StaticResource BoolVis}}">
+          <Border Style="{StaticResource PageEmptyIcon}">
+            <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconSearch}"/>
+          </Border>
+          <TextBlock Text="{Binding Explorer.NoMatchesTitle}" Style="{StaticResource PageEmptyTitle}"/>
+          <TextBlock Text="{Binding Explorer.NoMatchesHint}" Style="{StaticResource PageEmptyDescription}"/>
+        </StackPanel>
+
+        <DataGrid x:Name="BucketsGrid" ItemsSource="{Binding Explorer.BucketRows}"
+                  Visibility="{Binding Explorer.ShowBucketList, Converter={StaticResource BoolVis}}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  SizeChanged="BucketsGrid_SizeChanged"
+                  MouseDoubleClick="Buckets_MouseDoubleClick"
+                  SelectionMode="Single"
+                  AutomationProperties.Name="{Binding Texts[Explorer_Buckets]}">
+          <DataGrid.RowStyle>
+            <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+              <!-- Each menu targets its owning row, not the previously selected bucket. -->
+              <Setter Property="Tag" Value="{Binding DataContext.Explorer, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+              <Setter Property="ContextMenu">
+                <Setter.Value>
+                  <ContextMenu>
+                    <MenuItem Header="{Binding PlacementTarget.Tag.Texts[Places_OpenNewTab], RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              Command="{Binding PlacementTarget.Tag.OpenRowNewTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                      <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconOpenNewTab}"/></MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                    <MenuItem Header="{Binding PlacementTarget.DataContext.FavoriteActionText, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              Command="{Binding PlacementTarget.Tag.ToggleBucketFavoriteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              IsEnabled="{Binding PlacementTarget.Tag.CanFavorite, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                      <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </DataGrid.RowStyle>
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Width="*" SortMemberPath="Name">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Path Grid.Column="0" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0"
+                          VerticalAlignment="Center"
+                          Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.5"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          Fill="Transparent" Data="{StaticResource IconBucket}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="0,0,8,0"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding Name}"/>
+                    <Button Grid.Column="2" Style="{StaticResource BucketFavoriteButton}"
+                            VerticalAlignment="Center"
+                            Command="{Binding DataContext.Explorer.ToggleBucketFavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            IsEnabled="{Binding DataContext.Explorer.CanFavorite, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            ToolTip="{Binding FavoriteActionText}"
+                            AutomationProperties.Name="{Binding FavoriteActionText}">
+                      <Path Data="{StaticResource IconStar}" Width="16" Height="16" Stretch="Uniform"
+                            StrokeThickness="1.5" StrokeStartLineCap="Round"
+                            StrokeEndLineCap="Round" StrokeLineJoin="Round">
+                        <Path.Style>
+                          <Style TargetType="Path">
+                            <Setter Property="Stroke" Value="{DynamicResource MutedTextBrush}"/>
+                            <Setter Property="Fill" Value="Transparent"/>
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                <Setter Property="Stroke" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Fill" Value="{DynamicResource AccentBrush}"/>
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </Path.Style>
+                      </Path>
+                    </Button>
+                  </Grid>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Binding="{Binding Region}" Width="140"/>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Visibility="{Binding Explorer.ShowObjectList, Converter={StaticResource BoolVis}}">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <DataGrid x:Name="ObjectsGrid" Grid.Row="0" ItemsSource="{Binding Explorer.Rows}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    IsVisibleChanged="ObjectsGrid_IsVisibleChanged"
+                    SizeChanged="ObjectsGrid_SizeChanged"
+                    Visibility="{Binding Explorer.ShowObjectTable, Converter={StaticResource BoolVis}}"
+                    SelectionChanged="Objects_SelectionChanged"
+                    KeyboardNavigation.TabNavigation="Once"
+                    controls:FocusCue.RowFocusScope="True"
+                    PreviewKeyDown="ObjectsGrid_PreviewKeyDown"
+                    PreviewMouseLeftButtonDown="Marquee_PreviewMouseLeftButtonDown"
+                    PreviewMouseLeftButtonUp="Marquee_PreviewMouseLeftButtonUp"
+                    PreviewMouseMove="Marquee_MouseMove"
+                    LostMouseCapture="Marquee_LostMouseCapture"
+                    PreviewMouseRightButtonDown="Objects_PreviewMouseRightButtonDown"
+                    ContextMenuOpening="Objects_ContextMenuOpening"
+                    Sorting="Objects_Sorting"
+                   ColumnHeaderStyle="{StaticResource SortableListColumnHeader}"
+                    MouseDoubleClick="Objects_MouseDoubleClick"
+                    AutomationProperties.Name="{Binding Texts[Explorer_Objects]}">
+            <DataGrid.RowStyle>
+              <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                <Style.Triggers>
+                  <!-- The caret belongs to the row, not the cell, and is only
+                       visible after keyboard navigation (not mouse clicks). -->
+                  <DataTrigger Binding="{Binding Path=(controls:FocusCue.Visible), RelativeSource={RelativeSource Self}}" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SubtleAccentBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.ContextMenu>
+              <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Explorer_Open]}"
+                          Command="{Binding Explorer.OpenRowCommand}"
+                          IsEnabled="{Binding Explorer.CanOpen}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconTrayOpen}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Places_OpenNewTab]}"
+                          Command="{Binding Explorer.OpenRowNewTabCommand}"
+                          IsEnabled="{Binding Explorer.CanOpenFolderInNewTab}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconOpenNewTab}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_CopyKey]}"
+                          Command="{Binding Explorer.CopyKeyCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[Explorer_CopyUri]}"
+                          Command="{Binding Explorer.CopyUriCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[Share_Menu]}"
+                          Command="{Binding Explorer.ShareLinkCommand}"
+                          IsEnabled="{Binding Explorer.CanShareLink}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconShare}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Explorer.FolderFavoriteTip}"
+                          Command="{Binding Explorer.ToggleFolderFavoriteCommand}"
+                          IsEnabled="{Binding Explorer.CanFavoriteFolder}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Copy]}" InputGestureText="Ctrl+C"
+                          Command="{Binding Explorer.CopyCommand}"
+                          IsEnabled="{Binding Explorer.CanCopy}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconCopy}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_CopyTo]}"
+                          Command="{Binding Explorer.CopyToCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyTo}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Cut]}" InputGestureText="Ctrl+X"
+                          Command="{Binding Explorer.CutCommand}"
+                          IsEnabled="{Binding Explorer.CanCut}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconCut}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Paste]}" InputGestureText="Ctrl+V"
+                          Command="{Binding Explorer.PasteCommand}"
+                          IsEnabled="{Binding Explorer.CanPaste}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconPaste}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Rename]}" InputGestureText="F2"
+                          Command="{Binding Explorer.RenameCommand}"
+                          IsEnabled="{Binding Explorer.CanRename}"/>
+                <MenuItem Header="{Binding Texts[Transfer_Download]}"
+                          Click="Download_Click"
+                          IsEnabled="{Binding Explorer.CanDownload}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconDownload}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Delete]}" InputGestureText="Del"
+                          Command="{Binding Explorer.DeleteCommand}"
+                          IsEnabled="{Binding Explorer.CanDelete}"
+                          controls:MenuAssist.IsDanger="True">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuDangerIconStyle}" Data="{StaticResource IconTrash}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+              <DataGridTemplateColumn Width="*" SortMemberPath="Name" MinWidth="240">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <!-- Constrain long names to the remaining star-column width; a horizontal
+                         StackPanel measures text at its full desired width and can widen
+                         the DataGrid when directory contents change. -->
+                    <Grid MinWidth="0" ClipToBounds="True">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" MinWidth="0"/>
+                      </Grid.ColumnDefinitions>
+                      <Path Grid.Column="0" Style="{StaticResource FileGlyph}" Margin="0,0,8,0"/>
+                      <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                                 ToolTip="{Binding DisplayName}"/>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Binding="{Binding Size}" MinWidth="80" Width="110" SortMemberPath="SizeBytes"/>
+              <DataGridTextColumn Binding="{Binding Kind}" MinWidth="80" Width="110" CanUserSort="False"/>
+              <DataGridTextColumn Binding="{Binding ModifiedText}" MinWidth="150" Width="180" SortMemberPath="Modified"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <ListBox x:Name="ObjectsIcons" Grid.Row="0" ItemsSource="{Binding Explorer.Rows}"
+                   Tag="164"
+                   Visibility="{Binding Explorer.ShowObjectIcons, Converter={StaticResource BoolVis}}"
+                   SelectionMode="Extended"
+                   Background="{DynamicResource SurfaceBrush}"
+                   Foreground="{DynamicResource PrimaryTextBrush}"
+                   BorderThickness="0" Padding="12,8"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   ScrollViewer.CanContentScroll="True"
+                   VirtualizingPanel.IsVirtualizing="True"
+                   ItemContainerStyle="{StaticResource ExplorerDropIconTile}"
+                   SelectionChanged="Icons_SelectionChanged"
+                   PreviewMouseLeftButtonDown="Marquee_PreviewMouseLeftButtonDown"
+                   PreviewMouseLeftButtonUp="Marquee_PreviewMouseLeftButtonUp"
+                   PreviewMouseMove="Marquee_MouseMove"
+                   LostMouseCapture="Marquee_LostMouseCapture"
+                   PreviewMouseRightButtonDown="Icons_PreviewMouseRightButtonDown"
+                   ContextMenuOpening="Icons_ContextMenuOpening"
+                   PreviewKeyDown="Icons_PreviewKeyDown"
+                   SizeChanged="Icons_SizeChanged"
+                   MouseDoubleClick="Icons_MouseDoubleClick"
+                   AutomationProperties.Name="{Binding Texts[Explorer_Objects]}">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                 <explorer:VirtualizingTilePanel
+                     ItemWidth="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                     ItemHeight="{Binding DataContext.Explorer.TileHeight, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ContextMenu>
+              <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem Header="{Binding Texts[Explorer_Open]}"
+                          Command="{Binding Explorer.OpenRowCommand}"
+                          IsEnabled="{Binding Explorer.CanOpen}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconTrayOpen}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Places_OpenNewTab]}"
+                          Command="{Binding Explorer.OpenRowNewTabCommand}"
+                          IsEnabled="{Binding Explorer.CanOpenFolderInNewTab}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconOpenNewTab}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_CopyKey]}"
+                          Command="{Binding Explorer.CopyKeyCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[Explorer_CopyUri]}"
+                          Command="{Binding Explorer.CopyUriCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[Share_Menu]}"
+                          Command="{Binding Explorer.ShareLinkCommand}"
+                          IsEnabled="{Binding Explorer.CanShareLink}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconShare}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Explorer.FolderFavoriteTip}"
+                          Command="{Binding Explorer.ToggleFolderFavoriteCommand}"
+                          IsEnabled="{Binding Explorer.CanFavoriteFolder}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Copy]}" InputGestureText="Ctrl+C"
+                          Command="{Binding Explorer.CopyCommand}"
+                          IsEnabled="{Binding Explorer.CanCopy}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconCopy}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_CopyTo]}"
+                          Command="{Binding Explorer.CopyToCommand}"
+                          IsEnabled="{Binding Explorer.CanCopyTo}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Cut]}" InputGestureText="Ctrl+X"
+                          Command="{Binding Explorer.CutCommand}"
+                          IsEnabled="{Binding Explorer.CanCut}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconCut}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Paste]}" InputGestureText="Ctrl+V"
+                          Command="{Binding Explorer.PasteCommand}"
+                          IsEnabled="{Binding Explorer.CanPaste}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconPaste}"/></MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                <MenuItem Header="{Binding Texts[Explorer_Rename]}" InputGestureText="F2"
+                          Command="{Binding Explorer.RenameCommand}"
+                          IsEnabled="{Binding Explorer.CanRename}"/>
+                <MenuItem Header="{Binding Texts[Transfer_Download]}"
+                          Click="Download_Click"
+                          IsEnabled="{Binding Explorer.CanDownload}">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconDownload}"/></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding Texts[Explorer_Delete]}" InputGestureText="Del"
+                          Command="{Binding Explorer.DeleteCommand}"
+                          IsEnabled="{Binding Explorer.CanDelete}"
+                          controls:MenuAssist.IsDanger="True">
+                  <MenuItem.Icon><Path Style="{StaticResource ContextMenuDangerIconStyle}" Data="{StaticResource IconTrash}"/></MenuItem.Icon>
+                </MenuItem>
+              </ContextMenu>
+            </ListBox.ContextMenu>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <Path Style="{StaticResource FileGlyph}" Margin="0,0,0,10"
+                        Width="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        Height="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        StrokeThickness="{Binding DataContext.Explorer.TileIconStrokeThickness, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                  <TextBlock TextAlignment="Center" TextWrapping="Wrap"
+                             ToolTip="{Binding DisplayName}"
+                             TextTrimming="CharacterEllipsis"
+                             MaxHeight="{Binding DataContext.Explorer.TileNameMaxHeight, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                             LineHeight="{Binding DataContext.Explorer.TileNameLineHeight, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                             FontSize="{Binding DataContext.Explorer.TileNameSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                             Foreground="{DynamicResource PrimaryTextBrush}">
+                    <TextBlock.Text>
+                      <MultiBinding Converter="{StaticResource GridFileName}">
+                        <Binding Path="DisplayName"/>
+                        <Binding Path="DataContext.Explorer.IsCompactGrid" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
+                      </MultiBinding>
+                    </TextBlock.Text>
+                  </TextBlock>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <!-- Only the selection outline is visible; the overlay never intercepts input. -->
+          <Canvas x:Name="MarqueeLayer" Grid.Row="0" Panel.ZIndex="5"
+                  ClipToBounds="True" IsHitTestVisible="False">
+            <Rectangle x:Name="MarqueeBox" Visibility="Collapsed"
+                       Stroke="{DynamicResource AccentBrush}"
+                       Fill="{DynamicResource MarqueeSelectionFillBrush}"
+                       StrokeThickness="1" SnapsToDevicePixels="True"/>
+          </Canvas>
+          <Border Grid.Row="1" Padding="16,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+                  Visibility="{Binding Explorer.ShowLoadMore, Converter={StaticResource BoolVis}}">
+            <Button Style="{StaticResource SecondaryButton}"
+                    HorizontalAlignment="Left"
+                    Command="{Binding Explorer.LoadMoreCommand}"
+                    IsEnabled="{Binding Explorer.CanLoadMore}"
+                    AutomationProperties.Name="{Binding Explorer.LoadMoreText}">
+              <StackPanel Orientation="Horizontal">
+                <controls:LoadingView Mode="Inline" Margin="0,0,8,0" VerticalAlignment="Center"
+                                      Visibility="{Binding Explorer.IsLoadingMore, Converter={StaticResource BoolVis}}"/>
+                <TextBlock Text="{Binding Explorer.LoadMoreText}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+          </Border>
+        </Grid>
+        <!-- The outline and destination hint do not intercept native shell input. -->
+        <Border Grid.Column="0" Margin="8" CornerRadius="8" BorderThickness="2" IsHitTestVisible="False"
+                BorderBrush="{DynamicResource AccentBrush}" Background="Transparent"
+                Visibility="{Binding Explorer.IsDropTarget, Converter={StaticResource BoolVis}}"/>
+        <Border Grid.Column="0" Margin="16" Padding="16,10" CornerRadius="8" BorderThickness="1"
+                IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource AccentBrush}"
+                Visibility="{Binding Explorer.IsDropTarget, Converter={StaticResource BoolVis}}">
+          <StackPanel MaxWidth="480">
+            <TextBlock Text="{Binding Texts[Transfer_DropHint]}" TextAlignment="Center"
+                       FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
+            <TextBlock Text="{Binding Explorer.DropDestination}" TextAlignment="Center"
+                       TextWrapping="Wrap" Margin="0,4,0,0" Foreground="{DynamicResource MutedTextBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <GridSplitter x:Name="SideSplitter" Grid.Column="1" Style="{StaticResource PaneSplitter}"
+                    DragCompleted="SideSplitter_DragCompleted" Visibility="Collapsed"/>
+
+      <Border x:Name="SidePane" Grid.Column="2" Background="{DynamicResource SurfaceBrush}"
+              Visibility="{Binding Explorer.ShowSide, Converter={StaticResource BoolVis}}">
+        <DockPanel>
+          <DockPanel DockPanel.Dock="Top" Margin="16,12,12,0">
+            <Button DockPanel.Dock="Right" Style="{StaticResource ViewModeButton}"
+                    Command="{Binding Explorer.ToggleDetailsPaneCommand}"
+                    ToolTip="{Binding Texts[Explorer_HideDetails]}"
+                    AutomationProperties.Name="{Binding Texts[Explorer_HideDetails]}">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+            </Button>
+          <TextBlock DockPanel.Dock="Left" Text="{Binding Texts[Explorer_Details]}" FontWeight="SemiBold"
+                     VerticalAlignment="Center" FontSize="{DynamicResource FontSizeBody}">
+            <TextBlock.Style>
+              <Style TargetType="TextBlock">
+                <Setter Property="Visibility" Value="Collapsed"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Explorer.Preview.IsOpen}" Value="False">
+                    <Setter Property="Visibility" Value="Visible"/>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+          <StackPanel Orientation="Horizontal"
+                      Visibility="{Binding Explorer.Preview.IsOpen, Converter={StaticResource BoolVis}}">
+            <Button Content="{Binding Texts[Preview_Content]}"
+                    Command="{Binding Explorer.Preview.ShowContentCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_Content]}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource SideModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.Preview.ShowingContent}" Value="True">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+            </Button>
+            <Button Content="{Binding Texts[Explorer_Details]}"
+                    Command="{Binding Explorer.Preview.ShowDetailsCommand}"
+                    AutomationProperties.Name="{Binding Texts[Explorer_Details]}">
+              <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource SideModeButton}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Explorer.Preview.ShowingContent}" Value="False">
+                      <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Button.Style>
+            </Button>
+          </StackPanel>
+          </DockPanel>
+          <Grid>
+            <preview:PreviewPane DataContext="{Binding Explorer.Preview}"
+                                 Visibility="{Binding DataContext.Explorer.Preview.ShowingContent, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolVis}}"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16"
+                          Visibility="{Binding DataContext.Explorer.Preview.ShowingDetails, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolVis}}">
+            <StackPanel DataContext="{Binding Explorer.Detail}">
+              <DockPanel Margin="0,0,0,4" LastChildFill="True" Background="Transparent">
+                <Button DockPanel.Dock="Right" Style="{StaticResource DetailCopyButton}" Margin="6,0,0,0"
+                        Command="{Binding DataContext.Explorer.CopyDetailValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding Name}"
+                        Visibility="{Binding ShowNameCopy, Converter={StaticResource BoolVis}}"
+                        ToolTip="{Binding DataContext.Texts[Explorer_CopyDetailName], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        AutomationProperties.Name="{Binding DataContext.Texts[Explorer_CopyDetailName], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                  <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+                </Button>
+                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis" MaxHeight="54" ToolTip="{Binding Name}"/>
+              </DockPanel>
+              <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}"
+                         Margin="0,0,0,4" ToolTip="{Binding SizeTooltip}"/>
+              <TextBlock Text="{Binding ModifiedSummary}" Style="{StaticResource DetailLabel}" Margin="0,0,0,16"
+                         ToolTip="{Binding ModifiedTooltip}"
+                         Visibility="{Binding ShowFileFacts, Converter={StaticResource BoolVis}}"/>
+
+              <StackPanel Visibility="{Binding ShowLocation, Converter={StaticResource BoolVis}}">
+                <TextBlock Text="{Binding DataContext.Texts[Explorer_Location], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                <StackPanel Visibility="{Binding ShowBucket, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding DataContext.Texts[Explorer_CopyToBucket], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Style="{StaticResource DetailLabel}"/>
+                  <TextBlock Text="{Binding Bucket}" Margin="0,2,0,12" TextWrapping="Wrap"
+                             ToolTip="{Binding Bucket}"/>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding ShowKey, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding KeyLabel}" Style="{StaticResource DetailLabel}"/>
+                  <DockPanel Margin="0,2,0,12" LastChildFill="True" Background="Transparent">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource DetailCopyButton}" Margin="6,0,0,0"
+                            Command="{Binding DataContext.Explorer.CopyDetailValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding Key}"
+                            ToolTip="{Binding DataContext.Texts[Explorer_CopyKey], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            AutomationProperties.Name="{Binding DataContext.Texts[Explorer_CopyKey], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                      <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+                    </Button>
+                    <TextBlock Text="{Binding Key}" TextWrapping="Wrap" ToolTip="{Binding Key}"/>
+                  </DockPanel>
+                </StackPanel>
+
+                <StackPanel Visibility="{Binding ShowUri, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding DataContext.Texts[Explorer_UriLabel], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Style="{StaticResource DetailLabel}"/>
+                  <DockPanel Margin="0,2,0,16" LastChildFill="True" Background="Transparent">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource DetailCopyButton}" Margin="6,0,0,0"
+                            Command="{Binding DataContext.Explorer.CopyDetailValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding Uri}"
+                            ToolTip="{Binding DataContext.Texts[Explorer_CopyUri], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            AutomationProperties.Name="{Binding DataContext.Texts[Explorer_CopyUri], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                      <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+                    </Button>
+                    <TextBlock Text="{Binding Uri}" TextWrapping="Wrap" ToolTip="{Binding Uri}"/>
+                  </DockPanel>
+                </StackPanel>
+              </StackPanel>
+
+              <StackPanel Visibility="{Binding ShowFileFacts, Converter={StaticResource BoolVis}}">
+                <TextBlock Text="{Binding DataContext.Texts[Explorer_Technical], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontWeight="SemiBold" Margin="0,0,0,10"/>
+                <StackPanel Visibility="{Binding ShowEtag, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding DataContext.Texts[Explorer_ETag], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Style="{StaticResource DetailLabel}"
+                              ToolTip="{Binding DataContext.Texts[Explorer_ETagHint], RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                  <DockPanel Margin="0,2,0,12" LastChildFill="True" Background="Transparent">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource DetailCopyButton}" Margin="6,0,0,0"
+                            Command="{Binding DataContext.Explorer.CopyDetailValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding ETagRaw}"
+                            ToolTip="{Binding DataContext.Texts[Explorer_CopyETag], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            AutomationProperties.Name="{Binding DataContext.Texts[Explorer_CopyETag], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                      <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+                    </Button>
+                    <TextBlock Text="{Binding ETag}" TextTrimming="CharacterEllipsis" ToolTip="{Binding ETag}"/>
+                  </DockPanel>
+                </StackPanel>
+                <StackPanel Visibility="{Binding ShowHeaders, Converter={StaticResource BoolVis}}">
+                  <TextBlock Text="{Binding DataContext.Texts[Explorer_ContentType], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Style="{StaticResource DetailLabel}"
+                              ToolTip="{Binding DataContext.Texts[Explorer_ContentTypeHint], RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                  <DockPanel Margin="0,2,0,0" LastChildFill="True" Background="Transparent">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource DetailCopyButton}" Margin="6,0,0,0"
+                            Command="{Binding DataContext.Explorer.CopyDetailValueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding ContentType}"
+                            ToolTip="{Binding DataContext.Texts[Explorer_CopyContentType], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            AutomationProperties.Name="{Binding DataContext.Texts[Explorer_CopyContentType], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                      <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconCopy}"/>
+                    </Button>
+                    <TextBlock Text="{Binding ContentTypeDisplay}" TextWrapping="Wrap" ToolTip="{Binding ContentType}"/>
+                  </DockPanel>
+                </StackPanel>
+              </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
+          </Grid>
+        </DockPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

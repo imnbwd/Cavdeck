@@ -1,0 +1,431 @@
+<UserControl x:Class="Cavdeck.App.Features.Connections.ConnectionsView"
+             x:Name="ConnectionsRoot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+             xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters">
+  <UserControl.Resources>
+    <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+    <converters:StringToVisibilityConverter x:Key="StringVis"/>
+    <Style x:Key="ProviderChoiceButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+      <Setter Property="MinHeight" Value="60"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+      <Setter Property="Padding" Value="8,6"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+          <Setter Property="Background" Value="{DynamicResource SubtleAccentBrush}"/>
+          <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+          <Setter Property="FontWeight" Value="SemiBold"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <!-- Compact disclosure affordance with an arrow reflecting expanded state. -->
+    <Style x:Key="AdvancedToggleChevron" TargetType="Path" BasedOn="{StaticResource IconGlyph}">
+      <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+      <Setter Property="RenderTransform">
+        <Setter.Value><RotateTransform Angle="0"/></Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Editor.ShowAdvanced}" Value="True">
+          <Setter Property="RenderTransform">
+            <Setter.Value><RotateTransform Angle="180"/></Setter.Value>
+          </Setter>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="FieldError" TargetType="TextBlock" BasedOn="{StaticResource TextCaption}">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+    <Style x:Key="FieldHint" TargetType="TextBlock" BasedOn="{StaticResource TextCaption}">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid Visibility="{Binding ShowList, Converter={StaticResource BoolVis}}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="1" Background="{DynamicResource DangerSubtleBrush}" CornerRadius="8"
+              Padding="12" Margin="{DynamicResource PageContentMargin}"
+              Visibility="{Binding Connections.HasLoadError, Converter={StaticResource BoolVis}}">
+        <TextBlock Text="{Binding Connections.LoadError}" TextWrapping="Wrap"
+                   Foreground="{DynamicResource DangerTextBrush}"/>
+      </Border>
+
+      <Border Grid.Row="0" Style="{StaticResource PageToolbar}"
+              Visibility="{Binding ShowRows, Converter={StaticResource BoolVis}}">
+        <DockPanel LastChildFill="False" VerticalAlignment="Center">
+        <Button DockPanel.Dock="Right" Content="{Binding Texts[Connection_Add]}"
+                  Style="{StaticResource PrimaryButton}" Command="{Binding AddCommand}"
+                  AutomationProperties.Name="{Binding Texts[Connection_Add]}"/>
+          <TextBlock Text="{Binding ListSummary}" VerticalAlignment="Center"
+                     Foreground="{DynamicResource MutedTextBrush}"/>
+        </DockPanel>
+      </Border>
+
+      <controls:LoadingView Grid.Row="2" Mode="Inline" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Message="{Binding Texts[Nav_LoadingConnections]}"
+                            Visibility="{Binding ShowLoading, Converter={StaticResource BoolVis}}"/>
+      <StackPanel Grid.Row="2" Style="{StaticResource PageEmptyHost}"
+                  TextBlock.TextAlignment="Center"
+                  Visibility="{Binding ShowEmpty, Converter={StaticResource BoolVis}}">
+        <Border Style="{StaticResource PageEmptyIcon}">
+          <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconConnections}"/>
+        </Border>
+        <TextBlock Text="{Binding Texts[Connection_EmptyTitle]}" Style="{StaticResource PageEmptyTitle}"/>
+        <TextBlock Text="{Binding Texts[Connection_EmptyDescription]}" Style="{StaticResource PageEmptyDescription}"/>
+        <Button Content="{Binding Texts[Connection_Add]}" Style="{StaticResource PrimaryButton}"
+                Command="{Binding AddCommand}" Margin="0,20,0,0" HorizontalAlignment="Center"
+                AutomationProperties.Name="{Binding Texts[Connection_Add]}"/>
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="2" Margin="{DynamicResource PageContentMargin}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    Visibility="{Binding ShowRows, Converter={StaticResource BoolVis}}">
+        <ItemsControl ItemsSource="{Binding Connections.Items}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Margin="0,0,0,8" SnapsToDevicePixels="True">
+                 <Border.Style>
+                   <Style TargetType="Border" BasedOn="{StaticResource SurfaceCard}">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Border.Style>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*" MinWidth="0"/>
+                    </Grid.ColumnDefinitions>
+                    <controls:ProviderGlyph Grid.Column="0" Style="{StaticResource ProviderGlyphStyle}"
+                                            Provider="{Binding Connection.Provider}" Width="20" Height="20"
+                                            Margin="0,2,12,0" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Column="1">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Subtitle}" Margin="0,2,0,0" FontSize="12"
+                               Foreground="{DynamicResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Badges}" Margin="0,2,0,0" FontSize="12"
+                               Foreground="{DynamicResource MutedTextBrush}" TextTrimming="CharacterEllipsis"
+                               Visibility="{Binding HasBadges, Converter={StaticResource BoolVis}}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                Visibility="{Binding HasStatus, Converter={StaticResource BoolVis}}">
+                      <controls:LoadingView Mode="Inline" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <controls:LoadingView.Style>
+                          <Style TargetType="controls:LoadingView">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                              <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                  <Condition Binding="{Binding StatusLevel}" Value="Muted"/>
+                                  <Condition Binding="{Binding DataContext.Connections.IsBusy, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                              </MultiDataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </controls:LoadingView.Style>
+                      </controls:LoadingView>
+                      <TextBlock Text="{Binding Status}" FontSize="12" TextWrapping="Wrap"
+                                 VerticalAlignment="Center"
+                                 ToolTip="{Binding StatusDetail}">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding StatusLevel}" Value="Success">
+                                <Setter Property="Foreground" Value="{DynamicResource SuccessTextBrush}"/>
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding StatusLevel}" Value="Warning">
+                                <Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}"/>
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding StatusLevel}" Value="Danger">
+                                <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}"/>
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                    </StackPanel>
+                    </StackPanel>
+                  </Grid>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="{Binding DataContext.Texts[Explorer_Open], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Style="{StaticResource PrimaryButton}" MinWidth="72" Margin="0,0,8,0"
+                            Command="{Binding DataContext.Connections.OpenCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            IsEnabled="{Binding DataContext.Connections.IsIdle, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                    <Button Style="{StaticResource IconButton}" Width="32" Height="32"
+                            Click="ConnectionMore_Click"
+                            ToolTip="{Binding DataContext.Texts[Explorer_More], RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            AutomationProperties.Name="{Binding DataContext.Texts[Explorer_More], RelativeSource={RelativeSource AncestorType=UserControl}}">
+                      <Button.ContextMenu>
+                        <ContextMenu Placement="Bottom" HorizontalOffset="-4" VerticalOffset="-4"
+                                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                          <MenuItem Header="{Binding DataContext.Texts[Connection_Test], Source={x:Reference ConnectionsRoot}}"
+                                    Command="{Binding DataContext.Connections.TestStoredCommand, Source={x:Reference ConnectionsRoot}}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="{Binding DataContext.Connections.IsIdle, Source={x:Reference ConnectionsRoot}}"/>
+                          <MenuItem Header="{Binding DataContext.Texts[Connection_Edit], Source={x:Reference ConnectionsRoot}}"
+                                    Command="{Binding DataContext.EditCommand, Source={x:Reference ConnectionsRoot}}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="{Binding DataContext.Connections.IsIdle, Source={x:Reference ConnectionsRoot}}"/>
+                          <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                          <MenuItem Header="{Binding DataContext.Texts[Connection_Delete], Source={x:Reference ConnectionsRoot}}"
+                                    Command="{Binding DataContext.Connections.DeleteCommand, Source={x:Reference ConnectionsRoot}}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="{Binding DataContext.Connections.IsIdle, Source={x:Reference ConnectionsRoot}}"
+                                    controls:MenuAssist.IsDanger="True">
+                            <MenuItem.Icon><Path Style="{StaticResource ContextMenuDangerIconStyle}" Data="{StaticResource IconTrash}"/></MenuItem.Icon>
+                          </MenuItem>
+                        </ContextMenu>
+                      </Button.ContextMenu>
+                      <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconMoreHorizontal}" Width="16" Height="16"/>
+                    </Button>
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  Visibility="{Binding Editor.IsOpen, Converter={StaticResource BoolVis}}">
+      <StackPanel MaxWidth="560" HorizontalAlignment="Left" Margin="16,16,16,24">
+        <TextBlock Text="{Binding Editor.Title}" Style="{StaticResource TextTitle}" Margin="0,0,0,12"/>
+        <controls:LoadingView Mode="Inline"
+                              Message="{Binding Editor.BusyMessage}"
+                              Margin="0,0,0,12"
+                              Visibility="{Binding Editor.BusyMessage, Converter={StaticResource StringVis}}"/>
+
+        <TextBlock Text="{Binding Texts[Connection_Provider]}" Style="{StaticResource FieldLabelStyle}"/>
+        <ItemsControl ItemsSource="{Binding Editor.Providers}" Margin="0,0,0,8">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="4"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Style="{StaticResource ProviderChoiceButton}"
+                      Command="{Binding DataContext.Editor.SelectProviderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      CommandParameter="{Binding Kind}"
+                      AutomationProperties.Name="{Binding Label}">
+                <StackPanel HorizontalAlignment="Center">
+                  <controls:ProviderGlyph Style="{StaticResource ProviderGlyphStyle}"
+                                          Provider="{Binding Kind}" Width="18" Height="18"
+                                          HorizontalAlignment="Center" Margin="0,0,0,4"
+                                          Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                  <TextBlock Text="{Binding Label}" TextWrapping="Wrap" TextAlignment="Center"
+                             HorizontalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{Binding Editor.ProviderHint}" Style="{StaticResource FieldHint}" Margin="0,0,0,14"/>
+
+        <StackPanel IsEnabled="{Binding Editor.IsIdle}">
+          <StackPanel Margin="0,0,0,14">
+            <TextBlock Text="{Binding Texts[Connection_Name]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.Name, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_NamePlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasNameError}"
+                     AutomationProperties.Name="{Binding Texts[Connection_Name]}"/>
+            <TextBlock Text="{Binding Editor.NameError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.NameError, Converter={StaticResource StringVis}}"/>
+          </StackPanel>
+
+          <StackPanel Margin="0,0,0,14" Visibility="{Binding Editor.ShowAccount, Converter={StaticResource BoolVis}}">
+            <TextBlock Text="{Binding Texts[Connection_AccountId]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.AccountId, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_AccountPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasAccountError}"
+                     AutomationProperties.Name="{Binding Texts[Connection_AccountId]}"/>
+            <TextBlock Text="{Binding Editor.AccountError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.AccountError, Converter={StaticResource StringVis}}"/>
+          </StackPanel>
+
+          <StackPanel Margin="0,0,0,14" Visibility="{Binding Editor.ShowRegion, Converter={StaticResource BoolVis}}">
+            <TextBlock Text="{Binding Texts[Connection_Region]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.Region, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_RegionPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasRegionError}"
+                     AutomationProperties.Name="{Binding Texts[Connection_Region]}"/>
+            <TextBlock Text="{Binding Editor.RegionError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.RegionError, Converter={StaticResource StringVis}}"/>
+          </StackPanel>
+
+          <StackPanel Margin="0,0,0,14" Visibility="{Binding Editor.ShowEndpoint, Converter={StaticResource BoolVis}}">
+            <TextBlock Text="{Binding Texts[Connection_Endpoint]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.Endpoint, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_EndpointPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasEndpointError}"
+                     AutomationProperties.Name="{Binding Texts[Connection_Endpoint]}"/>
+            <TextBlock Text="{Binding Editor.EndpointError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.EndpointError, Converter={StaticResource StringVis}}"/>
+            <TextBlock Text="{Binding Texts[Connection_HttpWarning]}" Style="{StaticResource FieldHint}"
+                       Foreground="{DynamicResource WarningTextBrush}"
+                       Visibility="{Binding Editor.ShowHttpWarning, Converter={StaticResource BoolVis}}"/>
+          </StackPanel>
+
+          <StackPanel Margin="0,0,0,14">
+            <TextBlock Text="{Binding Texts[Connection_AccessKey]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.AccessKeyId, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_AccessKeyPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasAccessKeyError}"
+                     AutomationProperties.Name="{Binding Texts[Connection_AccessKey]}"/>
+            <TextBlock Text="{Binding Editor.AccessKeyError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.AccessKeyError, Converter={StaticResource StringVis}}"/>
+          </StackPanel>
+
+          <StackPanel Margin="0,0,0,14">
+            <TextBlock Text="{Binding Texts[Connection_Secret]}" Style="{StaticResource FieldLabelStyle}"/>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Grid>
+                <PasswordBox controls:InputAssist.Password="{Binding Editor.Secret, UpdateSourceTrigger=PropertyChanged}"
+                             controls:InputAssist.Placeholder="{Binding Texts[Connection_SecretPlaceholder]}"
+                             controls:InputAssist.IsInvalid="{Binding Editor.HasSecretError}"
+                             AutomationProperties.Name="{Binding Texts[Connection_Secret]}"
+                             Visibility="{Binding Editor.ShowSecret, Converter={StaticResource BoolVis}, ConverterParameter=invert}"/>
+                <TextBox Text="{Binding Editor.Secret, UpdateSourceTrigger=PropertyChanged}"
+                         controls:InputAssist.Placeholder="{Binding Texts[Connection_SecretPlaceholder]}"
+                         controls:InputAssist.IsInvalid="{Binding Editor.HasSecretError}"
+                         Visibility="{Binding Editor.ShowSecret, Converter={StaticResource BoolVis}}"/>
+              </Grid>
+              <Button Grid.Column="1" MinWidth="72" Margin="8,0,0,0"
+                      Content="{Binding Editor.SecretToggleLabel}"
+                      Style="{StaticResource SecondaryButton}"
+                      Command="{Binding Editor.ToggleSecretCommand}"
+                      AutomationProperties.Name="{Binding Editor.SecretToggleLabel}"/>
+            </Grid>
+            <TextBlock Text="{Binding Editor.SecretError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.SecretError, Converter={StaticResource StringVis}}"/>
+            <TextBlock Text="{Binding Texts[Connection_SecretKeep]}" Style="{StaticResource FieldHint}"
+                       Visibility="{Binding Editor.ShowSecretHint, Converter={StaticResource BoolVis}}"/>
+          </StackPanel>
+
+          <TextBlock Text="{Binding Texts[Connection_CredentialNote]}" Style="{StaticResource FieldHint}" Margin="0,0,0,14"/>
+          <TextBlock Text="{Binding Editor.Preview}" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,14"
+                     Foreground="{DynamicResource MutedTextBrush}"/>
+
+          <Button x:Name="AdvancedToggleButton" Style="{StaticResource SecondaryButton}"
+                  MinHeight="{DynamicResource ControlHeightCompact}"
+                  Padding="{DynamicResource ControlPaddingCompact}"
+                  HorizontalAlignment="Left" Margin="0,0,0,12"
+                  Command="{Binding Editor.ToggleAdvancedCommand}"
+                  AutomationProperties.Name="{Binding Editor.AdvancedLabel}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Editor.AdvancedLabel}" VerticalAlignment="Center"/>
+              <Path Data="{StaticResource IconChevronDown}"
+                    Style="{StaticResource AdvancedToggleChevron}"
+                    Width="16" Height="16" Margin="6,0,0,0"/>
+            </StackPanel>
+          </Button>
+
+          <StackPanel Visibility="{Binding Editor.ShowAdvanced, Converter={StaticResource BoolVis}}">
+            <CheckBox Content="{Binding Texts[Connection_ReadOnly]}"
+                      IsChecked="{Binding Editor.IsReadOnly}" Margin="0,0,0,4"/>
+            <TextBlock Text="{Binding Texts[Connection_ReadOnlyHint]}" Style="{StaticResource FieldHint}" Margin="0,0,0,14"/>
+
+            <TextBlock Text="{Binding Texts[Connection_Bucket]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.Bucket, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_BucketPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasBucketError}"
+                     Margin="0,0,0,0"/>
+            <TextBlock Text="{Binding Editor.BucketError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.BucketError, Converter={StaticResource StringVis}}"/>
+            <TextBlock Text="{Binding Texts[Connection_BucketHint]}" Style="{StaticResource FieldHint}" Margin="0,4,0,14"/>
+
+            <TextBlock Text="{Binding Texts[Connection_Prefix]}" Style="{StaticResource FieldLabelStyle}"/>
+            <TextBox Text="{Binding Editor.Prefix, UpdateSourceTrigger=PropertyChanged}"
+                     controls:InputAssist.Placeholder="{Binding Texts[Connection_PrefixPlaceholder]}"
+                     controls:InputAssist.IsInvalid="{Binding Editor.HasPrefixError}"/>
+            <TextBlock Text="{Binding Editor.PrefixError}" Style="{StaticResource FieldError}"
+                       Visibility="{Binding Editor.PrefixError, Converter={StaticResource StringVis}}"/>
+            <TextBlock Text="{Binding Texts[Connection_PrefixHint]}" Style="{StaticResource FieldHint}" Margin="0,4,0,14"/>
+
+            <StackPanel Visibility="{Binding Editor.ShowPathStyle, Converter={StaticResource BoolVis}}">
+              <CheckBox Content="{Binding Texts[Connection_PathStyle]}"
+                        IsChecked="{Binding Editor.ForcePathStyle}" Margin="0,0,0,4"/>
+              <TextBlock Text="{Binding Texts[Connection_PathStyleHint]}" Style="{StaticResource FieldHint}" Margin="0,0,0,8"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <Border Margin="0,4,0,16"
+                Visibility="{Binding Editor.HasProbe, Converter={StaticResource BoolVis}}">
+          <Border.Style>
+            <Style TargetType="Border" BasedOn="{StaticResource SurfaceCard}">
+              <Setter Property="Margin" Value="0,4,0,16"/>
+              <Setter Property="Background" Value="{DynamicResource DangerSubtleBrush}"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Editor.ProbeLevel}" Value="Success">
+                  <Setter Property="Background" Value="{DynamicResource SuccessSubtleBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor.ProbeLevel}" Value="Warning">
+                  <Setter Property="Background" Value="{DynamicResource WarningSubtleBrush}"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Border.Style>
+          <StackPanel>
+            <TextBlock Text="{Binding Editor.ProbeTitle}" FontWeight="SemiBold" TextWrapping="Wrap">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}"/>
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Editor.ProbeLevel}" Value="Success">
+                      <Setter Property="Foreground" Value="{DynamicResource SuccessTextBrush}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Editor.ProbeLevel}" Value="Warning">
+                      <Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <TextBlock Text="{Binding Editor.ProbeSuggestion}" TextWrapping="Wrap" Margin="0,6,0,0"
+                       Visibility="{Binding Editor.ProbeSuggestion, Converter={StaticResource StringVis}}"/>
+            <TextBlock Text="{Binding Editor.ProbeTechnical}" TextWrapping="Wrap" Margin="0,6,0,0"
+                       FontSize="12" Foreground="{DynamicResource MutedTextBrush}"
+                       Visibility="{Binding Editor.ProbeTechnical, Converter={StaticResource StringVis}}"/>
+            <Button Content="{Binding Texts[Connection_CopyDiagnostic]}" Style="{StaticResource GhostButton}"
+                    HorizontalAlignment="Left" Margin="0,8,0,0" Padding="0"
+                    Command="{Binding Editor.CopyDiagnosticCommand}"/>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" IsEnabled="{Binding Editor.IsIdle}">
+          <Button Content="{Binding Editor.TestLabel}" Style="{StaticResource SecondaryButton}"
+                  MinWidth="120" Margin="0,0,8,0" Command="{Binding Editor.TestCommand}"/>
+          <Button Content="{Binding Editor.SaveLabel}" Style="{StaticResource PrimaryButton}"
+                  MinWidth="120" Command="{Binding Editor.SaveCommand}"/>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

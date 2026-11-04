@@ -1,0 +1,44 @@
+name: Release (Windows x64)
+
+# Deliberately manual: upload a draft, then review and publish it in GitHub.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Stable SemVer version (e.g. 1.0.0)'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cavdeck-stable-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Stable releases and the update feed belong exclusively to the public repository.
+    if: github.repository == 'imnbwd/Cavdeck' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    environment: production-release
+    env:
+      VPK_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install pinned Velopack CLI
+        shell: pwsh
+        run: |
+          dotnet tool install --global vpk --version 1.2.161
+          if ($LASTEXITCODE -ne 0) { throw 'Velopack CLI installation failed.' }
+      - name: Build, validate and create a draft release
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: ./scripts/Publish-WindowsRelease.ps1 -Version $env:RELEASE_VERSION -DisposableMachine

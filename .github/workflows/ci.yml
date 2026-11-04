@@ -1,0 +1,68 @@
+name: Build & Test
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate release script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $PWD 'scripts/Publish-WindowsRelease.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Cavdeck.sln
+      - name: Build
+        run: dotnet build Cavdeck.sln --no-restore -c Release
+      - name: Unit tests
+        run: dotnet test Cavdeck.sln --no-build -c Release
+      - name: Install pinned Velopack CLI
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: dotnet tool install --global vpk --version 1.2.161
+      - name: Package Windows installer and verify feed
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.1 -SkipTests
+      - name: Smoke test silent install and uninstall
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.1/Releases -Version 0.0.1 -DisposableMachine
+      - name: Save installer smoke-test logs on failure
+        if: failure() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cavdeck-win-x64-smoke-logs-${{ github.run_id }}
+          path: artifacts/windows-package/0.0.1/smoke-logs/
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Save installer for manual VM review
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cavdeck-win-x64-installer-${{ github.run_id }}
+          path: artifacts/windows-package/0.0.1/Releases/
+          retention-days: 7
+          if-no-files-found: error

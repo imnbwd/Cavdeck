@@ -1,0 +1,44 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <!-- 4px spacing grid. Control height 36, compact rows 32, radii 6 / 8 / 12. -->
+  <sys:Double x:Key="Space1">4</sys:Double>
+  <sys:Double x:Key="Space2">8</sys:Double>
+  <sys:Double x:Key="Space3">12</sys:Double>
+  <sys:Double x:Key="Space4">16</sys:Double>
+  <sys:Double x:Key="Space5">24</sys:Double>
+  <sys:Double x:Key="Space6">32</sys:Double>
+
+  <sys:Double x:Key="FontSizeCaption">11</sys:Double>
+  <sys:Double x:Key="FontSizeSmall">12</sys:Double>
+  <sys:Double x:Key="FontSizeBody">13</sys:Double>
+  <sys:Double x:Key="FontSizeTitle">16</sys:Double>
+  <sys:Double x:Key="FontSizeHeadline">20</sys:Double>
+
+  <sys:Double x:Key="ControlHeight">36</sys:Double>
+  <sys:Double x:Key="ControlHeightCompact">32</sys:Double>
+  <sys:Double x:Key="IconButtonSize">32</sys:Double>
+  <sys:Double x:Key="TitleBarHeight">48</sys:Double>
+  <!-- GridLength cannot be a DynamicResource double; keep this in step with TitleBarHeight. -->
+  <GridLength x:Key="TitleBarGridLength">48</GridLength>
+  <sys:Double x:Key="CaptionButtonWidth">46</sys:Double>
+  <sys:Double x:Key="TreeRowHeight">32</sys:Double>
+  <sys:Double x:Key="ListRowHeight">36</sys:Double>
+
+  <CornerRadius x:Key="RadiusSmall">6</CornerRadius>
+  <!-- 2px inside a 6px corner. -->
+  <CornerRadius x:Key="RadiusFocus">4</CornerRadius>
+  <CornerRadius x:Key="RadiusMedium">8</CornerRadius>
+  <CornerRadius x:Key="RadiusLarge">12</CornerRadius>
+
+  <!-- Inset for card content, not the full-bleed workspace toolbar or file grids. -->
+  <Thickness x:Key="PageContentMargin">16,12,16,16</Thickness>
+  <Thickness x:Key="ControlPadding">14,0</Thickness>
+  <Thickness x:Key="ControlPaddingCompact">10,0</Thickness>
+  <Thickness x:Key="CardPadding">16</Thickness>
+  <Thickness x:Key="DialogPadding">20</Thickness>
+  <Thickness x:Key="Hairline">1</Thickness>
+
+  <Duration x:Key="MotionEnter">0:0:0.15</Duration>
+  <Duration x:Key="MotionExit">0:0:0.1</Duration>
+</ResourceDictionary>

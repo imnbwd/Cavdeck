@@ -1,0 +1,617 @@
+<UserControl x:Class="Cavdeck.App.Features.Settings.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+             xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters">
+  <UserControl.Resources>
+    <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+    <Style x:Key="SettingsRow" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
+      <Setter Property="Padding" Value="20,16"/>
+      <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+    <!-- Settings uses a single quiet underline affordance. The 2-DIP selected
+         indicator meets the 1-DIP header divider without any intervening gap. -->
+    <Style x:Key="SettingsTabItem" TargetType="{x:Type TabItem}">
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Padding" Value="14,4,14,0"/>
+      <Setter Property="FontWeight" Value="Medium"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type TabItem}">
+            <Grid Margin="0,0,4,0" SnapsToDevicePixels="True">
+              <!-- 36-DIP hit area, text shifted down optically toward the baseline. -->
+              <Border x:Name="HoverSurface" Margin="0,0,0,2"
+                      Background="{TemplateBinding Background}"
+                      CornerRadius="{DynamicResource RadiusSmall}">
+                <ContentPresenter ContentSource="Header"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Margin="{TemplateBinding Padding}"
+                                  RecognizesAccessKey="True"/>
+              </Border>
+              <!-- Underline and divider are adjacent, never separated by a floating pill. -->
+              <Border x:Name="SelectionIndicator" Height="2" Margin="14,0,14,0"
+                      VerticalAlignment="Bottom" Background="{DynamicResource AccentBrush}"
+                      Visibility="Collapsed" IsHitTestVisible="False"/>
+              <!-- Keyboard-only focus remains inside the hit target. -->
+              <Border x:Name="FocusRing" Margin="2,2,2,4"
+                      BorderThickness="2" BorderBrush="{DynamicResource FocusBorderBrush}"
+                      CornerRadius="{DynamicResource RadiusFocus}"
+                      Visibility="Collapsed" IsHitTestVisible="False"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                <Setter TargetName="HoverSurface" Property="Background" Value="{DynamicResource HoverBrush}"/>
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                <Setter TargetName="HoverSurface" Property="Background" Value="Transparent"/>
+                <Setter TargetName="SelectionIndicator" Property="Visibility" Value="Visible"/>
+              </Trigger>
+              <DataTrigger Binding="{Binding Path=(controls:FocusCue.Visible), RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                <Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/>
+              </DataTrigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="SettingsTabControl" TargetType="{x:Type TabControl}">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <!-- A simple horizontal stack avoids TabPanel's selected-tab row reordering. -->
+      <Setter Property="ItemsPanel">
+        <Setter.Value>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type TabControl}">
+            <Grid KeyboardNavigation.TabNavigation="Local">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+              <!-- One shared baseline: the selected 2-DIP stroke paints directly over
+                   the 1-DIP rule, rather than stopping above a separate border. -->
+              <Grid Grid.Row="0" SnapsToDevicePixels="True">
+                <Border x:Name="HeaderRule" Height="1" VerticalAlignment="Bottom"
+                        Background="{DynamicResource BorderBrush}" IsHitTestVisible="False"/>
+                <!-- Like ShellWindow's tabs, keep overflow scrollable but don't let
+                     a scrollbar insert a visible gap under the header. -->
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                              CanContentScroll="False" Focusable="False">
+                  <ItemsPresenter/>
+                </ScrollViewer>
+              </Grid>
+              <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1"
+                                ContentSource="SelectedContent"/>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </UserControl.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel MaxWidth="820" Margin="32,28,32,16" HorizontalAlignment="Stretch">
+      <TextBlock Text="{Binding Texts[Settings_Title]}" Style="{StaticResource TextHeadline}"/>
+      <TextBlock Text="{Binding Texts[Settings_Description]}" Style="{StaticResource TextMuted}"
+                 Margin="0,6,0,0" TextWrapping="Wrap"/>
+      <!-- Persistence errors stay visible regardless of the selected section. -->
+      <TextBlock Text="{Binding SaveError}" Foreground="{DynamicResource DangerTextBrush}"
+                 Margin="0,12,0,0" TextWrapping="Wrap"
+                 Visibility="{Binding SaveError, Converter={StaticResource StringVis}}"
+                 AutomationProperties.LiveSetting="Assertive"/>
+    </StackPanel>
+    <TabControl Grid.Row="1" MaxWidth="820" Margin="32,0,32,0"
+                HorizontalAlignment="Stretch" Style="{StaticResource SettingsTabControl}"
+                SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}" KeyboardNavigation.TabNavigation="Local">
+    <TabItem Header="{Binding Texts[Settings_TabGeneral]}"
+             AutomationProperties.Name="{Binding Texts[Settings_TabGeneral]}"
+             Style="{StaticResource SettingsTabItem}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    CanContentScroll="False">
+        <StackPanel Margin="0,24,0,48">
+      <TextBlock Text="{Binding Texts[Settings_AppearanceGroup]}" Style="{StaticResource TextTitle}"
+                 Margin="0,0,0,12"/>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+            <TextBlock Text="{Binding Texts[Label_Theme]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding ThemeDetail}" Style="{StaticResource TextCaption}" Margin="0,4,0,0"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" x:Name="ThemeCombo" MinHeight="36"
+                    SelectedValuePath="Tag" SelectedValue="{Binding ThemeChoice, Mode=TwoWay}"
+                    AutomationProperties.Name="{Binding Texts[Label_Theme]}">
+            <ComboBoxItem Tag="System" Content="{Binding Texts[Settings_FollowSystem]}"/>
+            <ComboBoxItem Tag="Light" Content="{Binding Texts[Theme_Light]}"/>
+            <ComboBoxItem Tag="Dark" Content="{Binding Texts[Theme_Dark]}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+            <TextBlock Text="{Binding Texts[Label_Language]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding LanguageDetail}" Style="{StaticResource TextCaption}" Margin="0,4,0,0"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" x:Name="LanguageCombo" MinHeight="36"
+                    ItemsSource="{Binding LanguageOptions}" DisplayMemberPath="DisplayName"
+                    SelectedValuePath="Code" SelectedValue="{Binding LanguageChoice, Mode=TwoWay}"
+                    AutomationProperties.Name="{Binding Texts[Label_Language]}"/>
+        </Grid>
+      </Border>
+      <TextBlock Text="{Binding Texts[Tray_SettingsGroup]}" Style="{StaticResource TextTitle}"
+                 Margin="0,28,0,12"/>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+            <TextBlock Text="{Binding Texts[Tray_CloseLabel]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Tray_CloseHelp]}" Style="{StaticResource TextCaption}"
+                       Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" SelectedValuePath="Tag"
+                    SelectedValue="{Binding CloseBehaviorChoice, Mode=TwoWay}"
+                    AutomationProperties.Name="{Binding Texts[Tray_CloseLabel]}">
+            <ComboBoxItem Tag="Exit" Content="{Binding Texts[Tray_CloseExit]}"/>
+            <ComboBoxItem Tag="MinimizeToTray" Content="{Binding Texts[Tray_CloseHide]}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+            <TextBlock Text="{Binding Texts[Settings_RestoreTabs]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_RestoreTabsHelp]}" Style="{StaticResource TextCaption}"
+                       Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <CheckBox Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    Content="{Binding Texts[Settings_Enable]}"
+                    IsChecked="{Binding RestorePreviousTabs, Mode=TwoWay}"
+                    AutomationProperties.Name="{Binding Texts[Settings_RestoreTabs]}"/>
+        </Grid>
+      </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+    <TabItem Header="{Binding Texts[Settings_TabBrowsing]}"
+             AutomationProperties.Name="{Binding Texts[Settings_TabBrowsing]}"
+             Style="{StaticResource SettingsTabItem}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    CanContentScroll="False">
+        <StackPanel Margin="0,24,0,48">
+      <TextBlock Text="{Binding Texts[Settings_BrowseGroup]}" Style="{StaticResource TextTitle}" Margin="0,0,0,12"/>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_BrowserView]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_BrowserViewHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" SelectedValuePath="Tag" SelectedValue="{Binding BrowserViewChoice, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_BrowserView]}">
+            <ComboBoxItem Tag="List" Content="{Binding Texts[Explorer_ViewList]}"/>
+            <ComboBoxItem Tag="Icons" Content="{Binding Texts[Explorer_ViewIcons]}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_GridDensity]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_GridDensityHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" SelectedValuePath="Tag" SelectedValue="{Binding GridDensityChoice, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_GridDensity]}">
+            <ComboBoxItem Tag="Comfortable" Content="{Binding Texts[Settings_Comfortable]}"/>
+            <ComboBoxItem Tag="Compact" Content="{Binding Texts[Settings_Compact]}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_DetailsPane]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_DetailsPaneHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <CheckBox Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Content="{Binding Texts[Settings_Show]}" IsChecked="{Binding ShowDetailsPane, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_DetailsPane]}"/>
+        </Grid>
+      </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+    <TabItem Header="{Binding Texts[Settings_TabTransfers]}"
+             AutomationProperties.Name="{Binding Texts[Settings_TabTransfers]}"
+             Style="{StaticResource SettingsTabItem}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    CanContentScroll="False">
+        <StackPanel Margin="0,24,0,48">
+      <TextBlock Text="{Binding Texts[Settings_TransferGroup]}" Style="{StaticResource TextTitle}" Margin="0,0,0,12"/>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_DownloadDestination]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_DownloadDestinationHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" SelectedValuePath="Tag" SelectedValue="{Binding DownloadDestinationChoice, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_DownloadDestination]}">
+            <ComboBoxItem Tag="AskEveryTime" Content="{Binding Texts[Settings_AskEveryTime]}"/>
+            <ComboBoxItem Tag="DefaultFolder" Content="{Binding Texts[Settings_UseDefaultFolder]}" IsEnabled="{Binding HasDownloadDirectory}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_DownloadFolder]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_DownloadFolderHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <Button Content="{Binding Texts[Settings_ChooseFolder]}" Command="{Binding ChooseDownloadDirectoryCommand}" Style="{StaticResource SecondaryButton}" HorizontalAlignment="Right" MinWidth="100" AutomationProperties.Name="{Binding Texts[Settings_ChooseFolder]}"/>
+            <TextBlock Text="{Binding DownloadDirectoryDetail}" ToolTip="{Binding DownloadDirectoryDetail}" Style="{StaticResource TextCaption}" TextAlignment="Right" TextTrimming="CharacterEllipsis" Margin="0,6,0,0"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_Conflict]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_ConflictHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" SelectedValuePath="Tag" SelectedValue="{Binding TransferConflictChoice, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_Conflict]}">
+            <ComboBoxItem Tag="AskOnConflict" Content="{Binding Texts[Settings_AskOnConflict]}"/>
+            <ComboBoxItem Tag="Skip" Content="{Binding Texts[Transfer_Skip]}"/>
+            <ComboBoxItem Tag="Rename" Content="{Binding Texts[Transfer_Rename]}"/>
+          </ComboBox>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Texts[Settings_Concurrency]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_ConcurrencyHelp]}" Style="{StaticResource TextCaption}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ComboBox Grid.Column="1" MinHeight="36" ItemsSource="{Binding ConcurrencyChoices}" SelectedItem="{Binding Concurrency, Mode=TwoWay}" AutomationProperties.Name="{Binding Texts[Settings_Concurrency]}"/>
+        </Grid>
+      </Border>
+      <Border Style="{StaticResource SettingsRow}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="230"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+            <TextBlock Text="{Binding Texts[Settings_TransferCompletionNotice]}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Texts[Settings_TransferCompletionNoticeHelp]}" Style="{StaticResource TextCaption}"
+                       Margin="0,4,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <CheckBox Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    Content="{Binding Texts[Settings_Enable]}"
+                    IsChecked="{Binding NotifyTransferCompletion, Mode=TwoWay}"
+                    AutomationProperties.Name="{Binding Texts[Settings_TransferCompletionNotice]}"/>
+        </Grid>
+      </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+    <TabItem Header="{Binding Texts[Settings_TabShortcuts]}"
+             AutomationProperties.Name="{Binding Texts[Settings_TabShortcuts]}"
+             Style="{StaticResource SettingsTabItem}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    CanContentScroll="False">
+        <StackPanel Margin="0,24,0,48">
+          <TextBlock Text="{Binding Texts[Shortcuts_GlobalGroup]}" Style="{StaticResource TextTitle}"
+                     Margin="0,0,0,12"/>
+          <Border Style="{StaticResource SettingsRow}">
+            <StackPanel>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                  <TextBlock Text="{Binding Texts[Shortcuts_GlobalTitle]}" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding Texts[Shortcuts_GlobalHelp]}" Style="{StaticResource TextCaption}"
+                             TextWrapping="Wrap" Margin="0,4,0,0"/>
+                </StackPanel>
+                <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                          Content="{Binding Texts[Shortcuts_Enable]}"
+                          IsEnabled="{Binding CanToggleGlobalHotkey}"
+                          IsChecked="{Binding GlobalHotkeyEnabled, Mode=TwoWay}"
+                          AutomationProperties.Name="{Binding Texts[Shortcuts_Enable]}"/>
+              </Grid>
+              <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,16,0,16"/>
+              <TextBlock Text="{Binding Texts[Shortcuts_Combination]}" FontWeight="SemiBold"
+                         Margin="0,0,0,8"/>
+              <WrapPanel VerticalAlignment="Center">
+                <Button x:Name="HotkeyCaptureButton" MinWidth="164" MinHeight="36"
+                        Style="{StaticResource SecondaryButton}"
+                        Content="{Binding GlobalHotkeyButtonLabel}"
+                        IsEnabled="{Binding CanEditGlobalHotkey}"
+                        Click="CaptureHotkey_Click"
+                        PreviewKeyDown="CaptureHotkey_PreviewKeyDown"
+                        LostKeyboardFocus="CaptureHotkey_LostKeyboardFocus"
+                        ToolTip="{Binding Texts[Shortcuts_ChangeHotkey]}"
+                        AutomationProperties.Name="{Binding Texts[Shortcuts_ChangeHotkey]}"/>
+              </WrapPanel>
+              <TextBlock Text="{Binding Texts[Shortcuts_CaptureHelp]}"
+                         Style="{StaticResource TextCaption}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+              <TextBlock Text="{Binding GlobalHotkeyStatus}" TextWrapping="Wrap" Margin="0,12,0,0"
+                         AutomationProperties.LiveSetting="Polite">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding HasGlobalHotkeyWarning}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </StackPanel>
+          </Border>
+          <TextBlock Text="{Binding Texts[Shortcuts_ReferenceGroup]}" Style="{StaticResource TextTitle}"
+                     Margin="0,24,0,8"/>
+          <TextBlock Text="{Binding Texts[Shortcuts_ReferenceHelp]}"
+                     Style="{StaticResource TextCaption}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+          <ItemsControl ItemsSource="{Binding ShortcutGroups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel>
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Margin="4,8,0,8"/>
+                  <Border Style="{StaticResource SettingsRow}">
+                    <ItemsControl ItemsSource="{Binding Items}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="*" MinWidth="0"/>
+                              <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Action}" VerticalAlignment="Center"
+                                       Margin="0,0,12,0" TextWrapping="Wrap"/>
+                            <Border Grid.Column="1" Padding="9,5"
+                                    VerticalAlignment="Center"
+                                    Background="{DynamicResource SurfaceMutedBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="{DynamicResource RadiusSmall}">
+                              <TextBlock Text="{Binding Keys}" FontFamily="Consolas" FontSize="12"
+                                         Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            </Border>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </Border>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+    <TabItem Header="{Binding Texts[Settings_TabAbout]}"
+             AutomationProperties.Name="{Binding Texts[Settings_TabAbout]}"
+             Style="{StaticResource SettingsTabItem}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                    CanContentScroll="False">
+        <StackPanel Margin="0,24,0,48">
+          <Border Style="{StaticResource SettingsRow}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Image Width="48" Height="48" Stretch="Uniform" VerticalAlignment="Top"
+                     Margin="0,0,16,0" Source="{StaticResource CavdeckBrandImage}"
+                     SnapsToDevicePixels="True" AutomationProperties.Name="Cavdeck"/>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="Cavdeck" Style="{StaticResource TextTitle}"/>
+                <TextBlock Text="{Binding Texts[About_Description]}" Style="{StaticResource TextCaption}"
+                           Margin="0,4,0,0" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding VersionText}" Style="{StaticResource TextCaption}"
+                           Margin="0,8,0,0"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <TextBlock Text="{Binding Texts[About_UpdatesGroup]}" Style="{StaticResource TextTitle}"
+                     Margin="0,20,0,12"/>
+          <Border Style="{StaticResource SettingsRow}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="0"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                <TextBlock Text="{Binding UpdateStatusText}" Style="{StaticResource TextCaption}"
+                           TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+                <TextBlock Text="{Binding UpdateDiagnostic}" Style="{StaticResource TextCaption}"
+                           Margin="0,4,0,0" TextWrapping="Wrap"
+                           Visibility="{Binding UpdateDiagnostic, Converter={StaticResource StringVis}}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <Button Content="{Binding Texts[Button_CheckUpdates]}"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding CheckUpdatesCommand}"
+                        IsEnabled="{Binding CanCheckUpdates}"
+                        AutomationProperties.Name="{Binding Texts[Button_CheckUpdates]}"/>
+                <Button Content="{Binding Texts[Update_DownloadButton]}"
+                        Style="{StaticResource SecondaryButton}" Margin="0,8,0,0"
+                        Command="{Binding DownloadUpdateCommand}"
+                        Visibility="{Binding CanDownloadUpdate, Converter={StaticResource BoolVis}}"
+                        AutomationProperties.Name="{Binding Texts[Update_DownloadButton]}"/>
+                <Button Content="{Binding Texts[Update_RestartNow]}"
+                        Style="{StaticResource PrimaryButton}" Margin="0,8,0,0"
+                        Command="{Binding RestartUpdateCommand}"
+                        Visibility="{Binding CanRestartUpdate, Converter={StaticResource BoolVis}}"
+                        AutomationProperties.Name="{Binding Texts[Update_RestartNow]}"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border Style="{StaticResource SettingsRow}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Margin="0,0,16,0">
+                <TextBlock Text="{Binding Texts[Update_AutoCheck]}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Texts[Update_AutoCheckHelp]}" Style="{StaticResource TextCaption}"
+                           Margin="0,4,0,0" TextWrapping="Wrap"/>
+              </StackPanel>
+              <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                        Content="{Binding Texts[Settings_Enable]}"
+                        IsChecked="{Binding AutomaticUpdateChecks, Mode=TwoWay}"
+                        AutomationProperties.Name="{Binding Texts[Update_AutoCheck]}"/>
+            </Grid>
+          </Border>
+          <Border Style="{StaticResource SettingsRow}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Margin="0,0,16,0">
+                <TextBlock Text="{Binding Texts[Update_BackgroundDownload]}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Texts[Update_BackgroundDownloadHelp]}" Style="{StaticResource TextCaption}"
+                           Margin="0,4,0,0" TextWrapping="Wrap"/>
+              </StackPanel>
+              <CheckBox Grid.Column="1" VerticalAlignment="Center"
+                        Content="{Binding Texts[Settings_Enable]}"
+                        IsChecked="{Binding BackgroundUpdateDownloads, Mode=TwoWay}"
+                        AutomationProperties.Name="{Binding Texts[Update_BackgroundDownload]}"/>
+            </Grid>
+          </Border>
+
+          <TextBlock Text="{Binding Texts[About_ResourcesGroup]}" Style="{StaticResource TextTitle}"
+                     Margin="0,20,0,12"/>
+          <Border Style="{StaticResource SettingsRow}">
+            <StackPanel>
+              <WrapPanel>
+                <Button Content="{Binding Texts[About_ProjectPage]}"
+                        Command="{Binding OpenProjectPageCommand}"
+                        Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                        MinHeight="36" AutomationProperties.Name="{Binding Texts[About_ProjectPage]}"/>
+                <Button Content="{Binding Texts[About_Documentation]}"
+                        Command="{Binding OpenDocumentationCommand}"
+                        Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                        MinHeight="36" AutomationProperties.Name="{Binding Texts[About_Documentation]}"/>
+                <Button Content="{Binding Texts[About_ReportIssue]}"
+                        Command="{Binding ReportIssueCommand}"
+                        Style="{StaticResource SecondaryButton}" Margin="0,0,8,8"
+                        MinHeight="36" AutomationProperties.Name="{Binding Texts[About_ReportIssue]}"/>
+              </WrapPanel>
+              <TextBlock Text="{Binding ResourceStatus}" Foreground="{DynamicResource WarningTextBrush}"
+                         Margin="0,8,0,0" TextWrapping="Wrap"
+                         Visibility="{Binding ResourceStatus, Converter={StaticResource StringVis}}"
+                         AutomationProperties.LiveSetting="Polite"/>
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="{Binding Texts[About_PrivacyLicenseGroup]}" Style="{StaticResource TextTitle}"
+                     Margin="0,20,0,12"/>
+          <Border Style="{StaticResource SettingsRow}">
+            <StackPanel>
+              <TextBlock Text="{Binding Texts[About_PrivacyTitle]}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding Texts[About_PrivacySummary]}" Style="{StaticResource TextCaption}"
+                         TextWrapping="Wrap" Margin="0,4,0,0"/>
+              <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,16,0,16"/>
+              <TextBlock Text="{Binding Texts[About_LicenseTitle]}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding Texts[About_LicenseSummary]}" Style="{StaticResource TextCaption}"
+                         TextWrapping="Wrap" Margin="0,4,0,8"/>
+              <Button Content="{Binding Texts[About_ViewLicense]}"
+                      Command="{Binding OpenLicenseCommand}"
+                      Style="{StaticResource GhostButton}" HorizontalAlignment="Left"
+                      MinHeight="32" AutomationProperties.Name="{Binding Texts[About_ViewLicense]}"/>
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="{Binding Texts[Diagnostics_Group]}" Style="{StaticResource TextTitle}"
+                     Margin="0,20,0,12"/>
+          <Border Style="{StaticResource SettingsRow}">
+            <StackPanel>
+              <TextBlock Text="{Binding Texts[Diagnostics_Title]}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding Texts[Diagnostics_Description]}" Style="{StaticResource TextCaption}"
+                         Margin="0,4,0,12" TextWrapping="Wrap"/>
+              <WrapPanel>
+                <controls:LoadingView Mode="Inline" Margin="0,0,12,0"
+                                      Visibility="{Binding IsDiagnosticBusy, Converter={StaticResource BoolVis}}"/>
+                <Button Content="{Binding Texts[Diagnostics_Copy]}" Style="{StaticResource SecondaryButton}"
+                        Command="{Binding CopyDiagnosticCommand}" Margin="0,0,8,8"/>
+                <Button Content="{Binding Texts[Diagnostics_OpenLogs]}" Style="{StaticResource GhostButton}"
+                        Command="{Binding OpenLogsCommand}" Margin="0,0,8,8"/>
+              </WrapPanel>
+              <TextBlock Text="{Binding DiagnosticStatus}" Style="{StaticResource TextCaption}"
+                         Margin="0,8,0,0" TextWrapping="Wrap"
+                         Visibility="{Binding DiagnosticStatus, Converter={StaticResource StringVis}}"
+                         AutomationProperties.LiveSetting="Polite"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+    </TabControl>
+  </Grid>
+</UserControl>

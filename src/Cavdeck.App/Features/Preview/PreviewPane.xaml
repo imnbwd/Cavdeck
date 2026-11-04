@@ -1,0 +1,311 @@
+<UserControl x:Class="Cavdeck.App.Features.Preview.PreviewPane"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+             xmlns:converters="clr-namespace:Cavdeck.App.Controls.Converters"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:preview="clr-namespace:Cavdeck.App.Features.Preview"
+             Focusable="False">
+  <UserControl.Resources>
+    <converters:BooleanToVisibilityConverter x:Key="BoolVis"/>
+    <converters:StringToVisibilityConverter x:Key="StringVis"/>
+    <Style x:Key="EditorBox" TargetType="TextBox">
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CaretBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+      <!-- Keep text selection distinct from the subtler list-row selection. -->
+      <Setter Property="SelectionBrush" Value="{DynamicResource EditorSelectionBrush}"/>
+      <!-- WPF draws its selection over text; opaque highlights hide the glyphs. -->
+      <Setter Property="SelectionOpacity" Value="0.4"/>
+      <Setter Property="SelectionTextBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+      <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Microsoft YaHei UI"/>
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="AcceptsReturn" Value="True"/>
+      <Setter Property="AcceptsTab" Value="True"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+      <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+      <Setter Property="VerticalContentAlignment" Value="Top"/>
+      <Setter Property="SpellCheck.IsEnabled" Value="False"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TextBox">
+            <Border x:Name="Bd"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{DynamicResource RadiusSmall}"
+                    SnapsToDevicePixels="True">
+              <ScrollViewer x:Name="PART_ContentHost"
+                            Focusable="False"
+                            Margin="{TemplateBinding Padding}"
+                            VerticalAlignment="Stretch"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Auto"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <!-- Hover highlights editable text only; read-only documents stay borderless until focused. -->
+              <MultiTrigger>
+                <MultiTrigger.Conditions>
+                  <Condition Property="IsMouseOver" Value="True"/>
+                  <Condition Property="IsReadOnly" Value="False"/>
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}"/>
+              </MultiTrigger>
+              <!-- Keep a 1-DIP border in layout at all times so focus never shifts the text. -->
+              <Trigger Property="IsReadOnly" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource SurfaceBrush}"/>
+              </Trigger>
+              <!-- Show the focus border for selecting/copying a preview or editing text. -->
+              <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="PreviewAction" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinWidth" Value="32"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+    </Style> 
+    <Style x:Key="PreviewIconAction" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="Width" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="MinWidth" Value="32"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="4,0,0,0"/>
+    </Style>
+    <Style x:Key="PreviewModeAction" TargetType="Button" BasedOn="{StaticResource PreviewAction}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsEditing}" Value="False">
+          <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+          <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="EditModeAction" TargetType="Button" BasedOn="{StaticResource PreviewAction}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+          <Setter Property="Background" Value="{DynamicResource SelectedBrush}"/>
+          <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid Margin="16,10,16,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- File identity and contextual actions remain stable across preview types. -->
+    <Grid Grid.Row="0" Margin="0,0,0,6">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MinWidth="0"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" VerticalAlignment="Center">
+        <DockPanel LastChildFill="True">
+          <Ellipse DockPanel.Dock="Right" Width="7" Height="7" Margin="8,0,0,0"
+                   VerticalAlignment="Center" Fill="{DynamicResource AccentBrush}"
+                   Visibility="{Binding IsDirty, Converter={StaticResource BoolVis}}"/>
+          <TextBlock Text="{Binding Title}" FontSize="{DynamicResource FontSizeTitle}"
+                     FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                     ToolTip="{Binding Title}" VerticalAlignment="Center"/>
+        </DockPanel>
+        <TextBlock Text="{Binding FileSummary}" FontSize="{DynamicResource FontSizeSmall}"
+                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,2,0,0"
+                   Visibility="{Binding ShowFileSummary, Converter={StaticResource BoolVis}}"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <Button Style="{StaticResource PreviewIconAction}" Command="{Binding ShellCommand}"
+                Visibility="{Binding ShowShellButton, Converter={StaticResource BoolVis}}"
+                ToolTip="{Binding Texts[Preview_OpenExternalTip]}"
+                AutomationProperties.Name="{Binding Texts[Preview_Shell]}">
+          <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconOpenExternal}"/>
+        </Button>
+        <Button Style="{StaticResource PreviewIconAction}" Command="{Binding DownloadCommand}"
+                Visibility="{Binding ShowDownloadButton, Converter={StaticResource BoolVis}}"
+                ToolTip="{Binding Texts[Preview_Download]}"
+                AutomationProperties.Name="{Binding Texts[Preview_Download]}">
+          <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconDownload}"/>
+        </Button>
+        <Button Style="{StaticResource PreviewIconAction}"
+                Command="{Binding ToggleExpandedCommand}"
+                ToolTip="{Binding ExpandLabel}"
+                AutomationProperties.Name="{Binding ExpandLabel}">
+          <Path>
+            <Path.Style>
+              <Style TargetType="Path" BasedOn="{StaticResource IconGlyph}">
+                <Setter Property="Data" Value="{StaticResource IconMaximize}"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                    <Setter Property="Data" Value="{StaticResource IconRestore}"/>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Path.Style>
+          </Path>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- Editor mode controls only; hidden modes take no vertical space. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8"
+                Visibility="{Binding ShowEditor, Converter={StaticResource BoolVis}}">
+      <Button Content="{Binding Texts[Preview_Preview]}" Style="{StaticResource PreviewModeAction}"
+              Command="{Binding PreviewCommand}" IsEnabled="{Binding CanPreviewAction}"
+              AutomationProperties.Name="{Binding Texts[Preview_Preview]}"/>
+      <Button Content="{Binding Texts[Preview_Edit]}" Style="{StaticResource EditModeAction}"
+              Command="{Binding EditCommand}" IsEnabled="{Binding CanEdit}"
+              AutomationProperties.Name="{Binding Texts[Preview_Edit]}"/>
+    </StackPanel>
+
+    <!-- Inline decision panels move the reader instead of obscuring text. -->
+    <StackPanel Grid.Row="2">
+      <Border Background="{DynamicResource WarningSubtleBrush}" BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="1" CornerRadius="{DynamicResource RadiusSmall}" Margin="0,0,0,8" Padding="12"
+              Visibility="{Binding ShowReadOnlyDraft, Converter={StaticResource BoolVis}}">
+        <StackPanel>
+          <TextBlock Text="{Binding Texts[Preview_ReadOnlyDraft]}" TextWrapping="Wrap" LineHeight="20"/>
+          <Button Content="{Binding Texts[Preview_CopyDraft]}" Command="{Binding CopyDraftCommand}"
+                  Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,8,0,0"
+                  AutomationProperties.Name="{Binding Texts[Preview_CopyDraft]}"/>
+        </StackPanel>
+      </Border>
+
+      <Border Background="{DynamicResource WarningSubtleBrush}" BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="1" CornerRadius="{DynamicResource RadiusSmall}"
+              Margin="0,0,0,8" Padding="12"
+              Visibility="{Binding ShowLeaveBar, Converter={StaticResource BoolVis}}">
+        <StackPanel>
+          <TextBlock Text="{Binding Texts[Preview_Dirty]}" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding LeaveMessage}" TextWrapping="Wrap" LineHeight="20" Margin="0,4,0,0"/>
+          <WrapPanel Margin="0,8,0,0">
+            <Button Content="{Binding LeaveSaveLabel}" Style="{StaticResource PrimaryButton}"
+                    Height="32" MinWidth="72" Margin="0,0,8,0" Padding="12,0"
+                    Command="{Binding SaveCommand}" IsEnabled="{Binding CanSave}"
+                    AutomationProperties.Name="{Binding LeaveSaveLabel}"/>
+            <Button Content="{Binding LeaveDiscardLabel}" Style="{StaticResource SecondaryButton}"
+                    Height="32" MinWidth="72" Margin="0,0,8,0" Padding="12,0"
+                    Command="{Binding DiscardLeaveCommand}"
+                    AutomationProperties.Name="{Binding LeaveDiscardLabel}"/>
+            <Button Content="{Binding Texts[Preview_Cancel]}" Style="{StaticResource GhostButton}"
+                    Height="32" MinWidth="72" Padding="12,0"
+                    Command="{Binding StayCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_Cancel]}"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      <Border Background="{DynamicResource WarningSubtleBrush}" CornerRadius="{DynamicResource RadiusSmall}"
+              Margin="0,0,0,8" Padding="12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+              Visibility="{Binding ShowConflictBar, Converter={StaticResource BoolVis}}">
+        <StackPanel>
+          <TextBlock Text="{Binding ConflictTitle}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding ConflictDetail}" TextWrapping="Wrap" LineHeight="20" Margin="0,4,0,0"
+                     Foreground="{DynamicResource MutedTextBrush}"/>
+          <WrapPanel Margin="0,8,0,0">
+            <Button Content="{Binding Texts[Preview_Reload]}" Style="{StaticResource PrimaryButton}"
+                    Height="32" MinWidth="72" Margin="0,0,8,0" Padding="12,0"
+                    Command="{Binding ReloadCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_Reload]}"/>
+            <Button Content="{Binding Texts[Preview_Overwrite]}" Style="{StaticResource SecondaryButton}"
+                    Height="32" MinWidth="72" Margin="0,0,8,0" Padding="12,0"
+                    Command="{Binding OverwriteCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_Overwrite]}"/>
+            <Button Content="{Binding Texts[Preview_DownloadLatest]}" Style="{StaticResource SecondaryButton}"
+                    Height="32" MinWidth="72" Margin="0,0,8,0" Padding="12,0"
+                    Command="{Binding DownloadCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_DownloadLatest]}"/>
+            <Button Content="{Binding Texts[Preview_KeepDraft]}" Style="{StaticResource GhostButton}"
+                    Height="32" MinWidth="72" Padding="12,0"
+                    Command="{Binding StayCommand}"
+                    AutomationProperties.Name="{Binding Texts[Preview_KeepDraft]}"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+
+    <Grid Grid.Row="3">
+      <controls:LoadingView Mode="Overlay" Message="{Binding LoadingMessage}"
+                            Visibility="{Binding ShowLoadingSpinner, Converter={StaticResource BoolVis}}"/>
+      <preview:PreviewProgressView Panel.ZIndex="3"
+                                   Visibility="{Binding ShowPreviewDownload, Converter={StaticResource BoolVis}}"/>
+      <wv2:WebView2 x:Name="PdfBrowser"
+                    Visibility="{Binding ShowPdf, Converter={StaticResource BoolVis}}"/>
+      <TextBox x:Name="Editor" Style="{StaticResource EditorBox}"
+               Text="{Binding EditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
+               Visibility="{Binding ShowEditor, Converter={StaticResource BoolVis}}"
+               AutomationProperties.Name="{Binding Title}">
+        <TextBox.InputBindings>
+          <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+        </TextBox.InputBindings>
+      </TextBox>
+      <Border Background="{DynamicResource SurfaceMutedBrush}" CornerRadius="{DynamicResource RadiusSmall}"
+              Visibility="{Binding ShowImage, Converter={StaticResource BoolVis}}">
+        <Image Source="{Binding Image}" Stretch="Uniform" Margin="12"
+               AutomationProperties.Name="{Binding Title}"/>
+      </Border>
+      <!-- Notice states use the same centered, theme-aware empty-state treatment as other pages. -->
+      <StackPanel Style="{StaticResource PageEmptyHost}" TextBlock.TextAlignment="Center"
+                  Visibility="{Binding ShowNotice, Converter={StaticResource BoolVis}}">
+        <Path Style="{StaticResource PageEmptyGlyph}" Data="{StaticResource IconGenericFile}"
+              Stroke="{DynamicResource MutedTextBrush}" Margin="0,0,0,12"
+              IsHitTestVisible="False"/>
+        <TextBlock Text="{Binding Notice}" MaxWidth="380" TextWrapping="Wrap" LineHeight="20"
+                   Foreground="{DynamicResource MutedTextBrush}"/>
+        <Button Content="{Binding Texts[Preview_Retry]}" Style="{StaticResource SecondaryButton}"
+                HorizontalAlignment="Center" Margin="0,12,0,0" Height="32" Padding="12,0"
+                Command="{Binding RetryCommand}"
+                Visibility="{Binding ShowRetry, Converter={StaticResource BoolVis}}"
+                AutomationProperties.Name="{Binding Texts[Preview_Retry]}"/>
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Grid.Row="4" Text="{Binding SaveError}" TextWrapping="Wrap" Margin="0,8,0,0"
+               Foreground="{DynamicResource DangerTextBrush}"
+               Visibility="{Binding SaveError, Converter={StaticResource StringVis}}"/>
+
+    <DockPanel Grid.Row="5" Margin="0,8,0,0" LastChildFill="False"
+               Visibility="{Binding ShowFooter, Converter={StaticResource BoolVis}}">
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+        <Ellipse Width="7" Height="7" Margin="0,0,6,0" Fill="{DynamicResource AccentBrush}"
+                 Visibility="{Binding IsDirty, Converter={StaticResource BoolVis}}"/>
+        <TextBlock Text="{Binding Texts[Preview_UnsavedStatus]}" VerticalAlignment="Center"
+                   FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource MutedTextBrush}"
+                   Visibility="{Binding IsDirty, Converter={StaticResource BoolVis}}"/>
+        <TextBlock Text="{Binding Status}" VerticalAlignment="Center"
+                   FontSize="{DynamicResource FontSizeSmall}" Foreground="{DynamicResource MutedTextBrush}"/>
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="{Binding Texts[Preview_Revert]}" Style="{StaticResource PreviewAction}"
+                Command="{Binding RevertCommand}" IsEnabled="{Binding CanRevert}"
+                Visibility="{Binding ShowSaveButton, Converter={StaticResource BoolVis}}"
+                AutomationProperties.Name="{Binding Texts[Preview_Revert]}"/>
+        <Button Content="{Binding Texts[Preview_Save]}" Style="{StaticResource PrimaryButton}"
+                Height="32" MinWidth="72" Padding="12,0"
+                Command="{Binding SaveCommand}" IsEnabled="{Binding CanSave}"
+                Visibility="{Binding ShowSaveButton, Converter={StaticResource BoolVis}}"
+                ToolTip="{Binding Texts[Preview_SaveTip]}"
+                AutomationProperties.Name="{Binding Texts[Preview_Save]}"/>
+      </StackPanel>
+    </DockPanel>
+  </Grid>
+</UserControl>

@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Header_Connections" xml:space="preserve"><value>Verbindungen</value></data>
+  <data name="Label_Language" xml:space="preserve"><value>Sprache</value></data>
+  <data name="Label_Theme" xml:space="preserve"><value>Design</value></data>
+  <data name="Nav_Workspace" xml:space="preserve"><value>ARBEITSBEREICH</value></data>
+  <data name="Nav_Connections" xml:space="preserve"><value>Verbindungen</value></data>
+  <data name="Nav_Favorites" xml:space="preserve"><value>Favoriten</value></data>
+  <data name="Nav_Recent" xml:space="preserve"><value>Zuletzt verwendet</value></data>
+  <data name="Nav_Transfers" xml:space="preserve"><value>Übertragungen</value></data>
+  <data name="Nav_Explorer" xml:space="preserve"><value>Explorer</value></data>
+  <data name="Nav_Storage" xml:space="preserve"><value>SPEICHER</value></data>
+  <data name="Nav_EmptyConnections" xml:space="preserve"><value>Noch keine Speicherverbindungen</value></data>
+  <data name="Empty_Title" xml:space="preserve"><value>Willkommen bei Cavdeck</value></data>
+  <data name="Empty_Description" xml:space="preserve"><value>Ihr Arbeitsbereich für AWS S3, Cloudflare R2, MinIO und kompatiblen Objektspeicher.</value></data>
+  <data name="Scaffold_Title" xml:space="preserve"><value>Grundlage bereit</value></data>
+  <data name="Scaffold_Description" xml:space="preserve"><value>Designwechsel, sofortige Sprachumschaltung, MVVM und eine Velopack-Aktualisierungsschnittstelle sind eingerichtet. Speicherverbindungen und Übertragungen sind geplant, aber noch nicht implementiert.</value></data>
+  <data name="Update_NoticeAvailableTitle" xml:space="preserve"><value>Cavdeck-Update verfügbar</value></data>
+  <data name="Update_NoticeReadyTitle" xml:space="preserve"><value>Cavdeck-Update bereit</value></data>
+  <data name="Update_ViewDetails" xml:space="preserve"><value>Update anzeigen</value></data>
+  <data name="Update_TrayAvailable" xml:space="preserve"><value>Update verfügbar: {0}</value></data>
+  <data name="Update_TrayReady" xml:space="preserve"><value>Update bereit: {0}</value></data>
+  <data name="Button_CheckUpdates" xml:space="preserve"><value>Auf Updates prüfen</value></data>
+  <data name="Update_Idle" xml:space="preserve"><value>Sie können jederzeit nach neuen Versionen suchen.</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>Updates werden gesucht…</value></data>
+  <data name="Update_NotConfigured" xml:space="preserve"><value>Legen Sie CAVDECK_UPDATE_REPOSITORY fest, um die Updateprüfung zu aktivieren.</value></data>
+  <data name="Update_NotInstalled" xml:space="preserve"><value>Updates sind nur in der offiziell installierten Cavdeck-Version verfügbar.</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>Sie verwenden die neueste Version.</value></data>
+  <data name="Update_Downloaded" xml:space="preserve"><value>Update heruntergeladen. Der Neustart wird aktiviert, sobald die Sicherheitsfunktionen für laufende Übertragungen fertiggestellt sind.</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>Updates konnten nicht geprüft oder heruntergeladen werden. Bitte später erneut versuchen.</value></data>
+  <data name="Settings_SaveFailed" xml:space="preserve"><value>Einstellungen konnten nicht gespeichert werden.</value></data>
+  <data name="Footer_NoConnections" xml:space="preserve"><value>Keine aktive Verbindung</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Hell</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Dunkel</value></data>
+  <data name="Theme_System" xml:space="preserve"><value>Automatisch</value></data>
+  <data name="Dialog_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Dialog_Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Dialog_Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Toast_Dismiss" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Window_Minimize" xml:space="preserve"><value>Minimieren</value></data>
+  <data name="Window_Maximize" xml:space="preserve"><value>Maximieren</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>Wiederherstellen</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Window_SystemMenu" xml:space="preserve"><value>Systemmenü</value></data>
+  <data name="Tab_AllTabs" xml:space="preserve"><value>Alle geöffneten Tabs</value></data>
+  <data name="Tab_Duplicate" xml:space="preserve"><value>Tab duplizieren</value></data>
+  <data name="Tab_UnsavedChanges" xml:space="preserve"><value>Ungespeicherte Änderungen</value></data>
+  <data name="Tab_UnsavedConnectionTitle" xml:space="preserve"><value>Ungespeicherte Änderungen an dieser Verbindung verwerfen?</value></data>
+  <data name="Tab_UnsavedConnectionMessage" xml:space="preserve"><value>Diese Verbindung enthält ungespeicherte Änderungen. Bearbeiten Sie sie weiter, um die Verbindung vor dem Schließen des Tabs zu speichern.</value></data>
+  <data name="Tab_DiscardChanges" xml:space="preserve"><value>Änderungen verwerfen</value></data>
+  <data name="Tab_KeepEditing" xml:space="preserve"><value>Weiter bearbeiten</value></data>
+  <data name="Tab_RestoreMissingConnection" xml:space="preserve"><value>Einige Tab-Speicherorte konnten nicht wiederhergestellt werden, da die zugehörige Verbindung fehlt.</value></data>
+  <data name="Tab_LimitReached" xml:space="preserve"><value>Tab-Limit erreicht</value></data>
+  <data name="Tab_NewTip" xml:space="preserve"><value>Neuer Tab (Strg+T)</value></data>
+  <data name="Tab_CloseTip" xml:space="preserve"><value>Tab schließen (Strg+W)</value></data>
+  <data name="Tab_CloseWindowTip" xml:space="preserve"><value>Fenster schließen (Strg+W)</value></data>
+  <data name="Sidebar_CollapseTip" xml:space="preserve"><value>Seitenleiste ausblenden (Strg+B)</value></data>
+  <data name="Sidebar_ExpandTip" xml:space="preserve"><value>Seitenleiste einblenden (Strg+B)</value></data>
+  <data name="Appearance_Title" xml:space="preserve"><value>Darstellung</value></data>
+  <data name="Appearance_Hint" xml:space="preserve"><value>Sprache und Design</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="Settings_Description" xml:space="preserve"><value>Legen Sie fest, wie Cavdeck auf diesem PC aussieht und funktioniert.</value></data>
+  <data name="Settings_AppearanceGroup" xml:space="preserve"><value>Darstellung und Sprache</value></data>
+  <data name="About_Group" xml:space="preserve"><value>Über Cavdeck</value></data>
+  <data name="About_UpdatesGroup" xml:space="preserve"><value>Updates</value></data>
+  <data name="About_ViewLicense" xml:space="preserve"><value>Lizenz anzeigen</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Ein moderner, kostenloser Open-Source-S3-Client für Windows.</value></data>
+  <data name="About_VersionFormat" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>App-Updates</value></data>
+  <data name="Settings_FollowSystem" xml:space="preserve"><value>Systemeinstellung verwenden</value></data>
+  <data name="Settings_CurrentValue" xml:space="preserve"><value>Aktuell: {0}</value></data>
+  <data name="Settings_English" xml:space="preserve"><value>Englisch</value></data>
+  <data name="Settings_Chinese" xml:space="preserve"><value>Vereinfachtes Chinesisch</value></data>
+  <data name="Diagnostics_Group" xml:space="preserve"><value>Diagnose</value></data>
+  <data name="Diagnostics_Title" xml:space="preserve"><value>Lokale Fehlerprotokolle</value></data>
+  <data name="Diagnostics_Description" xml:space="preserve"><value>Berichte enthalten App- und Fehler-IDs, jedoch keine Dateinamen, Pfade, Kontodaten, Anfragen oder Zugangsdaten. Protokolle bleiben bis zu sieben Tage auf diesem PC.</value></data>
+  <data name="Diagnostics_Copy" xml:space="preserve"><value>Diagnosebericht kopieren</value></data>
+  <data name="Diagnostics_OpenLogs" xml:space="preserve"><value>Protokollordner öffnen</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>Diagnosebericht kopiert.</value></data>
+  <data name="Diagnostics_Preparing" xml:space="preserve"><value>Diagnosebericht wird erstellt…</value></data>
+  <data name="Diagnostics_Opening" xml:space="preserve"><value>Protokollordner wird geöffnet…</value></data>
+  <data name="Diagnostics_CopyFailed" xml:space="preserve"><value>Bericht konnte nicht kopiert werden.</value></data>
+  <data name="Diagnostics_OpenFailed" xml:space="preserve"><value>Protokollordner konnte nicht geöffnet werden.</value></data>
+  <data name="Diagnostics_ErrorId" xml:space="preserve"><value>Fehler-ID: {0}</value></data>
+  <data name="Brand_Name" xml:space="preserve"><value>Cavdeck</value></data>
+  <data name="Diagnostics_StartupFailedTitle" xml:space="preserve"><value>Cavdeck — Startfehler</value></data>
+  <data name="Diagnostics_StartupFailedMessage" xml:space="preserve"><value>Cavdeck konnte nicht gestartet werden. Fehler-ID: {0} Protokolle: {1}</value></data>
+  <data name="Diagnostics_FatalTitle" xml:space="preserve"><value>Cavdeck muss beendet werden</value></data>
+  <data name="Diagnostics_FatalMessage" xml:space="preserve"><value>Ein unerwarteter Fehler ist aufgetreten. Cavdeck muss beendet werden. Fehler-ID: {0}. Nach dem Neustart können Sie unter Einstellungen einen Diagnosebericht kopieren.</value></data>
+  <data name="Status_NoItems" xml:space="preserve"><value>Keine Elemente</value></data>
+  <data name="Status_NoTransfers" xml:space="preserve"><value>0 Übertragungen</value></data>
+  <data name="Status_TabLimit" xml:space="preserve"><value>Sie können höchstens {0} Tabs gleichzeitig öffnen. Schließen Sie einen geöffneten Tab und versuchen Sie es erneut.</value></data>
+  <data name="Empty_FavoritesTitle" xml:space="preserve"><value>Noch keine Favoriten</value></data>
+  <data name="Empty_FavoritesDescription" xml:space="preserve"><value>Öffnen Sie eine Verbindung, einen Bucket oder Ordner und wählen Sie den Stern neben dem Pfad.</value></data>
+  <data name="Empty_RecentTitle" xml:space="preserve"><value>Noch keine zuletzt verwendeten Elemente</value></data>
+  <data name="Empty_RecentDescription" xml:space="preserve"><value>Geöffnete Verbindungen, Buckets und Ordner werden hier angezeigt.</value></data>
+  <data name="Empty_TransferHistoryTitle" xml:space="preserve"><value>Kein Übertragungsverlauf</value></data>
+  <data name="Empty_TransferHistoryDescription" xml:space="preserve"><value>Abgeschlossene und abgebrochene Übertragungen erscheinen hier.</value></data>
+  <data name="Empty_TransfersTitle" xml:space="preserve"><value>Keine Übertragungen</value></data>
+  <data name="Empty_TransfersDescription" xml:space="preserve"><value>Uploads, Downloads und Kopiervorgänge werden hier angezeigt.</value></data>
+  <data name="Nav_ConnectionsTip" xml:space="preserve"><value>Verbindungen. Strg+Klick öffnet einen neuen Tab.</value></data>
+  <data name="Nav_FavoritesTip" xml:space="preserve"><value>Favoriten</value></data>
+  <data name="Nav_RecentTip" xml:space="preserve"><value>Zuletzt verwendet</value></data>
+  <data name="Nav_TransfersTip" xml:space="preserve"><value>Übertragungen</value></data>
+  <data name="Connection_ListSummary" xml:space="preserve"><value>{0} Verbindungen</value></data>
+  <data name="Connection_Add" xml:space="preserve"><value>Verbindung hinzufügen</value></data>
+  <data name="Connection_Back" xml:space="preserve"><value>Alle Verbindungen</value></data>
+  <data name="Connection_NewTitle" xml:space="preserve"><value>Neue Verbindung</value></data>
+  <data name="Connection_EditTitle" xml:space="preserve"><value>Verbindung bearbeiten</value></data>
+  <data name="Connection_EmptyTitle" xml:space="preserve"><value>Objektspeicher hinzufügen</value></data>
+  <data name="Connection_EmptyDescription" xml:space="preserve"><value>Verbinden Sie sich mit Cloudflare R2, Amazon S3 oder MinIO. Zugriffsschlüssel bleiben in der Windows-Anmeldeinformationsverwaltung dieses PCs.</value></data>
+  <data name="Connection_Provider" xml:space="preserve"><value>Anbieter</value></data>
+  <data name="Connection_Test" xml:space="preserve"><value>Testen</value></data>
+  <data name="Connection_Testing" xml:space="preserve"><value>Wird getestet…</value></data>
+  <data name="Connection_Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Connection_Saving" xml:space="preserve"><value>Wird gespeichert…</value></data>
+  <data name="Connection_Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Connection_Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Connection_DeleteTitle" xml:space="preserve"><value>Diese Verbindung löschen?</value></data>
+  <data name="Connection_DeleteMessage" xml:space="preserve"><value>{0} und die gespeicherten Schlüssel werden von diesem PC entfernt. Dateien im Bucket bleiben erhalten.</value></data>
+  <data name="Connection_SavedTitle" xml:space="preserve"><value>Verbindung gespeichert</value></data>
+  <data name="Connection_SavedMessage" xml:space="preserve"><value>{0} ist bereit.</value></data>
+  <data name="Connection_Name" xml:space="preserve"><value>Verbindungsname</value></data>
+  <data name="Connection_NamePlaceholder" xml:space="preserve"><value>Mein R2-Speicher</value></data>
+  <data name="Connection_AccountId" xml:space="preserve"><value>Konto-ID</value></data>
+  <data name="Connection_AccountPlaceholder" xml:space="preserve"><value>Cloudflare-Konto-ID</value></data>
+  <data name="Connection_Region" xml:space="preserve"><value>Region</value></data>
+  <data name="Connection_RegionPlaceholder" xml:space="preserve"><value>us-east-1</value></data>
+  <data name="Connection_Endpoint" xml:space="preserve"><value>Endpunkt</value></data>
+  <data name="Connection_EndpointPlaceholder" xml:space="preserve"><value>https://s3.example.com</value></data>
+  <data name="Connection_AccessKey" xml:space="preserve"><value>Zugriffsschlüssel-ID</value></data>
+  <data name="Connection_AccessKeyPlaceholder" xml:space="preserve"><value>Zugriffsschlüssel-ID</value></data>
+  <data name="Connection_Secret" xml:space="preserve"><value>Geheimer Zugriffsschlüssel</value></data>
+  <data name="Connection_SecretPlaceholder" xml:space="preserve"><value>Geheimer Zugriffsschlüssel</value></data>
+  <data name="Connection_SecretKeep" xml:space="preserve"><value>Lassen Sie das Feld leer, um den gespeicherten Schlüssel beizubehalten.</value></data>
+  <data name="Connection_ShowSecret" xml:space="preserve"><value>Anzeigen</value></data>
+  <data name="Connection_HideSecret" xml:space="preserve"><value>Ausblenden</value></data>
+  <data name="Connection_CredentialNote" xml:space="preserve"><value>Schlüssel werden für diesen Windows-Benutzer in der Windows-Anmeldeinformationsverwaltung gespeichert, nicht in der Einstellungsdatei.</value></data>
+  <data name="Connection_Advanced" xml:space="preserve"><value>Erweitert</value></data>
+  <data name="Connection_AdvancedHide" xml:space="preserve"><value>Erweiterte Optionen ausblenden</value></data>
+  <data name="Connection_ReadOnly" xml:space="preserve"><value>Schreibgeschützte Verbindung</value></data>
+  <data name="Connection_ReadOnlyHint" xml:space="preserve"><value>Cavdeck lädt mit dieser Verbindung nichts hoch und löscht nichts. Dies ersetzt keine serverseitigen Berechtigungen.</value></data>
+  <data name="Connection_Bucket" xml:space="preserve"><value>Auf Bucket beschränken</value></data>
+  <data name="Connection_BucketPlaceholder" xml:space="preserve"><value>Leer lassen, um alle Buckets aufzulisten</value></data>
+  <data name="Connection_BucketHint" xml:space="preserve"><value>Geben Sie einen Bucket an, wenn der Schlüssel keine Buckets auflisten darf.</value></data>
+  <data name="Connection_Prefix" xml:space="preserve"><value>Schlüsselpräfix</value></data>
+  <data name="Connection_PrefixPlaceholder" xml:space="preserve"><value>images/</value></data>
+  <data name="Connection_PrefixHint" xml:space="preserve"><value>Nur Objekte mit diesem Präfix sind sichtbar.</value></data>
+  <data name="Connection_PathStyle" xml:space="preserve"><value>Pfadbasierte URLs verwenden</value></data>
+  <data name="Connection_PathStyleHint" xml:space="preserve"><value>MinIO und die meisten kompatiblen Dienste benötigen dies. Amazon S3 verwendet üblicherweise virtuelle Host-URLs.</value></data>
+  <data name="Connection_HttpWarning" xml:space="preserve"><value>Diese Adresse verwendet HTTP. Der Datenverkehr ist nicht verschlüsselt.</value></data>
+  <data name="Connection_ProviderHint_R2" xml:space="preserve"><value>Geben Sie die Konto-ID ein. Der Endpunkt wird automatisch ausgefüllt, die Region wird auf auto gesetzt.</value></data>
+  <data name="Connection_ProviderHint_Aws" xml:space="preserve"><value>Geben Sie eine Region ein. Lassen Sie den Endpunkt leer, um den Amazon-Standard zu verwenden.</value></data>
+  <data name="Connection_ProviderHint_Minio" xml:space="preserve"><value>Geben Sie Serveradresse und Port ein, z. B. http://127.0.0.1:9000.</value></data>
+  <data name="Connection_ProviderHint_Compatible" xml:space="preserve"><value>Geben Sie eine beliebige S3-kompatible Adresse ein. Der pfadbasierte Zugriff ist standardmäßig aktiviert.</value></data>
+  <data name="Connection_PreviewEmpty" xml:space="preserve"><value>Sobald die Pflichtfelder ausgefüllt sind, erscheint hier der Endpunkt.</value></data>
+  <data name="Connection_Preview" xml:space="preserve"><value>Endpunkt {0} · Region {1}</value></data>
+  <data name="Connection_PreviewAws" xml:space="preserve"><value>Regionaler Amazon-Endpunkt · {0}</value></data>
+  <data name="Provider_R2" xml:space="preserve"><value>Cloudflare R2</value></data>
+  <data name="Provider_Aws" xml:space="preserve"><value>Amazon S3</value></data>
+  <data name="Provider_Minio" xml:space="preserve"><value>MinIO</value></data>
+  <data name="Provider_Compatible" xml:space="preserve"><value>S3-kompatibel</value></data>
+  <data name="Connection_BadgeReadOnly" xml:space="preserve"><value>Schreibgeschützt</value></data>
+  <data name="Connection_BadgeBucket" xml:space="preserve"><value>Bucket {0}</value></data>
+  <data name="Connection_BadgePrefix" xml:space="preserve"><value>Präfix {0}</value></data>
+  <data name="Connection_TestSuccessBuckets" xml:space="preserve"><value>Verbunden. {0} Buckets sind sichtbar.</value></data>
+  <data name="Connection_TestSuccessBucketOne" xml:space="preserve"><value>Verbunden. 1 Bucket ist sichtbar.</value></data>
+  <data name="Connection_TestSuccessBucket" xml:space="preserve"><value>Mit Bucket {0} verbunden.</value></data>
+  <data name="Connection_TestSuccessBucketPrefix" xml:space="preserve"><value>Mit Bucket {0} verbunden. Das Präfix ist erreichbar.</value></data>
+  <data name="Connection_TestSuccessEmpty" xml:space="preserve"><value>Verbunden. Dieses Konto hat noch keine Buckets.</value></data>
+  <data name="Connection_Failure_InvalidCredentials" xml:space="preserve"><value>Schlüssel wurde abgelehnt</value></data>
+  <data name="Connection_Failure_InvalidCredentialsHint" xml:space="preserve"><value>Zugriffsschlüssel oder geheimer Schlüssel ist falsch. Auch eine falsche Region oder ein falscher Endpunkt kann die Signaturprüfung scheitern lassen.</value></data>
+  <data name="Connection_Failure_AccessDenied" xml:space="preserve"><value>Zugriff verweigert</value></data>
+  <data name="Connection_Failure_AccessDeniedHint" xml:space="preserve"><value>Der Schlüssel wurde authentifiziert, aber dieser Aufruf ist nicht erlaubt. Beschränken Sie die Verbindung auf einen zugänglichen Bucket und ein passendes Präfix.</value></data>
+  <data name="Connection_Failure_Endpoint" xml:space="preserve"><value>Endpunkt oder Region ist falsch</value></data>
+  <data name="Connection_Failure_EndpointHint" xml:space="preserve"><value>Der Dienst ist unter dieser Adresse nicht erreichbar. Prüfen Sie Host, Port und Region.</value></data>
+  <data name="Connection_Failure_BucketNotFound" xml:space="preserve"><value>Bucket nicht gefunden</value></data>
+  <data name="Connection_Failure_BucketNotFoundHint" xml:space="preserve"><value>Der Bucket existiert nicht oder ist mit diesem Schlüssel nicht sichtbar.</value></data>
+  <data name="Connection_Failure_Network" xml:space="preserve"><value>Keine Antwort vom Netzwerk</value></data>
+  <data name="Connection_Failure_NetworkHint" xml:space="preserve"><value>Der Dienst hat nicht rechtzeitig geantwortet. Prüfen Sie Netzwerk, Proxy und Firewall.</value></data>
+  <data name="Connection_Failure_CredentialMissing" xml:space="preserve"><value>Kein gespeicherter Schlüssel</value></data>
+  <data name="Connection_Failure_CredentialMissingHint" xml:space="preserve"><value>Auf diesem PC ist kein geheimer Schlüssel für die Verbindung gespeichert. Geben Sie ihn erneut ein.</value></data>
+  <data name="Connection_Failure_InvalidConfiguration" xml:space="preserve"><value>Ungültige Verbindung</value></data>
+  <data name="Connection_Failure_InvalidConfigurationHint" xml:space="preserve"><value>Prüfen Sie Bucket, Präfix und Adresse.</value></data>
+  <data name="Connection_Failure_Unsupported" xml:space="preserve"><value>Der Speicherdienst unterstützt diesen Vorgang nicht</value></data>
+  <data name="Connection_Failure_UnsupportedHint" xml:space="preserve"><value>Prüfen Sie, welche Vorgänge dieser Speicherdienst unterstützt.</value></data>
+  <data name="Connection_Failure_ReadOnly" xml:space="preserve"><value>Diese Verbindung ist schreibgeschützt</value></data>
+  <data name="Connection_Failure_ReadOnlyHint" xml:space="preserve"><value>Über eine schreibgeschützte Verbindung können keine Objekte hochgeladen oder gelöscht werden.</value></data>
+  <data name="Connection_Failure_Unknown" xml:space="preserve"><value>Der Dienst hat einen unerwarteten Fehler zurückgegeben</value></data>
+  <data name="Connection_Failure_UnknownHint" xml:space="preserve"><value>Prüfen Sie die Verbindungseinstellungen und versuchen Sie es erneut. Verfügbare technische Kennungen werden unten angezeigt.</value></data>
+  <data name="Connection_Failure_Cancelled" xml:space="preserve"><value>Test abgebrochen</value></data>
+  <data name="Connection_Failure_CancelledHint" xml:space="preserve"><value>Der Test wurde abgebrochen, bevor der Dienst antwortete.</value></data>
+  <data name="Connection_TechnicalCode" xml:space="preserve"><value>Fehlercode {0}</value></data>
+  <data name="Connection_TechnicalHttp" xml:space="preserve"><value>HTTP {0}</value></data>
+  <data name="Connection_TechnicalRequest" xml:space="preserve"><value>Anfrage-ID {0}</value></data>
+  <data name="Connection_CopyDiagnostic" xml:space="preserve"><value>Diagnose kopieren</value></data>
+  <data name="Connection_Copied" xml:space="preserve"><value>Diagnose kopiert</value></data>
+  <data name="Connection_CopyFailed" xml:space="preserve"><value>Diagnose konnte nicht kopiert werden</value></data>
+  <data name="Connection_Issue_NameRequired" xml:space="preserve"><value>Geben Sie einen Verbindungsnamen ein.</value></data>
+  <data name="Connection_Issue_NameInvalid" xml:space="preserve"><value>Verwenden Sie höchstens 80 Zeichen.</value></data>
+  <data name="Connection_Issue_AccountRequired" xml:space="preserve"><value>Geben Sie die Cloudflare-Konto-ID ein.</value></data>
+  <data name="Connection_Issue_AccountInvalid" xml:space="preserve"><value>Geben Sie nur die Konto-ID ein, nicht die vollständige URL.</value></data>
+  <data name="Connection_Issue_RegionRequired" xml:space="preserve"><value>Geben Sie eine Region ein.</value></data>
+  <data name="Connection_Issue_RegionInvalid" xml:space="preserve"><value>Verwenden Sie eine Region wie us-east-1.</value></data>
+  <data name="Connection_Issue_EndpointRequired" xml:space="preserve"><value>Geben Sie den Endpunkt ein.</value></data>
+  <data name="Connection_Issue_EndpointInvalid" xml:space="preserve"><value>Verwenden Sie eine http- oder https-Adresse ohne Pfad.</value></data>
+  <data name="Connection_Issue_EndpointUserInfo" xml:space="preserve"><value>Fügen Sie keinen Schlüssel in die Adresse ein.</value></data>
+  <data name="Connection_Issue_AccessKeyRequired" xml:space="preserve"><value>Geben Sie die Zugriffsschlüssel-ID ein.</value></data>
+  <data name="Connection_Issue_AccessKeyInvalid" xml:space="preserve"><value>Die Zugriffsschlüssel-ID darf keine Leerzeichen enthalten.</value></data>
+  <data name="Connection_Issue_SecretRequired" xml:space="preserve"><value>Geben Sie den geheimen Zugriffsschlüssel ein.</value></data>
+  <data name="Connection_Issue_BucketInvalid" xml:space="preserve"><value>Bucket-Namen dürfen keine Leerzeichen oder Schrägstriche enthalten.</value></data>
+  <data name="Connection_Issue_PrefixInvalid" xml:space="preserve"><value>Ein Präfix darf keine .. enthalten oder mit einem Schrägstrich beginnen.</value></data>
+  <data name="Connection_LoadFailed" xml:space="preserve"><value>Gespeicherte Verbindungen konnten nicht gelesen werden.</value></data>
+  <data name="Connection_SaveFailed" xml:space="preserve"><value>Verbindung konnte nicht gespeichert werden.</value></data>
+  <data name="Footer_OneConnection" xml:space="preserve"><value>1 Verbindung</value></data>
+  <data name="Footer_ConnectionCount" xml:space="preserve"><value>{0} Verbindungen</value></data>
+  <data name="Explorer_Open" xml:space="preserve"><value>Öffnen</value></data>
+  <data name="Tab_CloseOthers" xml:space="preserve"><value>Andere Tabs schließen</value></data>
+  <data name="Tab_RestoreClosed" xml:space="preserve"><value>Geschlossenen Tab wiederherstellen (Strg+Umschalt+T)</value></data>
+  <data name="Explorer_PickTitle" xml:space="preserve"><value>Verbindung öffnen</value></data>
+  <data name="Explorer_PickDescription" xml:space="preserve"><value>Wählen Sie eine gespeicherte Verbindung, um ihre Buckets und Objekte zu durchsuchen.</value></data>
+  <data name="Explorer_Filter" xml:space="preserve"><value>Geladene Namen filtern oder dieses Präfix durchsuchen</value></data>
+  <data name="Explorer_SearchScope" xml:space="preserve"><value>Suchbereich</value></data>
+  <data name="Explorer_ScopeLoaded" xml:space="preserve"><value>Geladen</value></data>
+  <data name="Explorer_ScopePrefix" xml:space="preserve"><value>Präfix</value></data>
+  <data name="Explorer_ScopeBucket" xml:space="preserve"><value>Bucket</value></data>
+  <data name="Explorer_FilterLoaded" xml:space="preserve"><value>Geladene Elemente filtern</value></data>
+  <data name="Explorer_KeyPrefix" xml:space="preserve"><value>Nach Schlüsselpräfix suchen</value></data>
+  <data name="Explorer_ScanBucket" xml:space="preserve"><value>Gesamten Bucket durchsuchen</value></data>
+  <data name="Explorer_SearchPlaceholder" xml:space="preserve"><value>Dateien oder Ordner suchen (Strg+F)</value></data>
+  <data name="Explorer_Search" xml:space="preserve"><value>Suchen</value></data>
+  <data name="Explorer_LoadedFilterHint" xml:space="preserve"><value>Filtert nur bereits geladene Elemente dieses Ordners. Laden Sie weitere Elemente, um diese einzubeziehen.</value></data>
+  <data name="Explorer_BucketFilterHint" xml:space="preserve"><value>Filtert die bereits geladenen Buckets sofort.</value></data>
+  <data name="Explorer_KeyPrefixHint" xml:space="preserve"><value>Listet Schlüssel auf, die im aktuellen Ordner mit diesem Text beginnen. Groß- und Kleinschreibung wird beachtet; Netzwerkanfragen werden ausgeführt.</value></data>
+  <data name="Explorer_BucketScanHint" xml:space="preserve"><value>Durchsucht alle zugänglichen Schlüssel des Buckets nach passendem Text. Dies kann dauern und Anfragekosten verursachen.</value></data>
+  <data name="Explorer_KeyPrefixNoMatchesHint" xml:space="preserve"><value>Hier beginnen keine Schlüssel mit diesem Text. Versuchen Sie ein kürzeres Präfix.</value></data>
+  <data name="Explorer_KeyPrefixProgress" xml:space="preserve"><value>Schlüssel unter {0} werden aufgelistet · {1} Objekte geprüft · {2} Listenanfragen · {3} Treffer.</value></data>
+  <data name="Explorer_KeyPrefixLoading" xml:space="preserve"><value>Schlüssel mit diesem Präfix werden aufgelistet…</value></data>
+  <data name="Explorer_KeyPrefixComplete" xml:space="preserve"><value>Schlüsselpräfix-Suche unter {0} abgeschlossen · {1} Objekte geprüft · {2} Listenanfragen · {3} Treffer.</value></data>
+  <data name="Explorer_KeyPrefixIncomplete" xml:space="preserve"><value>Bei der Grenze von 2.000 Ergebnissen unter {0} angehalten · {1} Objekte geprüft · {2} Listenanfragen. Die Ergebnisse sind unvollständig.</value></data>
+  <data name="Explorer_New" xml:space="preserve"><value>Neu</value></data>
+  <data name="Explorer_NewTextFile" xml:space="preserve"><value>Neue Textdatei</value></data>
+  <data name="Explorer_NewTextFileMessage" xml:space="preserve"><value>Erstellt eine leere Textdatei in diesem Ordner.</value></data>
+  <data name="Explorer_More" xml:space="preserve"><value>Mehr</value></data>
+  <data name="Explorer_UploadFilesTip" xml:space="preserve"><value>Dateien in diesen Ordner hochladen</value></data>
+  <data name="Explorer_UploadFiles" xml:space="preserve"><value>Dateien hochladen…</value></data>
+  <data name="Explorer_UploadFolder" xml:space="preserve"><value>Ordner hochladen…</value></data>
+  <data name="Explorer_RenameTip" xml:space="preserve"><value>Umbenennen (F2)</value></data>
+  <data name="Explorer_DeleteTip" xml:space="preserve"><value>Löschen (Entf)</value></data>
+  <data name="Explorer_SearchPrefix" xml:space="preserve"><value>Präfix durchsuchen</value></data>
+  <data name="Explorer_SearchCostHint" xml:space="preserve"><value>Durchsucht dieses Präfix und seine Unterordner. Pro Anfrage werden bis zu 1.000 Objekte aufgelistet; Gebühren des Anbieters können anfallen.</value></data>
+  <data name="Explorer_SearchLoading" xml:space="preserve"><value>Dieses Präfix und seine Unterordner werden durchsucht…</value></data>
+  <data name="Explorer_SearchNoMatches" xml:space="preserve"><value>Keine passenden Objekte</value></data>
+  <data name="Explorer_SearchNoMatchesHint" xml:space="preserve"><value>Der Scan ist abgeschlossen. Versuchen Sie einen anderen Namen oder ein engeres Präfix.</value></data>
+  <data name="Explorer_CancelScan" xml:space="preserve"><value>Scan abbrechen</value></data>
+  <data name="Explorer_SearchProgress" xml:space="preserve"><value>Suche in {0} und Unterordnern · {1} Objekte geprüft · {2} Listenanfragen · {3} Treffer. Jede Anfrage kann Speicherkosten verursachen.</value></data>
+  <data name="Explorer_SearchComplete" xml:space="preserve"><value>Suche in {0} und Unterordnern abgeschlossen · {1} Objekte geprüft · {2} Listenanfragen · {3} Treffer.</value></data>
+  <data name="Explorer_SearchIncomplete" xml:space="preserve"><value>Scan bei {0} angehalten · {1} Objekte geprüft · {2} Anfragen · {3} Treffer. Die Ergebnisse sind unvollständig. Setzen Sie die Suche fort.</value></data>
+  <data name="Explorer_PreparingOperation" xml:space="preserve"><value>Vorgang wird vorbereitet · {0} Objekte geprüft · {1} Listenanfragen · {2} Zielprüfungen</value></data>
+  <data name="Explorer_DeletePreview" xml:space="preserve"><value>{0} Objekte aus {1} löschen? Die Anzahl wurde mit {2} Listenanfragen geprüft. Nur die Objekte in dieser Vorschau werden gelöscht. Dies lässt sich nicht rückgängig machen.</value></data>
+  <data name="Explorer_RenamePreview" xml:space="preserve"><value>{0} Objekte nach {1} umbenennen? {2} Zielkonflikte gefunden. Für die Vorschau wurden {3} Listenanfragen und {4} Existenzprüfungen ausgeführt. Nur die angezeigten Objekte werden verschoben.</value></data>
+  <data name="Explorer_PreviewChanged" xml:space="preserve"><value>Das Ziel hat sich seit der Vorschau geändert. Keine Objekte wurden verschoben. Prüfen Sie den Vorgang erneut.</value></data>
+  <data name="Explorer_FailureDetails" xml:space="preserve"><value>Vollständiger Bericht über fehlgeschlagene Objekte</value></data>
+  <data name="Explorer_ConflictDetails" xml:space="preserve"><value>Bereits vorhandene Zielobjekte</value></data>
+  <data name="Explorer_CopyReport" xml:space="preserve"><value>Vollständigen Bericht kopieren</value></data>
+  <data name="Explorer_Refresh" xml:space="preserve"><value>Aktualisieren (F5)</value></data>
+  <data name="Explorer_RefreshMenu" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="Explorer_Up" xml:space="preserve"><value>Eine Ebene nach oben (Rücktaste)</value></data>
+  <data name="Explorer_Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Explorer_Loading" xml:space="preserve"><value>Wird geladen…</value></data>
+  <data name="Explorer_LoadMore" xml:space="preserve"><value>Mehr laden</value></data>
+  <data name="Explorer_ReadOnly" xml:space="preserve"><value>Schreibgeschützt</value></data>
+  <data name="Explorer_NewFolder" xml:space="preserve"><value>Neuer Ordner</value></data>
+  <data name="Explorer_NewFolderTitle" xml:space="preserve"><value>Neuer Ordner</value></data>
+  <data name="Explorer_NewFolderMessage" xml:space="preserve"><value>Ein Ordner ist ein Schlüsselpräfix. Er bleibt auch dann sichtbar, wenn er leer ist.</value></data>
+  <data name="Explorer_Create" xml:space="preserve"><value>Erstellen</value></data>
+  <data name="Explorer_NameLabel" xml:space="preserve"><value>Name</value></data>
+  <data name="Explorer_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Explorer_Size" xml:space="preserve"><value>Größe</value></data>
+  <data name="Explorer_Modified" xml:space="preserve"><value>Geändert</value></data>
+  <data name="Explorer_Kind" xml:space="preserve"><value>Typ</value></data>
+  <data name="Explorer_KindFolder" xml:space="preserve"><value>Ordner</value></data>
+  <data name="Explorer_KindFile" xml:space="preserve"><value>Datei</value></data>
+  <data name="Explorer_KindImage" xml:space="preserve"><value>Bild</value></data>
+  <data name="Explorer_KindVideo" xml:space="preserve"><value>Video</value></data>
+  <data name="Explorer_KindAudio" xml:space="preserve"><value>Audio</value></data>
+  <data name="Explorer_KindCode" xml:space="preserve"><value>Code</value></data>
+  <data name="Explorer_KindData" xml:space="preserve"><value>Daten</value></data>
+  <data name="Explorer_KindText" xml:space="preserve"><value>Text</value></data>
+  <data name="Explorer_KindDocument" xml:space="preserve"><value>Dokument</value></data>
+  <data name="Explorer_KindPdf" xml:space="preserve"><value>PDF</value></data>
+  <data name="Explorer_KindArchive" xml:space="preserve"><value>Archiv</value></data>
+  <data name="Explorer_KindSheet" xml:space="preserve"><value>Tabelle</value></data>
+  <data name="Explorer_KindSlides" xml:space="preserve"><value>Präsentation</value></data>
+  <data name="Explorer_KindFont" xml:space="preserve"><value>Schriftart</value></data>
+  <data name="Explorer_KindProgram" xml:space="preserve"><value>Programm</value></data>
+  <data name="Explorer_ViewList" xml:space="preserve"><value>Liste</value></data>
+  <data name="Explorer_ViewIcons" xml:space="preserve"><value>Symbole</value></data>
+  <data name="Explorer_GridComfortable" xml:space="preserve"><value>Großzügiges Raster</value></data>
+  <data name="Explorer_GridCompact" xml:space="preserve"><value>Kompaktes Raster</value></data>
+  <data name="Explorer_ShowDetails" xml:space="preserve"><value>Detailbereich anzeigen</value></data>
+  <data name="Explorer_HideDetails" xml:space="preserve"><value>Detailbereich ausblenden</value></data>
+  <data name="Explorer_NameCopied" xml:space="preserve"><value>Dateiname kopiert</value></data>
+  <data name="Explorer_Region" xml:space="preserve"><value>Region</value></data>
+  <data name="Explorer_Buckets" xml:space="preserve"><value>Buckets</value></data>
+  <data name="Explorer_Objects" xml:space="preserve"><value>Objekte</value></data>
+  <data name="Explorer_CopyDetailName" xml:space="preserve"><value>Namen kopieren</value></data>
+  <data name="Explorer_DetailsBucket" xml:space="preserve"><value>Bucket</value></data>
+  <data name="Explorer_DetailsCurrentFolder" xml:space="preserve"><value>Aktueller Ordner</value></data>
+  <data name="Explorer_DetailsSelectionBreakdown" xml:space="preserve"><value>{0} Dateien · {1} Ordner</value></data>
+  <data name="Explorer_Details" xml:space="preserve"><value>Details</value></data>
+  <data name="Explorer_Location" xml:space="preserve"><value>Speicherort</value></data>
+  <data name="Explorer_Prefix" xml:space="preserve"><value>Präfix</value></data>
+  <data name="Explorer_ObjectKey" xml:space="preserve"><value>Objektschlüssel</value></data>
+  <data name="Explorer_Technical" xml:space="preserve"><value>Dateieigenschaften</value></data>
+  <data name="Explorer_CopyName" xml:space="preserve"><value>Dateinamen kopieren</value></data>
+  <data name="Explorer_ValueCopied" xml:space="preserve"><value>In Zwischenablage kopiert</value></data>
+  <data name="Explorer_ETagHint" xml:space="preserve"><value>Vom Speicherdienst zurückgegebenes Objekt-Tag; nicht unbedingt eine MD5-Prüfsumme.</value></data>
+  <data name="Explorer_ContentTypeHint" xml:space="preserve"><value>Der MIME-Typ der Datei (HTTP Content-Type).</value></data>
+  <data name="Explorer_CopyETag" xml:space="preserve"><value>ETag kopieren</value></data>
+  <data name="Explorer_CopyContentType" xml:space="preserve"><value>Content-Type kopieren</value></data>
+  <data name="Explorer_Bytes" xml:space="preserve"><value>Byte</value></data>
+  <data name="Explorer_Key" xml:space="preserve"><value>Schlüssel</value></data>
+  <data name="Explorer_ETag" xml:space="preserve"><value>ETag</value></data>
+  <data name="Explorer_ContentType" xml:space="preserve"><value>Inhaltstyp</value></data>
+  <data name="Explorer_HeaderUnavailable" xml:space="preserve"><value>Nicht verfügbar</value></data>
+  <data name="Explorer_UriLabel" xml:space="preserve"><value>S3-URI</value></data>
+  <data name="Explorer_Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Explorer_DeleteOneTitle" xml:space="preserve"><value>{0} löschen?</value></data>
+  <data name="Explorer_DeleteManyTitle" xml:space="preserve"><value>{0} Elemente löschen?</value></data>
+  <data name="Explorer_DeleteFileMessage" xml:space="preserve"><value>Das Objekt wird aus dem Bucket entfernt. Dies lässt sich nicht rückgängig machen.</value></data>
+  <data name="Explorer_DeleteFolderMessage" xml:space="preserve"><value>Beim Löschen eines Ordners werden alle Objekte unter diesem Präfix entfernt. Dies lässt sich nicht rückgängig machen.</value></data>
+  <data name="Explorer_Rename" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="Explorer_RenameTitle" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="Explorer_RenameMessage" xml:space="preserve"><value>Zunächst wird das neue Objekt kopiert. Das Original wird erst gelöscht, nachdem die Kopie erfolgreich erstellt wurde.</value></data>
+  <data name="Explorer_Copy" xml:space="preserve"><value>Kopieren</value></data>
+  <data name="Explorer_Cut" xml:space="preserve"><value>Ausschneiden</value></data>
+  <data name="Explorer_Paste" xml:space="preserve"><value>Einfügen</value></data>
+  <data name="Explorer_CutUploadTitle" xml:space="preserve"><value>Ausgeschnittene Dateien hochladen?</value></data>
+  <data name="Explorer_CutUploadMessage" xml:space="preserve"><value>Diese Dateien wurden im Windows-Explorer ausgeschnitten. Cavdeck kann Kopien hochladen, aber die lokalen Originaldateien werden weder verschoben noch gelöscht.</value></data>
+  <data name="Explorer_UploadCopies" xml:space="preserve"><value>Kopien hochladen</value></data>
+  <data name="Explorer_CopyKey" xml:space="preserve"><value>Schlüssel kopieren</value></data>
+  <data name="Explorer_CopyUri" xml:space="preserve"><value>S3-URI kopieren</value></data>
+  <data name="Explorer_CopyReady" xml:space="preserve"><value>Bereit zum Kopieren in Cavdeck</value></data>
+  <data name="Explorer_CopyTo" xml:space="preserve"><value>Kopieren nach…</value></data>
+  <data name="Explorer_CopyToSummary" xml:space="preserve"><value>{0} Dateien und {1} Ordner ausgewählt</value></data>
+  <data name="Explorer_CopyToConnection" xml:space="preserve"><value>Zielverbindung</value></data>
+  <data name="Explorer_CopyToBucket" xml:space="preserve"><value>Bucket</value></data>
+  <data name="Explorer_CopyToFolder" xml:space="preserve"><value>Ordner</value></data>
+  <data name="Explorer_CopyToConflict" xml:space="preserve"><value>Wenn ein Objekt bereits vorhanden ist</value></data>
+  <data name="Explorer_CopyToUp" xml:space="preserve"><value>Nach oben</value></data>
+  <data name="Explorer_CopyToNoWritable" xml:space="preserve"><value>Keine beschreibbaren Zielverbindungen verfügbar.</value></data>
+  <data name="Explorer_CopyToNoBuckets" xml:space="preserve"><value>Für diese Verbindung sind keine Buckets verfügbar.</value></data>
+  <data name="Explorer_CopyToEmpty" xml:space="preserve"><value>Hier gibt es keine Unterordner. Sie können in den aktuellen Ordner kopieren.</value></data>
+  <data name="Explorer_CopyToRelayHint" xml:space="preserve"><value>Dateien werden über diesen Computer übertragen. Netzwerknutzung und Anbietergebühren können anfallen.</value></data>
+  <data name="Transfer_CrossMove" xml:space="preserve"><value>Verschieben</value></data>
+  <data name="Transfer_CrossMoving" xml:space="preserve"><value>Wird verschoben</value></data>
+  <data name="Transfer_CrossRemoving" xml:space="preserve"><value>Quelldatei wird entfernt</value></data>
+  <data name="Explorer_CrossMoveBatchQueued" xml:space="preserve"><value>Verschiebeauftrag wurde eingereiht</value></data>
+  <data name="Transfer_CrossCopy" xml:space="preserve"><value>Kopieren</value></data>
+  <data name="Transfer_CrossCopying" xml:space="preserve"><value>Wird kopiert</value></data>
+  <data name="Transfer_CrossVerifying" xml:space="preserve"><value>Wird überprüft</value></data>
+  <data name="Transfer_CrossChecksumVerified" xml:space="preserve"><value>SHA-256 verifiziert</value></data>
+  <data name="Explorer_CrossBatchQueued" xml:space="preserve"><value>Kopierauftrag eingereiht</value></data>
+  <data name="Explorer_CrossBatchQueuedHint" xml:space="preserve"><value>Den Fortschritt und das Ergebnis jedes Objekts finden Sie unter Übertragungen.</value></data>
+  <data name="Transfer_BatchTitle" xml:space="preserve"><value>Kopierauftrag</value></data>
+  <data name="Transfer_BatchProgress" xml:space="preserve"><value>{0} hinzugefügt · {1} kopiert · {2} übersprungen · {3} fehlgeschlagen · {4} verbleibend</value></data>
+  <data name="Transfer_BatchScanning" xml:space="preserve"><value>Quellordner werden durchsucht</value></data>
+  <data name="Transfer_BatchScanComplete" xml:space="preserve"><value>Scan abgeschlossen</value></data>
+  <data name="Transfer_BatchScanFailed" xml:space="preserve"><value>Ordnerscan erfordert Aufmerksamkeit</value></data>
+  <data name="Transfer_RetryBatch" xml:space="preserve"><value>Auftrag erneut versuchen</value></data>
+  <data name="Explorer_CrossCutUnsupported" xml:space="preserve"><value>Ausschneiden zwischen Verbindungen wird nicht unterstützt. Kopieren Sie stattdessen die Objekte.</value></data>
+  <data name="Explorer_SourceConnectionMissing" xml:space="preserve"><value>Die Quellverbindung ist nicht mehr verfügbar.</value></data>
+  <data name="Explorer_CutReady" xml:space="preserve"><value>Bereit zum Verschieben in Cavdeck</value></data>
+  <data name="Explorer_ClipboardCount" xml:space="preserve"><value>{0} Elemente können in dieser Verbindung eingefügt werden, auch aus anderen Tabs.</value></data>
+  <data name="Explorer_CopyNothingToDo" xml:space="preserve"><value>Keine Objekte zum Kopieren oder Verschieben</value></data>
+  <data name="Explorer_PasteMoveCount" xml:space="preserve"><value>Hierher verschieben ({0})</value></data>
+  <data name="Explorer_CrossMoveQueuedHint" xml:space="preserve"><value>Den Fortschritt finden Sie unter Übertragungen. Quellobjekte werden erst nach Prüfung des Ziels entfernt.</value></data>
+  <data name="Transfer_MoveBatchTitle" xml:space="preserve"><value>Verschiebeauftrag</value></data>
+  <data name="Transfer_MoveBatchProgress" xml:space="preserve"><value>{0} hinzugefügt · {1} verschoben · {2} übersprungen · {3} fehlgeschlagen · {4} verbleibend</value></data>
+  <data name="Explorer_PasteCount" xml:space="preserve"><value>Einfügen ({0})</value></data>
+  <data name="Explorer_SelectLoaded" xml:space="preserve"><value>Geladene Elemente auswählen</value></data>
+  <data name="Explorer_ClearSelection" xml:space="preserve"><value>Auswahl aufheben</value></data>
+  <data name="Explorer_CopyPlanning" xml:space="preserve"><value>Vorgang wird vorbereitet…</value></data>
+  <data name="Explorer_CopyChecking" xml:space="preserve"><value>Ziele werden geprüft · {0} von {1}</value></data>
+  <data name="Explorer_CopyProgress" xml:space="preserve"><value>Kopieren · {0} von {1}</value></data>
+  <data name="Explorer_MoveProgress" xml:space="preserve"><value>Verschobene Originale werden gelöscht · {0} von {1}</value></data>
+  <data name="Explorer_DeleteProgress" xml:space="preserve"><value>Löschen · {0} von {1}</value></data>
+  <data name="Explorer_StopOperation" xml:space="preserve"><value>Anhalten</value></data>
+  <data name="Explorer_CopyCanceled" xml:space="preserve"><value>Angehalten. Bereits abgeschlossene Änderungen bleiben bestehen. Aktualisieren Sie die Ansicht vor einem erneuten Versuch.</value></data>
+  <data name="Explorer_KeyCopied" xml:space="preserve"><value>Schlüssel kopiert</value></data>
+  <data name="Explorer_UriCopied" xml:space="preserve"><value>S3-URI kopiert</value></data>
+  <data name="Explorer_CopyFailed" xml:space="preserve"><value>Kopieren in die Zwischenablage fehlgeschlagen</value></data>
+  <data name="Explorer_ConflictTitle" xml:space="preserve"><value>Einige Objekte sind bereits vorhanden</value></data>
+  <data name="Explorer_ConflictMessage" xml:space="preserve"><value>{0} Zielobjekte sind bereits vorhanden. Überschreiben ersetzt diese; Überspringen behält sie bei und kopiert die übrigen.</value></data>
+  <data name="Explorer_Overwrite" xml:space="preserve"><value>Überschreiben</value></data>
+  <data name="Explorer_Skip" xml:space="preserve"><value>Überspringen</value></data>
+  <data name="Explorer_NameEmpty" xml:space="preserve"><value>Geben Sie einen Namen ein.</value></data>
+  <data name="Explorer_NameSeparator" xml:space="preserve"><value>Ein Name darf weder / noch \ enthalten.</value></data>
+  <data name="Explorer_NameReserved" xml:space="preserve"><value>Ein Name darf nicht . oder .. sein.</value></data>
+  <data name="Explorer_NameControl" xml:space="preserve"><value>Ein Name darf keine Steuerzeichen enthalten.</value></data>
+  <data name="Explorer_NameTooLong" xml:space="preserve"><value>Mit diesem Namen wird der Objektschlüssel zu lang.</value></data>
+  <data name="Explorer_NameExists" xml:space="preserve"><value>Dieser Name ist bereits vergeben</value></data>
+  <data name="Explorer_NameExistsMessage" xml:space="preserve"><value>Wählen Sie einen anderen Namen. Vorhandene Objekte bleiben unverändert.</value></data>
+  <data name="Explorer_IntoItself" xml:space="preserve"><value>Ein Ordner kann nicht in sich selbst kopiert werden.</value></data>
+  <data name="Explorer_CopyUnsupported" xml:space="preserve"><value>Dieser Speicherdienst unterstützt das serverseitige Kopieren von Objekten nicht.</value></data>
+  <data name="Explorer_PartialTitle" xml:space="preserve"><value>Mit Fehlern abgeschlossen</value></data>
+  <data name="Explorer_ResultPartial" xml:space="preserve"><value>{0} erfolgreich, {1} übersprungen, {2} fehlgeschlagen.</value></data>
+  <data name="Explorer_ResultDone" xml:space="preserve"><value>{0} erfolgreich, {1} übersprungen.</value></data>
+  <data name="Explorer_EmptyTitle" xml:space="preserve"><value>Dieses Präfix ist leer</value></data>
+  <data name="Explorer_EmptyDescription" xml:space="preserve"><value>Hier ist noch nichts gespeichert. Mit Neuer Ordner erstellen Sie ein leeres Präfix.</value></data>
+  <data name="Explorer_NoBucketsTitle" xml:space="preserve"><value>Keine Buckets</value></data>
+  <data name="Explorer_NoBucketsDescription" xml:space="preserve"><value>Mit diesem Schlüssel sind keine Buckets sichtbar. Bearbeiten Sie die Verbindung und beschränken Sie sie auf einen zugänglichen Bucket.</value></data>
+  <data name="Explorer_NoMatches" xml:space="preserve"><value>Keine passenden geladenen Namen</value></data>
+  <data name="Explorer_NoMatchesHint" xml:space="preserve"><value>Der Filter prüft nur bereits geladene Elemente. Laden Sie mehr oder öffnen Sie ein Präfix.</value></data>
+  <data name="Explorer_StatusBuckets" xml:space="preserve"><value>{0} Buckets</value></data>
+  <data name="Explorer_StatusItems" xml:space="preserve"><value>{0} Elemente</value></data>
+  <data name="Explorer_StatusMore" xml:space="preserve"><value>{0} Elemente · weitere verfügbar</value></data>
+  <data name="Explorer_StatusSelected" xml:space="preserve"><value>{0} ausgewählt</value></data>
+  <data name="Explorer_StatusSelectedLoaded" xml:space="preserve"><value>{0} geladene Elemente ausgewählt · weitere verfügbar</value></data>
+  <data name="Transfer_Upload" xml:space="preserve"><value>Hochladen</value></data>
+  <data name="Transfer_UploadFolder" xml:space="preserve"><value>Ordner hochladen</value></data>
+  <data name="Transfer_Download" xml:space="preserve"><value>Herunterladen</value></data>
+  <data name="Transfer_PickFiles" xml:space="preserve"><value>Dateien zum Hochladen auswählen</value></data>
+  <data name="Transfer_PickFolder" xml:space="preserve"><value>Ordner zum Hochladen auswählen</value></data>
+  <data name="Transfer_PickDestination" xml:space="preserve"><value>Speicherort für Download auswählen</value></data>
+  <data name="Transfer_DropHint" xml:space="preserve"><value>Zum Hochladen hier ablegen</value></data>
+  <data name="Transfer_ConflictTitle" xml:space="preserve"><value>Wenn eine Datei bereits vorhanden ist</value></data>
+  <data name="Transfer_ConflictMessage" xml:space="preserve"><value>Diese Auswahl gilt für den gesamten Auftrag. Bestehende Dateien bleiben unverändert, sofern Sie nicht Überschreiben wählen.</value></data>
+  <data name="Transfer_ConflictDetectedMessage" xml:space="preserve"><value>„{0}“ ist am Ziel bereits vorhanden. Wählen Sie, wie mit bestehenden Dateien dieses Auftrags verfahren werden soll. Beim Ersetzen können frühere Inhalte verloren gehen.</value></data>
+  <data name="Transfer_RememberChoice" xml:space="preserve"><value>Auswahl für zukünftige Übertragungen merken</value></data>
+  <data name="Transfer_CheckingConflicts" xml:space="preserve"><value>Vorhandene Dateien werden geprüft…</value></data>
+  <data name="Transfer_NoticeSkipped" xml:space="preserve"><value>{0} vorhandene Datei(en) übersprungen</value></data>
+  <data name="Transfer_ConflictCheckFailed" xml:space="preserve"><value>Das Ziel konnte nicht auf vorhandene Dateien geprüft werden. Keine Übertragung wurde gestartet.</value></data>
+  <data name="Transfer_ConflictPreferenceNotSaved" xml:space="preserve"><value>Übertragungseinstellung konnte nicht gespeichert werden</value></data>
+  <data name="Transfer_Skip" xml:space="preserve"><value>Vorhandene überspringen</value></data>
+  <data name="Transfer_Rename" xml:space="preserve"><value>Beide behalten</value></data>
+  <data name="Transfer_Overwrite" xml:space="preserve"><value>Überschreiben</value></data>
+  <data name="Transfer_Start" xml:space="preserve"><value>Starten</value></data>
+  <data name="Transfer_Queued" xml:space="preserve"><value>{0} eingereiht</value></data>
+  <data name="Transfer_NotQueued" xml:space="preserve"><value>{0} konnten nicht eingereiht werden</value></data>
+  <data name="Transfer_Rejected" xml:space="preserve"><value>Übertragung nicht gestartet</value></data>
+  <data name="Transfer_ReadOnly" xml:space="preserve"><value>Diese Verbindung ist schreibgeschützt.</value></data>
+  <data name="Transfer_Summary" xml:space="preserve"><value>{0} aktiv · {1} in Warteschlange</value></data>
+  <data name="Transfer_Footer" xml:space="preserve"><value>{0} aktiv · {1} in Warteschlange</value></data>
+  <data name="Transfer_Concurrency" xml:space="preserve"><value>Gleichzeitige Übertragungen</value></data>
+  <data name="Transfer_ConcurrencyHelp" xml:space="preserve"><value>Maximale Anzahl gleichzeitig laufender Uploads, Downloads und Kopiervorgänge. Höhere Werte beanspruchen mehr Netzwerkressourcen.</value>
+  </data>
+  <data name="Transfer_ConcurrencySaveFailed" xml:space="preserve"><value>Übertragungseinstellung konnte nicht gespeichert werden. Der vorherige Wert wurde wiederhergestellt.</value>
+  </data>
+  <data name="Transfer_ActionFailed" xml:space="preserve"><value>Die Übertragungsaktion konnte nicht abgeschlossen werden. Versuchen Sie es erneut.</value>
+  </data>
+  <data name="Transfer_Active" xml:space="preserve"><value>Aktuell</value></data>
+  <data name="Transfer_History" xml:space="preserve"><value>Verlauf</value></data>
+  <data name="Transfer_Pause" xml:space="preserve"><value>Pausieren</value></data>
+  <data name="Transfer_Resume" xml:space="preserve"><value>Fortsetzen</value></data>
+  <data name="Transfer_Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Transfer_Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Transfer_QueuedState" xml:space="preserve"><value>In Warteschlange</value></data>
+  <data name="Transfer_Uploading" xml:space="preserve"><value>Wird hochgeladen</value></data>
+  <data name="Transfer_Downloading" xml:space="preserve"><value>Wird heruntergeladen</value></data>
+  <data name="Transfer_Paused" xml:space="preserve"><value>Pausiert</value></data>
+  <data name="Transfer_Waiting" xml:space="preserve"><value>Wartet auf Wiederholung</value></data>
+  <data name="Transfer_Skipped" xml:space="preserve"><value>Übersprungen</value></data>
+  <data name="Transfer_Completed" xml:space="preserve"><value>Abgeschlossen</value></data>
+  <data name="Transfer_SizeVerified" xml:space="preserve"><value>Größe überprüft</value></data>
+  <data name="Transfer_ChecksumVerified" xml:space="preserve"><value>Prüfsumme verifiziert</value></data>
+  <data name="Transfer_Failed" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+  <data name="Transfer_Cancelled" xml:space="preserve"><value>Abgebrochen</value></data>
+  <data name="Transfer_FailureNetwork" xml:space="preserve"><value>Netzwerkfehler. Es wird automatisch erneut versucht.</value></data>
+  <data name="Transfer_FailureThrottled" xml:space="preserve"><value>Der Speicherdienst verlangt eine niedrigere Übertragungsrate.</value></data>
+  <data name="Transfer_FailureDenied" xml:space="preserve"><value>Zugriff wurde verweigert.</value></data>
+  <data name="Transfer_FailureMissing" xml:space="preserve"><value>Die Datei wurde nicht gefunden.</value></data>
+  <data name="Transfer_FailureConflict" xml:space="preserve"><value>Die Datei wurde an anderer Stelle geändert und daher nicht verändert.</value></data>
+  <data name="Transfer_FailureIntegrity" xml:space="preserve"><value>Die übertragenen Daten stimmen nicht überein.</value></data>
+  <data name="Transfer_FailureLocal" xml:space="preserve"><value>Die lokale Datei fehlt.</value></data>
+  <data name="Transfer_FailureBusy" xml:space="preserve"><value>Die Datei wird verwendet.</value></data>
+  <data name="Transfer_FailureDisk" xml:space="preserve"><value>Der Datenträger ist voll.</value></data>
+  <data name="Transfer_FailureConnection" xml:space="preserve"><value>Diese Verbindung ist nicht mehr verfügbar.</value></data>
+  <data name="Transfer_FailurePath" xml:space="preserve"><value>Der Pfad ist ungültig.</value></data>
+  <data name="Transfer_FailureUnknown" xml:space="preserve"><value>Übertragung fehlgeschlagen.</value></data>
+  <data name="Transfer_CloseTitle" xml:space="preserve"><value>Übertragungen sind noch nicht abgeschlossen</value></data>
+  <data name="Transfer_CloseMessage" xml:space="preserve"><value>{0} Übertragungen sind noch nicht abgeschlossen. Beim Schließen bleibt ihr Fortschritt erhalten; fortsetzbare Übertragungen werden beim nächsten Start fortgesetzt.</value></data>
+  <data name="Transfer_CloseAnyway" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Transfer_Finished" xml:space="preserve"><value>{0} abgeschlossen</value></data>
+  <data name="Transfer_CouldNotFinish" xml:space="preserve"><value>{0} nicht abgeschlossen</value></data>
+  <data name="Preview_Content" xml:space="preserve"><value>Inhalt</value></data>
+  <data name="Preview_Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Preview_Preview" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Preview_Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Preview_SaveOpen" xml:space="preserve"><value>Speichern und öffnen</value></data>
+  <data name="Preview_DiscardOpen" xml:space="preserve"><value>Verwerfen und öffnen</value></data>
+  <data name="Preview_SaveContinue" xml:space="preserve"><value>Speichern und fortfahren</value></data>
+  <data name="Preview_DiscardContinue" xml:space="preserve"><value>Verwerfen und fortfahren</value></data>
+  <data name="Preview_UnsavedGeneric" xml:space="preserve"><value>{0} enthält ungespeicherte Änderungen. Was möchten Sie vor dem Fortfahren tun?</value></data>
+  <data name="Preview_UnsavedSelect" xml:space="preserve"><value>{0} enthält ungespeicherte Änderungen. Was möchten Sie vor der Auswahl von {1} tun?</value></data>
+  <data name="Preview_SaveSelect" xml:space="preserve"><value>Speichern und auswählen</value></data>
+  <data name="Preview_DiscardSelect" xml:space="preserve"><value>Verwerfen und auswählen</value></data>
+  <data name="Preview_Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Preview_UnsavedTarget" xml:space="preserve"><value>{0} enthält ungespeicherte Änderungen. Was möchten Sie vor dem Öffnen von {1} tun?</value></data>
+  <data name="Preview_NextSelection" xml:space="preserve"><value>die nächste Auswahl</value></data>
+  <data name="Preview_Saving" xml:space="preserve"><value>Wird gespeichert…</value></data>
+  <data name="Preview_ReloadFailed" xml:space="preserve"><value>Die neueste Version konnte nicht geladen werden. Ihr Entwurf ist noch vorhanden.</value></data>
+  <data name="Preview_DownloadLatest" xml:space="preserve"><value>Neueste Version herunterladen</value></data>
+  <data name="Preview_KeepDraft" xml:space="preserve"><value>Entwurf behalten</value></data>
+  <data name="Preview_NoVersion" xml:space="preserve"><value>Remote-Version konnte nicht überprüft werden</value></data>
+  <data name="Preview_NoVersionDetail" xml:space="preserve"><value>Der Speicherdienst hat kein ETag bereitgestellt. Laden Sie die Datei erneut, um die neueste Version zu prüfen, oder überschreiben Sie sie ausdrücklich. Ihr Entwurf bleibt erhalten.</value></data>
+  <data name="Preview_SaveTip" xml:space="preserve"><value>Speichern (Strg+S)</value></data>
+  <data name="Preview_Revert" xml:space="preserve"><value>Zurücksetzen</value></data>
+  <data name="Preview_Discard" xml:space="preserve"><value>Nicht speichern</value></data>
+  <data name="Preview_Stay" xml:space="preserve"><value>Weiter bearbeiten</value></data>
+  <data name="Preview_Unsaved" xml:space="preserve"><value>Diese Datei enthält ungespeicherte Änderungen.</value></data>
+  <data name="Preview_Saved" xml:space="preserve"><value>Gespeichert</value></data>
+  <data name="Preview_Dirty" xml:space="preserve"><value>Nicht gespeichert</value></data>
+  <data name="Preview_ReadOnly" xml:space="preserve"><value>Schreibgeschützt</value></data>
+  <data name="Preview_Loading" xml:space="preserve"><value>Wird geöffnet…</value></data>
+  <data name="Preview_TooLarge" xml:space="preserve"><value>Diese Datei ist {0} groß. Sie ist zu groß, um hier sicher geöffnet zu werden.</value></data>
+  <data name="Preview_External" xml:space="preserve"><value>Für diesen Dateityp wird keine Vorschau unterstützt. Öffnen Sie ihn mit einer anderen App.</value></data>
+  <data name="Preview_ExternalCopy" xml:space="preserve"><value>Das andere Programm öffnet eine Kopie. Änderungen daran werden nicht zurückgeschrieben.</value></data>
+  <data name="Preview_Shell" xml:space="preserve"><value>Mit App öffnen</value></data>
+  <data name="Preview_ShellOpened" xml:space="preserve"><value>Kopie geöffnet</value></data>
+  <data name="Preview_ShellFailed" xml:space="preserve"><value>Kopie konnte nicht geöffnet werden</value></data>
+  <data name="Preview_Download" xml:space="preserve"><value>Herunterladen</value></data>
+  <data name="Preview_NotText" xml:space="preserve"><value>Diese Datei ist kein Text, der zurückgespeichert werden kann.</value></data>
+  <data name="Preview_ImageFailed" xml:space="preserve"><value>Dieses Bild konnte nicht angezeigt werden.</value></data>
+  <data name="Preview_Conflict" xml:space="preserve"><value>Remote-Datei wurde geändert</value></data>
+  <data name="Preview_ConflictDetail" xml:space="preserve"><value>Beim erneuten Laden gehen Ihre Änderungen verloren. Beim Überschreiben wird das Remote-Objekt ersetzt.</value></data>
+  <data name="Preview_ConditionalSaveUnsupported" xml:space="preserve"><value>Speichern erfordert ein ausdrückliches Überschreiben</value></data>
+  <data name="Preview_ConditionalSaveUnsupportedDetail" xml:space="preserve"><value>Dieser Speicherdienst kann beim Speichern nicht prüfen, ob die Remote-Datei geändert wurde. Beim erneuten Laden gehen Ihre Änderungen verloren. Beim Überschreiben wird die Remote-Datei ohne diese Prüfung ersetzt.</value></data>
+  <data name="Preview_Reload" xml:space="preserve"><value>Neu laden</value></data>
+  <data name="Preview_Overwrite" xml:space="preserve"><value>Überschreiben</value></data>
+  <data name="Preview_Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Preview_OpenFailed" xml:space="preserve"><value>Die Datei konnte nicht geöffnet werden.</value></data>
+  <data name="Preview_SaveFailed" xml:space="preserve"><value>Die Datei konnte nicht gespeichert werden.</value></data>
+  <data name="Connection_Failure_PreconditionFailed" xml:space="preserve"><value>Das Objekt wurde geändert</value></data>
+  <data name="Connection_Failure_PreconditionFailedHint" xml:space="preserve"><value>Laden Sie es erneut oder speichern Sie noch einmal, um die Remote-Kopie zu überschreiben.</value></data>
+  <data name="Share_Menu" xml:space="preserve"><value>Link teilen…</value></data>
+  <data name="Share_Title" xml:space="preserve"><value>Link teilen</value></data>
+  <data name="Share_Kind" xml:space="preserve"><value>Linktyp</value></data>
+  <data name="Share_ChooseHint" xml:space="preserve"><value>Wählen Sie, wie andere auf dieses Objekt zugreifen können.</value></data>
+  <data name="Share_Temporary" xml:space="preserve"><value>Temporärer Downloadlink</value></data>
+  <data name="Share_Public" xml:space="preserve"><value>Öffentliche URL</value></data>
+  <data name="Share_Expires" xml:space="preserve"><value>Läuft ab nach</value></data>
+  <data name="Share_PublicBase" xml:space="preserve"><value>Öffentliche Bucket-URL</value></data>
+  <data name="Share_PublicHint" xml:space="preserve"><value>Geben Sie die HTTPS-Stammadresse dieses Buckets ein, z. B. https://cdn.example.com. Der Bucket muss bereits öffentlich lesbar sein. Die Berechtigungen werden dadurch nicht geändert.</value></data>
+  <data name="Share_TemporaryHint" xml:space="preserve"><value>Jeder mit diesem Link kann das Objekt bis zum Ablauf herunterladen. Es wird der S3-API-Host verwendet, auch wenn eine öffentliche Domain eingerichtet ist.</value></data>
+  <data name="Share_InvalidBase" xml:space="preserve"><value>Geben Sie eine gültige HTTPS-URL ohne Abfrageparameter oder Fragment ein.</value></data>
+  <data name="Share_Create" xml:space="preserve"><value>Link erstellen</value></data>
+  <data name="Share_PublicStatus" xml:space="preserve"><value>Öffentlich · kein Ablaufdatum</value></data>
+  <data name="Share_ExpiryStatus" xml:space="preserve"><value>Temporär · läuft {0} ab</value></data>
+  <data name="Share_Url" xml:space="preserve"><value>Freigabe-URL</value></data>
+  <data name="Share_PublicCaution" xml:space="preserve"><value>Diese URL funktioniert nur, solange die öffentliche Domain und die Objektberechtigungen den Zugriff erlauben.</value></data>
+  <data name="Share_Sensitive" xml:space="preserve"><value>Behandeln Sie diesen Link vertraulich. Er kann vorzeitig ungültig werden, wenn Zugangsdaten widerrufen oder Zugriffsregeln geändert werden.</value></data>
+  <data name="Share_Ready" xml:space="preserve"><value>Link ist bereit</value></data>
+  <data name="Share_Copy" xml:space="preserve"><value>Link kopieren</value></data>
+  <data name="Share_Copied" xml:space="preserve"><value>Link kopiert</value></data>
+  <data name="Share_Failed" xml:space="preserve"><value>Link konnte nicht erstellt werden</value></data>
+  <data name="Share_15Minutes" xml:space="preserve"><value>15 Minuten</value></data>
+  <data name="Share_1Hour" xml:space="preserve"><value>1 Stunde</value></data>
+  <data name="Share_24Hours" xml:space="preserve"><value>24 Stunden</value></data>
+  <data name="Share_7Days" xml:space="preserve"><value>7 Tage</value></data>
+  <data name="Places_AddFavorite" xml:space="preserve"><value>Aktuellen Ort zu Favoriten hinzufügen</value></data>
+  <data name="Places_ToggleFavorite" xml:space="preserve"><value>Bucket-Favorit umschalten</value></data>
+  <data name="Places_RemoveFavorite" xml:space="preserve"><value>Aus Favoriten entfernen</value></data>
+  <data name="Places_RemoveRecent" xml:space="preserve"><value>Aus zuletzt verwendet entfernen</value></data>
+  <data name="Places_OpenNewTab" xml:space="preserve"><value>In neuem Tab öffnen</value></data>
+  <data name="Places_ClearRecent" xml:space="preserve"><value>Zuletzt verwendete löschen</value></data>
+  <data name="Places_ClearRecentConfirm" xml:space="preserve"><value>Alle zuletzt besuchten Speicherorte von diesem Gerät entfernen?</value></data>
+  <data name="Places_FavoritesHint" xml:space="preserve"><value>Auf diesem Gerät gespeicherte Orte</value></data>
+  <data name="Places_RecentHint" xml:space="preserve"><value>Ihre letzten 50 besuchten Orte</value></data>
+  <data name="Places_AllBuckets" xml:space="preserve"><value>Alle Buckets</value></data>
+  <data name="Places_MissingConnection" xml:space="preserve"><value>Diese Verbindung ist nicht mehr verfügbar</value></data>
+  <data name="Places_SaveFailed" xml:space="preserve"><value>Speicherorte konnten nicht gespeichert werden</value></data>
+  <data name="Places_StatusCount" xml:space="preserve"><value>{0} Speicherorte</value></data>
+  <data name="Places_Browse" xml:space="preserve"><value>Verbindungen durchsuchen</value></data>
+  <data name="Places_Connection" xml:space="preserve"><value>Verbindung</value></data>
+  <data name="Places_Location" xml:space="preserve"><value>Speicherort</value></data>
+  <data name="Places_Visited" xml:space="preserve"><value>Besucht</value></data>
+  <data name="Connection_OpenNewTab" xml:space="preserve"><value>In neuem Tab öffnen</value></data>
+  <data name="Nav_StorageTip" xml:space="preserve"><value>Speicher</value></data>
+  <data name="Transfer_FailedMarkTip" xml:space="preserve"><value>Eine Übertragung ist fehlgeschlagen</value></data>
+  <data name="Tray_UnfinishedTitle" xml:space="preserve"><value>Übertragungen sind noch nicht abgeschlossen</value></data>
+  <data name="Tray_UnfinishedMessage" xml:space="preserve"><value>{0} laufen, {1} warten oder werden erneut versucht, {2} sind pausiert. Beim Beenden von Cavdeck werden diese Übertragungen gestoppt.</value></data>
+  <data name="Tray_ExplicitExitMessage" xml:space="preserve"><value>Übertragungen sind noch nicht abgeschlossen. Beim Beenden werden sie gestoppt.</value></data>
+  <data name="Tray_KeepBackground" xml:space="preserve"><value>Im Hintergrund fortfahren</value></data>
+  <data name="Tray_ExitApplication" xml:space="preserve"><value>Cavdeck beenden</value></data>
+  <data name="Tray_Unavailable" xml:space="preserve"><value>Der Infobereich ist nicht verfügbar. Lassen Sie das Fenster geöffnet oder beenden Sie Cavdeck.</value></data>
+  <data name="Tray_Open" xml:space="preserve"><value>Cavdeck öffnen</value></data>
+  <data name="Tray_Transfers" xml:space="preserve"><value>Übertragungen</value></data>
+  <data name="Tray_Connections" xml:space="preserve"><value>Verbindungen</value></data>
+  <data name="Tray_Favorites" xml:space="preserve"><value>Favoriten</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="Tray_Status" xml:space="preserve"><value>{0} laufen · {1} warten · {2} pausiert · {3} fehlgeschlagen</value></data>
+  <data name="Tray_StatusIdle" xml:space="preserve"><value>Keine aktiven Übertragungen</value></data>
+  <data name="Tray_TooltipIdle" xml:space="preserve"><value>Cavdeck · Inaktiv</value></data>
+  <data name="Tray_TooltipBusy" xml:space="preserve"><value>Cavdeck · {0} laufen, {1} warten</value></data>
+  <data name="Tray_TooltipFailed" xml:space="preserve"><value>Cavdeck · {0} fehlgeschlagen</value></data>
+  <data name="Tray_SettingsGroup" xml:space="preserve"><value>Fenster und Hintergrund</value></data>
+  <data name="Tray_CloseLabel" xml:space="preserve"><value>Beim Schließen des Fensters</value></data>
+  <data name="Tray_CloseHelp" xml:space="preserve"><value>Beim Beenden wird nachgefragt, wenn Übertragungen noch laufen. Beim Ausblenden laufen sie weiter.</value></data>
+  <data name="Tray_CloseExit" xml:space="preserve"><value>Cavdeck beenden</value></data>
+  <data name="Tray_CloseHide" xml:space="preserve"><value>Im Infobereich ausblenden</value></data>
+  <data name="Tray_ActivationFailed" xml:space="preserve"><value>Cavdeck läuft bereits, konnte aber nicht aktiviert werden.</value></data>
+  <data name="Settings_BrowseGroup" xml:space="preserve"><value>Dateien durchsuchen</value></data>
+  <data name="Settings_BrowserView" xml:space="preserve"><value>Standardansicht</value></data>
+  <data name="Settings_BrowserViewHelp" xml:space="preserve"><value>Legen Sie fest, wie Objekte im Dateibrowser angezeigt werden.</value></data>
+  <data name="Settings_GridDensity" xml:space="preserve"><value>Symbolabstand</value></data>
+  <data name="Settings_GridDensityHelp" xml:space="preserve"><value>Legen Sie den Abstand in der Symbolansicht fest.</value></data>
+  <data name="Settings_Comfortable" xml:space="preserve"><value>Großzügig</value></data>
+  <data name="Settings_Compact" xml:space="preserve"><value>Kompakt</value></data>
+  <data name="Settings_DetailsPane" xml:space="preserve"><value>Detailbereich</value></data>
+  <data name="Settings_DetailsPaneHelp" xml:space="preserve"><value>Zeigen Sie Details neben ausgewählten Dateien an.</value></data>
+  <data name="Settings_Show" xml:space="preserve"><value>Anzeigen</value></data>
+  <data name="Settings_TransferGroup" xml:space="preserve"><value>Downloads und Übertragungen</value></data>
+  <data name="Settings_DownloadDestination" xml:space="preserve"><value>Downloadziel</value></data>
+  <data name="Settings_DownloadDestinationHelp" xml:space="preserve"><value>Ordner auswählen oder jedes Mal nachfragen.</value></data>
+  <data name="Settings_AskEveryTime" xml:space="preserve"><value>Jedes Mal nachfragen</value></data>
+  <data name="Settings_AskOnConflict" xml:space="preserve"><value>Nur bei Bedarf nachfragen</value></data>
+  <data name="Settings_UseDefaultFolder" xml:space="preserve"><value>Ausgewählten Ordner verwenden</value></data>
+  <data name="Settings_DownloadFolder" xml:space="preserve"><value>Downloadordner</value></data>
+  <data name="Settings_DownloadFolderHelp" xml:space="preserve"><value>Wenn Sie einen Ordner auswählen, sind direkte Downloads möglich. Nicht verfügbare Ordner führen weiterhin zu einer Rückfrage.</value></data>
+  <data name="Settings_ChooseFolder" xml:space="preserve"><value>Ordner auswählen…</value></data>
+  <data name="Settings_DownloadNotSelected" xml:space="preserve"><value>Kein Ordner ausgewählt</value></data>
+  <data name="Settings_InvalidDownloadDirectory" xml:space="preserve"><value>Wählen Sie einen vorhandenen, zugänglichen Ordner.</value></data>
+  <data name="Settings_Conflict" xml:space="preserve"><value>Wenn eine Datei bereits vorhanden ist</value></data>
+  <data name="Settings_ConflictHelp" xml:space="preserve"><value>Gilt für Uploads und Downloads. Nur bei übereinstimmender Datei nachfragen; Überschreiben erfordert immer eine ausdrückliche Auswahl.</value></data>
+  <data name="Settings_Concurrency" xml:space="preserve"><value>Gleichzeitige Übertragungen</value></data>
+  <data name="Settings_ConcurrencyHelp" xml:space="preserve"><value>Maximale Anzahl gleichzeitig laufender Upload-, Download- und Kopieraufträge.</value></data>
+  <data name="Nav_MoreConnectionActions" xml:space="preserve"><value>Weitere Verbindungsaktionen</value></data>
+  <data name="Nav_LoadingConnections" xml:space="preserve"><value>Verbindungen werden geladen…</value></data>
+  <data name="Nav_RetryConnections" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="Explorer_ScopeFolder" xml:space="preserve"><value>Aktueller Ordner</value></data>
+  <data name="Explorer_SearchFolder" xml:space="preserve"><value>Aktuellen Ordner und Unterordner durchsuchen</value></data>
+  <data name="Explorer_FolderScanHint" xml:space="preserve"><value>Durchsucht diesen Ordner und Unterordner nach passenden Objekt- oder Ordnernamen. Speicheranfragegebühren können anfallen.</value></data>
+  <data name="Explorer_ClearSearch" xml:space="preserve"><value>Suche löschen</value></data>
+  <data name="Explorer_ContinueSearch" xml:space="preserve"><value>Suche fortsetzen</value></data>
+  <data name="Explorer_StopSearch" xml:space="preserve"><value>Suche stoppen</value></data>
+  <data name="Explorer_SearchReady" xml:space="preserve"><value>Bereit zur Suche</value></data>
+  <data name="Explorer_SearchReadyHint" xml:space="preserve"><value>Drücken Sie die Eingabetaste oder wählen Sie Suchen, um den ausgewählten Bereich zu durchsuchen.</value></data>
+  <data name="Explorer_SearchPartialEmpty" xml:space="preserve"><value>Keine Treffer im durchsuchten Bereich</value></data>
+  <data name="Explorer_SearchPartialEmptyHint" xml:space="preserve"><value>Die Suche ist noch nicht abgeschlossen. Setzen Sie den Scan fort, ändern Sie die Anfrage oder schränken Sie den Bereich ein.</value></data>
+  <data name="Explorer_SearchFailed" xml:space="preserve"><value>Suche unter {0} unvollständig · {1} Objekte geprüft · {2} Anfragen · {3} Treffer. Versuchen Sie es erneut.</value></data>
+  <data name="Explorer_SearchStopped" xml:space="preserve"><value>Suche bei {0} angehalten · {1} Objekte geprüft · {2} Anfragen · {3} Treffer.</value></data>
+  <data name="Explorer_SearchDisplayLimit" xml:space="preserve"><value>Die Anzeigegrenze von 6.000 Ergebnissen wurde erreicht. Schränken Sie den Bereich ein oder präzisieren Sie die Suche.</value></data>
+  <data name="Explorer_BucketsNoMatches" xml:space="preserve"><value>Keine passenden Buckets</value></data>
+  <data name="Explorer_BucketsNoMatchesHint" xml:space="preserve"><value>Versuchen Sie einen anderen Namen oder löschen Sie den Filter, um alle Buckets anzuzeigen.</value></data>
+  <data name="Transfer_FilterLabel" xml:space="preserve"><value>Übertragungen filtern</value></data>
+  <data name="Transfer_FilterAll" xml:space="preserve"><value>Alle Status</value></data>
+  <data name="Transfer_FilterRunning" xml:space="preserve"><value>Laufend</value></data>
+  <data name="Transfer_FilterQueued" xml:space="preserve"><value>In Warteschlange</value></data>
+  <data name="Transfer_FilterPaused" xml:space="preserve"><value>Pausiert</value></data>
+  <data name="Transfer_FilterFailed" xml:space="preserve"><value>Fehlgeschlagen</value></data>
+  <data name="Transfer_FilterCompleted" xml:space="preserve"><value>Abgeschlossen</value></data>
+  <data name="Transfer_FilterCancelled" xml:space="preserve"><value>Abgebrochen</value></data>
+  <data name="Transfer_ShowItems" xml:space="preserve"><value>Übertragungselemente anzeigen</value></data>
+  <data name="Transfer_HideItems" xml:space="preserve"><value>Übertragungselemente ausblenden</value></data>
+  <data name="Transfer_ShowDetails" xml:space="preserve"><value>Übertragungsdetails anzeigen</value></data>
+  <data name="Transfer_HideDetails" xml:space="preserve"><value>Übertragungsdetails ausblenden</value></data>
+  <data name="Transfer_Source" xml:space="preserve"><value>Quelle</value></data>
+  <data name="Transfer_Destination" xml:space="preserve"><value>Ziel</value></data>
+  <data name="Transfer_NoticeCompleted" xml:space="preserve"><value>{0} Übertragungen abgeschlossen</value></data>
+  <data name="Transfer_NoticeFailed" xml:space="preserve"><value>{0} Übertragungen nicht abgeschlossen</value></data>
+  <data name="Empty_TransferFilteredTitle" xml:space="preserve"><value>Keine passenden Übertragungen</value></data>
+  <data name="Empty_TransferFilteredDescription" xml:space="preserve"><value>Wählen Sie einen anderen Statusfilter, um weitere Übertragungen zu sehen.</value></data>
+  <data name="Transfer_BatchOlderItemsHint" xml:space="preserve"><value>Keine aktuellen Elemente zum Aufklappen verfügbar. Die Auftragszahlen umfassen auch ältere Elemente.</value></data>
+  <data name="Preview_PdfDownloading" xml:space="preserve"><value>PDF für Vorschau wird heruntergeladen…</value></data>
+  <data name="Preview_PdfProgress" xml:space="preserve"><value>{0} von {1} · {2} %</value></data>
+  <data name="Preview_PdfCancel" xml:space="preserve"><value>Vorschau abbrechen</value></data>
+  <data name="Preview_PdfCanceled" xml:space="preserve"><value>PDF-Vorschau abgebrochen. Sie können es erneut versuchen oder die Datei herunterladen.</value></data>
+  <data name="Preview_PdfFailed" xml:space="preserve"><value>Der PDF-Viewer ist nicht verfügbar. Versuchen Sie es erneut, laden Sie die Datei herunter oder öffnen Sie sie mit einer anderen App.</value></data>
+  <data name="Preview_PdfDownloadFailed" xml:space="preserve"><value>Download für PDF-Vorschau fehlgeschlagen. Versuchen Sie es erneut oder laden Sie die Datei herunter.</value></data>
+  <data name="Preview_ExpandPane" xml:space="preserve"><value>Vorschau vergrößern</value></data>
+  <data name="Preview_RestorePane" xml:space="preserve"><value>Geteilte Ansicht wiederherstellen</value></data>
+  <data name="Preview_UnsavedStatus" xml:space="preserve"><value>Ungespeicherte Änderungen</value></data>
+  <data name="Preview_OpenExternalTip" xml:space="preserve"><value>Mit App öffnen (lokale Kopie; Änderungen werden nicht synchronisiert)</value></data>
+  <data name="Preview_Downloading" xml:space="preserve"><value>Für Vorschau wird heruntergeladen…</value></data>
+  <data name="Preview_DownloadProgress" xml:space="preserve"><value>{0} von {1} · {2} %</value></data>
+  <data name="Preview_CancelDownload" xml:space="preserve"><value>Vorschau abbrechen</value></data>
+  <data name="Preview_DownloadCanceled" xml:space="preserve"><value>Vorschau abgebrochen. Versuchen Sie es erneut oder laden Sie die Datei herunter.</value></data>
+  <data name="Preview_DownloadFailed" xml:space="preserve"><value>Download der Vorschau fehlgeschlagen. Versuchen Sie es erneut oder laden Sie die Datei herunter.</value></data>
+  <data name="Settings_TabGeneral" xml:space="preserve"><value>Allgemein</value></data>
+  <data name="Settings_TabBrowsing" xml:space="preserve"><value>Dateibrowser</value></data>
+  <data name="Settings_TabTransfers" xml:space="preserve"><value>Übertragungen</value></data>
+  <data name="Settings_TabAbout" xml:space="preserve"><value>Über</value></data>
+  <data name="Settings_TabShortcuts" xml:space="preserve"><value>Tastenkürzel</value></data>
+  <data name="Shortcuts_GlobalGroup" xml:space="preserve"><value>Cavdeck öffnen</value></data>
+  <data name="Shortcuts_GlobalTitle" xml:space="preserve"><value>Globales Tastenkürzel</value></data>
+  <data name="Shortcuts_GlobalHelp" xml:space="preserve"><value>Cavdeck von überall in den Vordergrund bringen, auch wenn es im Infobereich verborgen ist. Funktioniert nur, solange Cavdeck läuft.</value></data>
+  <data name="Shortcuts_Enable" xml:space="preserve"><value>Aktivieren</value></data>
+  <data name="Shortcuts_Combination" xml:space="preserve"><value>Tastenkombination</value></data>
+  <data name="Shortcuts_ChangeHotkey" xml:space="preserve"><value>Klicken, um ein neues Tastenkürzel aufzuzeichnen</value></data>
+  <data name="Shortcuts_CaptureHelp" xml:space="preserve"><value>Klicken Sie auf die Kombination und drücken Sie Strg+Alt oder Strg+Umschalt mit einem Buchstaben, einer Zahl oder einer verfügbaren Funktionstaste. Esc bricht ab; Tab wechselt den Fokus. Kombinationen mit der Windows-Taste sind reserviert.</value></data>
+  <data name="Shortcuts_Recording" xml:space="preserve"><value>Tastenkombination drücken…</value></data>
+  <data name="Shortcuts_StatusDisabled" xml:space="preserve"><value>Aus · Dieses Tastenkürzel ist nicht registriert.</value></data>
+  <data name="Shortcuts_StatusActive" xml:space="preserve"><value>Bereit · Mit diesem Tastenkürzel können Sie Cavdeck öffnen oder fokussieren.</value></data>
+  <data name="Shortcuts_StatusUnavailable" xml:space="preserve"><value>Nicht aktiv · Tastenkürzel konnte nicht registriert werden. Wählen Sie eine andere Kombination oder schalten Sie es aus und wieder ein.</value></data>
+  <data name="Shortcuts_InvalidGesture" xml:space="preserve"><value>Verwenden Sie Strg+Alt oder Strg+Umschalt mit einem Buchstaben, einer Zahl oder einer verfügbaren Funktionstaste. Reservierte Tastenkürzel werden nicht unterstützt.</value></data>
+  <data name="Shortcuts_RegistrationConflict" xml:space="preserve"><value>Nicht verfügbar · Möglicherweise verwenden Windows oder eine andere App dieses Tastenkürzel bereits. Das zuvor aktive Tastenkürzel bleibt unverändert.</value></data>
+  <data name="Shortcuts_ReferenceGroup" xml:space="preserve"><value>Tastenkombinationen</value></data>
+  <data name="Shortcuts_ReferenceHelp" xml:space="preserve"><value>Verfügbare Tastenkürzel je nach Kontext. Diese Liste ist schreibgeschützt; Dateiaktionen funktionieren nur bei passender Auswahl und Berechtigung.</value></data>
+  <data name="Shortcuts_GroupTabs" xml:space="preserve"><value>Tabs und Arbeitsbereich</value></data>
+  <data name="Shortcuts_GroupExplorer" xml:space="preserve"><value>Dateien und Ordner</value></data>
+  <data name="Shortcuts_GroupEditing" xml:space="preserve"><value>Bearbeitung und Navigation</value></data>
+  <data name="Shortcuts_NewTab" xml:space="preserve"><value>Neuer Tab</value></data>
+  <data name="Shortcuts_ReopenTab" xml:space="preserve"><value>Geschlossenen Tab wiederherstellen</value></data>
+  <data name="Shortcuts_CloseTab" xml:space="preserve"><value>Aktuellen Tab schließen</value></data>
+  <data name="Shortcuts_NextTab" xml:space="preserve"><value>Nächster Tab</value></data>
+  <data name="Shortcuts_PreviousTab" xml:space="preserve"><value>Vorheriger Tab</value></data>
+  <data name="Shortcuts_SelectTab" xml:space="preserve"><value>Zu Tab 1–8 wechseln</value></data>
+  <data name="Shortcuts_LastTab" xml:space="preserve"><value>Letzter Tab</value></data>
+  <data name="Shortcuts_Sidebar" xml:space="preserve"><value>Seitenleiste ein-/ausklappen</value></data>
+  <data name="Shortcuts_Search" xml:space="preserve"><value>Dateisuche fokussieren</value></data>
+  <data name="Shortcuts_Refresh" xml:space="preserve"><value>Aktuellen Ort aktualisieren</value></data>
+  <data name="Shortcuts_ParentFolder" xml:space="preserve"><value>Zum übergeordneten Ordner wechseln</value></data>
+  <data name="Shortcuts_Open" xml:space="preserve"><value>Ausgewähltes Element öffnen</value></data>
+  <data name="Shortcuts_Rename" xml:space="preserve"><value>Ausgewähltes Element umbenennen</value></data>
+  <data name="Shortcuts_Delete" xml:space="preserve"><value>Ausgewählte Elemente löschen</value></data>
+  <data name="Shortcuts_Copy" xml:space="preserve"><value>Ausgewählte Elemente kopieren</value></data>
+  <data name="Shortcuts_Cut" xml:space="preserve"><value>Ausgewählte Elemente ausschneiden</value></data>
+  <data name="Shortcuts_Paste" xml:space="preserve"><value>In aktuellen Ordner einfügen</value></data>
+  <data name="Shortcuts_SavePreview" xml:space="preserve"><value>Bearbeitete Textvorschau speichern</value></data>
+  <data name="Shortcuts_Back" xml:space="preserve"><value>Menü schließen / Einstellungen verlassen / vergrößerte Vorschau verlassen</value></data>
+  <data name="Connection_TestUnexpectedHint" xml:space="preserve"><value>Verbindungstest konnte nicht abgeschlossen werden. Prüfen Sie die Einstellungen und versuchen Sie es erneut.</value></data>
+  <data name="Transfer_BatchScanError" xml:space="preserve"><value>Ordnerscan fehlgeschlagen. Versuchen Sie den Auftrag erneut.</value></data>
+  <data name="Transfer_UnknownState" xml:space="preserve"><value>Unbekannter Status</value></data>
+  <data name="About_ResourcesGroup" xml:space="preserve"><value>Ressourcen &amp; Support</value></data>
+  <data name="About_ProjectPage" xml:space="preserve"><value>Projektseite</value></data>
+  <data name="About_Documentation" xml:space="preserve"><value>Dokumentation</value></data>
+  <data name="About_ReportIssue" xml:space="preserve"><value>Problem melden</value></data>
+  <data name="About_PrivacyLicenseGroup" xml:space="preserve"><value>Datenschutz &amp; Lizenz</value></data>
+  <data name="About_PrivacyTitle" xml:space="preserve"><value>Ihre Daten bleiben unter Ihrer Kontrolle</value></data>
+  <data name="About_PrivacySummary" xml:space="preserve"><value>Einstellungen und Protokolle bleiben auf diesem Gerät. Zugangsdaten werden in der Windows-Anmeldeinformationsverwaltung gespeichert. Diagnoseberichte werden nur auf Ihren Wunsch geteilt; Updateprüfungen kontaktieren GitHub Releases.</value></data>
+  <data name="About_LicenseTitle" xml:space="preserve"><value>Softwarelizenz</value></data>
+  <data name="About_LicenseSummary" xml:space="preserve"><value>Kostenlose Open-Source-Software unter GNU GPL-3.0-or-later. Kommerzielle Nutzung ist erlaubt; Spenden sind freiwillig.</value></data>
+  <data name="About_OpenLinkFailed" xml:space="preserve"><value>Der Link konnte nicht geöffnet werden. Prüfen Sie die Einstellungen des Standardbrowsers und versuchen Sie es erneut.</value></data>
+  <data name="Settings_RestoreTabs" xml:space="preserve"><value>Zuletzt geöffnete Tabs wiederherstellen</value></data>
+  <data name="Settings_RestoreTabsHelp" xml:space="preserve"><value>Stellt beim Start Tabs und Speicherorte wieder her. Bei Deaktivierung beginnt der nächste Start bei Verbindungen; offene Tabs bleiben bestehen.</value></data>
+  <data name="Settings_TransferCompletionNotice" xml:space="preserve"><value>Benachrichtigungen bei Transferabschluss</value></data>
+  <data name="Settings_TransferCompletionNoticeHelp" xml:space="preserve"><value>Zeigt zusammengefasste Hinweise in der App für abgeschlossene oder übersprungene Transfers. Fehlermeldungen bleiben aktiv.</value></data>
+  <data name="Settings_Enable" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>Update wird heruntergeladen… {0} %</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Version {0} ist verfügbar.</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>Version {0} ist bereit. Zum Installieren Cavdeck neu starten.</value></data>
+  <data name="Update_DownloadButton" xml:space="preserve"><value>Update herunterladen</value></data>
+  <data name="Update_RestartNow" xml:space="preserve"><value>Neu starten und aktualisieren</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>Später</value></data>
+  <data name="Update_AutoCheck" xml:space="preserve"><value>Automatisch nach Updates suchen</value></data>
+  <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Sucht nach dem Start nach Updates, ohne Ihre Arbeit zu unterbrechen.</value></data>
+  <data name="Update_BackgroundDownload" xml:space="preserve"><value>Updates im Hintergrund herunterladen</value></data>
+  <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>Lädt Updates automatisch herunter. Für die Installation ist Ihre Bestätigung erforderlich.</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>Übertragungen noch nicht abgeschlossen</value></data>
+  <data name="Update_TransfersMessage" xml:space="preserve"><value>Schließen Sie alle wartenden, laufenden, erneut versuchten oder pausierten Übertragungen ab oder brechen Sie sie ab, bevor Sie aktualisieren.</value></data>
+  <data name="Update_RestartTitle" xml:space="preserve"><value>Cavdeck-Update installieren</value></data>
+  <data name="Update_RestartMessage" xml:space="preserve"><value>Cavdeck speichert den Arbeitsbereich, wird beendet, installiert das Update und startet neu. Fortfahren?</value></data>
+  <data name="Update_SaveFailed" xml:space="preserve"><value>Arbeitsbereich konnte nicht gespeichert werden. Das Update wurde abgebrochen. Cavdeck bleibt geöffnet.</value></data>
+  <data name="Update_InstallFailed" xml:space="preserve"><value>Update konnte nicht gestartet werden. Cavdeck wird beendet. Starten Sie es erneut und versuchen Sie es noch einmal.</value></data>
+  <data name="Connection_DeleteImpact" xml:space="preserve"><value>Dabei werden {0} zugehörige Tabs geschlossen und {1} Übertragungsaufgaben oder Suchläufe abgebrochen. Dateien auf dem Server werden nicht gelöscht.</value></data>
+  <data name="Connection_ChangeTitle" xml:space="preserve"><value>Verbindung aktualisieren</value></data>
+  <data name="Connection_ChangeTransfers" xml:space="preserve"><value>Beim Speichern werden {0} zugehörige Übertragungsaufgaben oder Suchläufe abgebrochen. Bereits gesendete Anfragen können abgeschlossen sein. Fortfahren?</value></data>
+  <data name="Connection_RefreshFailed" xml:space="preserve"><value>Die Verbindung wurde gespeichert, aber einige Tabs konnten nicht aktualisiert werden. Laden Sie diese erneut.</value></data>
+  <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>Diese Verbindung ist jetzt schreibgeschützt. Ihr ungespeicherter Entwurf bleibt erhalten. Kopieren Sie ihn vor dem Verwerfen oder Schließen.</value></data>
+  <data name="Preview_CopyDraft" xml:space="preserve"><value>Entwurf kopieren</value></data>
+  <data name="Connection_ReconnectPending" xml:space="preserve"><value>Die Verbindung wurde aktualisiert. Bearbeiten Sie zuerst den ungespeicherten Entwurf und laden Sie dann neu. Dateiaktionen sind bis zur erneuten Verbindung nicht verfügbar.</value></data>
+  <data name="Transfer_DropDestination" xml:space="preserve"><value>Zielordner: {0}</value></data>
+  <data name="Transfer_ClearFailed" xml:space="preserve"><value>Fehler löschen</value></data>
+  <data name="Transfer_ClearHistory" xml:space="preserve"><value>Verlauf löschen</value></data>
+  <data name="Transfer_ClearFailedTitle" xml:space="preserve"><value>Fehlgeschlagene Übertragungen entfernen?</value></data>
+  <data name="Transfer_ClearHistoryTitle" xml:space="preserve"><value>Übertragungsverlauf löschen?</value></data>
+  <data name="Transfer_ClearRecordsMessage" xml:space="preserve"><value>Nur lokale Übertragungsprotokolle entfernen? Dateien und Remoteobjekte bleiben erhalten. Aktive Aufgaben und noch ausstehende Multipart-Bereinigungen bleiben bestehen.</value></data>
+  <data name="Transfer_RemoveRecords" xml:space="preserve"><value>Einträge entfernen</value></data>
+  <data name="Transfer_RemoveRecord" xml:space="preserve"><value>Eintrag entfernen</value></data>
+  <data name="Transfer_RemovedCount" xml:space="preserve"><value>{0} Übertragungseinträge entfernt.</value></data>
+  <data name="Transfer_NothingRemovable" xml:space="preserve"><value>Keine sicheren Einträge zum Entfernen. Ausstehende Multipart-Bereinigungen bleiben erhalten.</value></data>
+  <data name="Transfer_ErrorUnavailable" xml:space="preserve"><value>Nicht verfügbar</value></data>
+  <data name="Transfer_FailureDetails" xml:space="preserve"><value>Fehlerdetails</value></data>
+  <data name="Transfer_FailureCategory" xml:space="preserve"><value>Kategorie:</value></data>
+  <data name="Transfer_ErrorCode" xml:space="preserve"><value>Fehlercode:</value></data>
+  <data name="Transfer_Attempts" xml:space="preserve"><value>Versuche:</value></data>
+  <data name="Transfer_Retryable" xml:space="preserve"><value>Wiederholbar:</value></data>
+  <data name="Transfer_Yes" xml:space="preserve"><value>Ja</value></data>
+  <data name="Transfer_No" xml:space="preserve"><value>Nein</value></data>
+  <data name="Transfer_AdvicePermission" xml:space="preserve"><value>Anmeldedaten, Schreibrechte und Bucket-Zugriff prüfen und erneut versuchen.</value></data>
+  <data name="Transfer_AdviceNetwork" xml:space="preserve"><value>Verbindung und Endpunkt prüfen. Nach Erreichbarkeit erneut versuchen.</value></data>
+  <data name="Transfer_AdviceLocal" xml:space="preserve"><value>Prüfen, ob die lokale Datei noch vorhanden und zugänglich ist, dann erneut versuchen.</value></data>
+  <data name="Transfer_AdviceConflict" xml:space="preserve"><value>Quelle oder Ziel hat sich geändert. Konfliktregel vor erneutem Versuch prüfen.</value></data>
+  <data name="Transfer_AdviceGeneral" xml:space="preserve"><value>Fehlercode und Verbindungseinstellungen prüfen und das Problem beheben.</value></data>
+  <data name="Transfer_FailurePrivacy" xml:space="preserve"><value>Rohe Fehlermeldungen werden zum Schutz von Pfaden, signierten Links und Zugangsdaten ausgeblendet.</value></data>
+  <data name="Transfer_CopyFailure" xml:space="preserve"><value>Diagnose kopieren</value></data>
+  <data name="Transfer_FailureCopied" xml:space="preserve"><value>Diagnoseübersicht kopiert.</value></data>
+  <data name="Explorer_SortedAscending" xml:space="preserve"><value>Aufsteigend sortiert</value></data>
+  <data name="Explorer_SortedDescending" xml:space="preserve"><value>Absteigend sortiert</value></data>
+  <data name="Ui_ActionFailed" xml:space="preserve"><value>Die Aktion konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.</value></data>
+  <data name="Config_RecoveryTitle" xml:space="preserve"><value>Wiederherstellung der Konfiguration</value></data>
+  <data name="Config_SettingsBackupRestored" xml:space="preserve"><value>Die Einstellungen wurden aus einer gültigen Sicherung wiederhergestellt. Speicherort der Sicherung oder aufbewahrten Originaldatei:
+{0}</value></data>
+  <data name="Config_SettingsDefaults" xml:space="preserve"><value>Die Einstellungen sind beschädigt und es gibt keine gültige Sicherung. Vorübergehend werden Standardwerte verwendet. Die beschädigte Datei bleibt hier erhalten:
+{0}</value></data>
+  <data name="Config_ConnectionsBackupRestored" xml:space="preserve"><value>Die gespeicherten Verbindungen wurden aus einer gültigen Sicherung wiederhergestellt. Speicherort der Sicherung oder aufbewahrten Originaldatei:
+{0}</value></data>
+  <data name="Config_ConnectionsUnavailable" xml:space="preserve"><value>Gespeicherte Verbindungen konnten nicht geladen werden. Es wurden keine Verbindungsdaten gelöscht oder überschrieben. Prüfen Sie Originaldatei und Sicherung:
+{0}
+Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindungen ändern.</value></data>
+  <data name="Toast_DismissNamed" xml:space="preserve"><value>Benachrichtigung schließen: {0}</value></data>
+  <data name="Toast_ToneInformation" xml:space="preserve"><value>Information</value></data>
+  <data name="Toast_ToneSuccess" xml:space="preserve"><value>Erfolg</value></data>
+  <data name="Toast_ToneWarning" xml:space="preserve"><value>Warnung</value></data>
+  <data name="Toast_ToneError" xml:space="preserve"><value>Fehler</value></data>
+  <data name="Toast_CopyDiagnostics" xml:space="preserve"><value>Diagnose kopieren</value></data>
+  <data name="Toast_CopyHelpText" xml:space="preserve"><value>Kopiert einen bereinigten Bericht ohne Dateinamen, Pfade, Kontodaten oder Zugangsdaten.</value></data>
+  <data name="Toast_Copied" xml:space="preserve"><value>Diagnosebericht kopiert.</value></data>
+  <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>Fehlgeschlagene Übertragungen anzeigen</value></data>
+</root>

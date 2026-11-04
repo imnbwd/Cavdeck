@@ -1,0 +1,152 @@
+<UserControl x:Class="Cavdeck.App.Controls.ToastHost"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+             IsHitTestVisible="True">
+  <!-- Toasts never take keyboard focus when shown. Tab reaches their actions normally. -->
+  <ItemsControl ItemsSource="{Binding Items}" KeyboardNavigation.TabNavigation="Continue">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Vertical"/>
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate DataType="{x:Type controls:ToastItem}">
+        <Border x:Name="Card" MaxWidth="360" HorizontalAlignment="Right"
+                Margin="0,0,0,8" Opacity="0" Focusable="False"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource RadiusMedium}"
+                SnapsToDevicePixels="True"
+                MouseEnter="Card_MouseEnter"
+                MouseLeave="Card_MouseLeave"
+                GotKeyboardFocus="Card_GotKeyboardFocus"
+                LostKeyboardFocus="Card_LostKeyboardFocus"
+                Loaded="Card_Loaded">
+          <DockPanel>
+            <Border x:Name="AccentBar" DockPanel.Dock="Left" Width="3"
+                    Background="{DynamicResource InfoTextBrush}"
+                    CornerRadius="8,0,0,8"/>
+            <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}"
+                    Margin="0,4,4,0" VerticalAlignment="Top" TabIndex="2"
+                    Command="{Binding DismissCommand}"
+                    AutomationProperties.Name="{Binding CloseLabel}"
+                    ToolTip="{Binding CloseTooltip}">
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+            </Button>
+            <Grid Margin="12,10,4,10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Path x:Name="Glyph" Grid.Column="0" Style="{StaticResource IconGlyph}"
+                    Data="{StaticResource IconInfo}" Margin="0,1,10,0" VerticalAlignment="Top"
+                    Stroke="{DynamicResource InfoTextBrush}"/>
+              <StackPanel Grid.Column="1">
+                <!-- TextBlock has a WPF automation peer; the card Border does not.
+                     Announce one localized summary without moving keyboard focus. -->
+                <TextBlock x:Name="Announcement" Text="{Binding Title}"
+                           FontWeight="SemiBold" TextWrapping="Wrap"
+                           AutomationProperties.Name="{Binding AccessibleAnnouncement}"
+                           AutomationProperties.LiveSetting="Polite"
+                           Loaded="Announcement_Loaded"/>
+                <TextBlock Text="{Binding Message}" Margin="0,4,0,0"
+                           TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Null}">
+                          <Setter Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="">
+                          <Setter Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <!-- Wrap instead of clipping long Japanese/German action labels. -->
+                <WrapPanel Margin="0,10,0,0">
+                  <WrapPanel.Style>
+                    <Style TargetType="WrapPanel">
+                      <Style.Triggers>
+                        <MultiDataTrigger>
+                          <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding HasAction}" Value="False"/>
+                            <Condition Binding="{Binding HasCopy}" Value="False"/>
+                          </MultiDataTrigger.Conditions>
+                          <Setter Property="Visibility" Value="Collapsed"/>
+                        </MultiDataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </WrapPanel.Style>
+                  <Button Command="{Binding ActionCommand}" TabIndex="0"
+                          Style="{StaticResource SecondaryButton}"
+                          Margin="0,0,8,6" Padding="12,6"
+                          Visibility="{Binding HasAction, Converter={StaticResource BoolVis}}"
+                          AutomationProperties.Name="{Binding ActionLabel}">
+                    <TextBlock Text="{Binding ActionLabel}" TextWrapping="Wrap" MaxWidth="224"/>
+                  </Button>
+                  <Button Command="{Binding CopyCommand}" TabIndex="1"
+                          Style="{StaticResource SecondaryButton}"
+                          Margin="0,0,0,6" Padding="12,6"
+                          Visibility="{Binding HasCopy, Converter={StaticResource BoolVis}}"
+                          AutomationProperties.Name="{Binding CopyLabel}"
+                          AutomationProperties.HelpText="{Binding CopyHelpText}"
+                          ToolTip="{Binding CopyHelpText}">
+                    <TextBlock Text="{Binding CopyLabel}" TextWrapping="Wrap" MaxWidth="224"/>
+                  </Button>
+                </WrapPanel>
+                <TextBlock x:Name="CopyFeedback" Text="{Binding CopyFeedback, NotifyOnTargetUpdated=True}"
+                           Margin="0,2,0,0" TextWrapping="Wrap"
+                           Foreground="{DynamicResource MutedTextBrush}"
+                           AutomationProperties.Name="{Binding CopyFeedback}"
+                           AutomationProperties.LiveSetting="Polite"
+                           TargetUpdated="CopyFeedback_TargetUpdated">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Style.Triggers>
+                        <Trigger Property="Text" Value="">
+                          <Setter Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+              </StackPanel>
+            </Grid>
+          </DockPanel>
+        </Border>
+        <DataTemplate.Triggers>
+          <DataTrigger Binding="{Binding Tone}" Value="{x:Static controls:ToastTone.Success}">
+            <Setter TargetName="AccentBar" Property="Background" Value="{DynamicResource SuccessTextBrush}"/>
+            <Setter TargetName="Glyph" Property="Data" Value="{StaticResource IconCheck}"/>
+            <Setter TargetName="Glyph" Property="Stroke" Value="{DynamicResource SuccessTextBrush}"/>
+          </DataTrigger>
+          <DataTrigger Binding="{Binding Tone}" Value="{x:Static controls:ToastTone.Warning}">
+            <Setter TargetName="AccentBar" Property="Background" Value="{DynamicResource WarningTextBrush}"/>
+            <Setter TargetName="Glyph" Property="Data" Value="{StaticResource IconWarning}"/>
+            <Setter TargetName="Glyph" Property="Stroke" Value="{DynamicResource WarningTextBrush}"/>
+          </DataTrigger>
+          <DataTrigger Binding="{Binding Tone}" Value="{x:Static controls:ToastTone.Error}">
+            <Setter TargetName="AccentBar" Property="Background" Value="{DynamicResource DangerTextBrush}"/>
+            <Setter TargetName="Glyph" Property="Data" Value="{StaticResource IconClose}"/>
+            <Setter TargetName="Glyph" Property="Stroke" Value="{DynamicResource DangerTextBrush}"/>
+            <Setter TargetName="Announcement" Property="AutomationProperties.LiveSetting" Value="Assertive"/>
+          </DataTrigger>
+          <DataTrigger Binding="{Binding IsClosing}" Value="True">
+            <DataTrigger.EnterActions>
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Storyboard.TargetName="Card" Storyboard.TargetProperty="Opacity"
+                                   To="0" Duration="0:0:0.1"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </DataTrigger.EnterActions>
+          </DataTrigger>
+        </DataTemplate.Triggers>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

@@ -1,0 +1,56 @@
+<UserControl x:Class="Cavdeck.App.Features.Explorer.CopyDestinationPicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="340">
+  <StackPanel>
+    <TextBlock x:Name="SummaryText" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap"/>
+    <TextBlock x:Name="ConnectionLabel" Margin="0,16,0,4" Foreground="{DynamicResource PrimaryTextBrush}"/>
+    <ComboBox x:Name="Connections" SelectionChanged="Connections_SelectionChanged" MinHeight="32">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal" ToolTip="{Binding Name}">
+            <TextBlock Text="{Binding Name}" MaxWidth="215" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding Provider}" Margin="8,0,0,0"
+                       Foreground="{DynamicResource MutedTextBrush}"/>
+            <TextBlock Text="{Binding ReadOnlyText}"
+                       Margin="8,0,0,0" Foreground="{DynamicResource MutedTextBrush}">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Visibility" Value="Collapsed"/>
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsReadOnly}" Value="True">
+                      <Setter Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+          </StackPanel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock x:Name="BucketLabel" Margin="0,12,0,4" Foreground="{DynamicResource PrimaryTextBrush}"/>
+    <ComboBox x:Name="Buckets" SelectionChanged="Buckets_SelectionChanged"
+              DisplayMemberPath="Name" MinHeight="32"/>
+    <TextBlock x:Name="FolderLabel" Margin="0,12,0,4" Foreground="{DynamicResource PrimaryTextBrush}"/>
+    <DockPanel>
+      <Button x:Name="UpButton" DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}"
+              MinWidth="60" Margin="0,0,8,0" Click="Up_Click"/>
+      <TextBlock x:Name="PrefixText" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                 Foreground="{DynamicResource PrimaryTextBrush}"/>
+    </DockPanel>
+    <ListBox x:Name="Folders" Style="{StaticResource DialogFolderList}" Height="145" Margin="0,8,0,0"
+             MouseDoubleClick="Folders_MouseDoubleClick" KeyDown="Folders_KeyDown"/>
+    <Button x:Name="MoreButton" Style="{StaticResource GhostButton}" Margin="0,4,0,0"
+            HorizontalAlignment="Left" Click="More_Click"/>
+    <TextBlock x:Name="StatusText" Margin="0,6,0,0" TextWrapping="Wrap"
+               Foreground="{DynamicResource MutedTextBrush}"/>
+    <Button x:Name="RetryButton" Style="{StaticResource SecondaryButton}"
+            HorizontalAlignment="Left" Margin="0,8,0,0" Visibility="Collapsed"
+            Click="Retry_Click"/>
+    <TextBlock x:Name="ConflictLabel" Margin="0,12,0,4" Foreground="{DynamicResource PrimaryTextBrush}"/>
+    <ComboBox x:Name="Conflicts" MinHeight="32" SelectedIndex="0"/>
+    <TextBlock x:Name="RelayHint" Margin="0,12,0,0" TextWrapping="Wrap"
+               Foreground="{DynamicResource MutedTextBrush}"/>
+  </StackPanel>
+</UserControl>

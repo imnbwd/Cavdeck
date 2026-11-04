@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Soft charcoal layers, not pure black. Accent fill stays deep so white labels remain readable. -->
+  <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#181B20"/>
+  <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#1D2127"/>
+  <SolidColorBrush x:Key="SurfaceBrush" Color="#242A32"/>
+  <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#1F252D"/>
+  <SolidColorBrush x:Key="InputBackgroundBrush" Color="#1B2129"/>
+  <SolidColorBrush x:Key="OverlayBrush" Color="#CC000000"/>
+
+  <SolidColorBrush x:Key="PrimaryTextBrush" Color="#EEF1F5"/>
+  <SolidColorBrush x:Key="MutedTextBrush" Color="#A1ADBB"/>
+  <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="OnDangerBrush" Color="#FFFFFF"/>
+
+  <SolidColorBrush x:Key="BorderBrush" Color="#363F4C"/>
+  <SolidColorBrush x:Key="BorderStrongBrush" Color="#4E5B6B"/>
+  <SolidColorBrush x:Key="FocusBorderBrush" Color="#8FB4F5"/>
+
+  <SolidColorBrush x:Key="AccentBrush" Color="#3D6EC4"/>
+  <SolidColorBrush x:Key="AccentHoverBrush" Color="#345FA8"/>
+  <SolidColorBrush x:Key="AccentPressedBrush" Color="#2C528F"/>
+  <SolidColorBrush x:Key="AccentTextBrush" Color="#ACCAFF"/>
+  <SolidColorBrush x:Key="SubtleAccentBrush" Color="#293C5B"/>
+  <!-- File marquee: 20% accent fill for legibility on dark surfaces. -->
+  <SolidColorBrush x:Key="MarqueeSelectionFillBrush" Color="#333D6EC4"/>
+  <SolidColorBrush x:Key="HoverBrush" Color="#303842"/>
+  <SolidColorBrush x:Key="SelectedBrush" Color="#2A4060"/>
+  <!-- Stronger blue stays distinct on a dark surface after WPF's 40% overlay. -->
+  <SolidColorBrush x:Key="EditorSelectionBrush" Color="#5E9BEF"/>
+  <SolidColorBrush x:Key="PressedOverlayBrush" Color="#24FFFFFF"/>
+
+  <SolidColorBrush x:Key="DangerBrush" Color="#C4483E"/>
+  <SolidColorBrush x:Key="DangerHoverBrush" Color="#A53B33"/>
+  <SolidColorBrush x:Key="DangerTextBrush" Color="#FFB4AB"/>
+  <SolidColorBrush x:Key="DangerSubtleBrush" Color="#3A2626"/>
+  <SolidColorBrush x:Key="SuccessTextBrush" Color="#8FDBA8"/>
+  <SolidColorBrush x:Key="SuccessSubtleBrush" Color="#1E3330"/>
+  <SolidColorBrush x:Key="WarningTextBrush" Color="#F3D7A1"/>
+  <SolidColorBrush x:Key="WarningSubtleBrush" Color="#332C1E"/>
+  <SolidColorBrush x:Key="InfoTextBrush" Color="#ACCAFF"/>
+  <SolidColorBrush x:Key="InfoSubtleBrush" Color="#293C5B"/>
+
+  <SolidColorBrush x:Key="FileImageBrush" Color="#8FDBA8"/>
+  <SolidColorBrush x:Key="FileVideoBrush" Color="#F0B4C4"/>
+  <SolidColorBrush x:Key="FileAudioBrush" Color="#D4C2F2"/>
+  <SolidColorBrush x:Key="FileCodeBrush" Color="#ACCAFF"/>
+  <SolidColorBrush x:Key="FileDataBrush" Color="#8FDED6"/>
+  <SolidColorBrush x:Key="FilePdfBrush" Color="#F5B4AC"/>
+  <SolidColorBrush x:Key="FileArchiveBrush" Color="#F3D7A1"/>
+  <SolidColorBrush x:Key="FileSheetBrush" Color="#9ED7F2"/>
+  <SolidColorBrush x:Key="FileWordBrush" Color="#ACCAFF"/>
+  <SolidColorBrush x:Key="FileExcelBrush" Color="#8FDBA8"/>
+  <SolidColorBrush x:Key="FilePresentationBrush" Color="#F3B28D"/>
+  <SolidColorBrush x:Key="FileExecutableBrush" Color="#D4C2F2"/>
+  <SolidColorBrush x:Key="FilePythonBrush" Color="#A8D3FA"/>
+  <SolidColorBrush x:Key="FileCSharpBrush" Color="#D4BCF7"/>
+  <SolidColorBrush x:Key="FileJavaScriptBrush" Color="#F6D778"/>
+
+  <SolidColorBrush x:Key="ScrollThumbBrush" Color="#7D8B9C"/>
+  <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#A1ADBB"/>
+</ResourceDictionary>

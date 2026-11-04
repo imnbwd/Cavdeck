@@ -1,0 +1,75 @@
+name: Bug report
+description: Report a reproducible Cavdeck problem (not a security vulnerability).
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. **Do not include access keys, secrets, presigned URLs, private bucket/object names, user files, or unredacted logs/screenshots.**
+        If the issue could be security-sensitive, **do not file this form**. Read [SECURITY.md](https://github.com/imnbwd/Cavdeck/blob/main/SECURITY.md) and use private reporting instead.
+  - type: input
+    id: version
+    attributes:
+      label: Cavdeck version or commit
+      description: Include a release version, or the commit SHA for a source build.
+      placeholder: "e.g. source build, commit abc1234"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "e.g. Windows 11 24H2"
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Storage provider
+      description: Select the provider involved, if any.
+      options:
+        - Amazon S3
+        - Cloudflare R2
+        - MinIO
+        - Other S3-compatible
+        - Not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use a synthetic example; do not reveal production bucket names, keys, or endpoints.
+      placeholder: |
+        1. Open ...
+        2. Choose ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include a sanitized error category or message if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional context (optional)
+      description: Redacted screenshots, non-sensitive diagnostics, installation type, theme/language, or workarounds.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I checked for existing reports and removed sensitive data from this issue.
+          required: true

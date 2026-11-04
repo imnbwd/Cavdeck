@@ -1,0 +1,193 @@
+<controls:AppWindow x:Class="Cavdeck.App.Views.DesignCatalogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+        Style="{StaticResource AppWindowStyle}"
+        Title="Cavdeck"
+        Width="1180" Height="820" MinWidth="960" MinHeight="680"
+        WindowStartupLocation="CenterScreen">
+  <controls:AppWindow.TitleBarContent>
+    <StackPanel Orientation="Horizontal">
+      <Button Content="{Binding Texts[Theme_Light]}" Style="{StaticResource GhostButton}" Margin="4,0,0,0"
+              Click="LightTheme_Click" AutomationProperties.Name="Light theme"/>
+      <Button Content="{Binding Texts[Theme_Dark]}" Style="{StaticResource GhostButton}" Margin="4,0,0,0"
+              Click="DarkTheme_Click" AutomationProperties.Name="Dark theme"/>
+      <Button Content="{Binding Texts[Theme_System]}" Style="{StaticResource GhostButton}" Margin="4,0,0,0"
+              Click="SystemTheme_Click" AutomationProperties.Name="System theme"/>
+    </StackPanel>
+  </controls:AppWindow.TitleBarContent>
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock Text="Button · Input · TreeView · DataGrid · Dialog · Toast · Loading · Menu" Style="{StaticResource TextMuted}"/>
+
+    <Grid Grid.Row="1" Margin="0,16,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="16"/>
+        <ColumnDefinition Width="1.15*"/>
+      </Grid.ColumnDefinitions>
+
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="12"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="12"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource SurfaceCard}">
+          <StackPanel>
+            <TextBlock Text="Button" Style="{StaticResource TextTitle}"/>
+            <TextBlock Text="Primary, Secondary, Ghost, Danger, Icon" Style="{StaticResource TextCaption}" Margin="0,4,0,12"/>
+            <WrapPanel>
+              <Button x:Name="FocusSample" Content="Primary" Style="{StaticResource PrimaryButton}" Margin="0,0,8,8" MinWidth="96"/>
+              <Button Content="Secondary" Style="{StaticResource SecondaryButton}" Margin="0,0,8,8" MinWidth="96"/>
+              <Button Content="Ghost" Style="{StaticResource GhostButton}" Margin="0,0,8,8"/>
+              <Button Content="Danger" Style="{StaticResource DangerButton}" Margin="0,0,8,8" MinWidth="96"/>
+              <Button Style="{StaticResource IconButton}" Margin="0,0,8,8" AutomationProperties.Name="Close">
+                <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
+              </Button>
+              <Button Content="Disabled" Style="{StaticResource PrimaryButton}" IsEnabled="False" Margin="0,0,8,8" MinWidth="96"/>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+        <Border Grid.Row="2" Style="{StaticResource SurfaceCard}">
+          <StackPanel>
+            <TextBlock Text="Loading" Style="{StaticResource TextTitle}"/>
+            <TextBlock Text="Skeleton, inline, overlay" Style="{StaticResource TextCaption}" Margin="0,4,0,12"/>
+            <controls:LoadingView Message="Loading objects…" Rows="3"/>
+            <controls:LoadingView Mode="Inline" Message="Saving…" Margin="0,12,0,0"/>
+            <Border Height="88" Margin="0,12,0,0" CornerRadius="8" ClipToBounds="True"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+              <Grid>
+                <TextBlock Text="Connection form" Margin="12" Foreground="{DynamicResource MutedTextBrush}"/>
+                <controls:LoadingView Mode="Overlay" Message="Testing connection…"/>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+        <Border Grid.Row="4" Style="{StaticResource SurfaceCard}">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Text="TreeView" Style="{StaticResource TextTitle}"/>
+            <TextBlock DockPanel.Dock="Top" Text="Connections and prefixes" Style="{StaticResource TextCaption}" Margin="0,4,0,8"/>
+            <TreeView BorderThickness="0">
+              <TreeViewItem Header="Cloudflare R2" IsExpanded="True">
+                <TreeViewItem Header="assets" IsExpanded="True">
+                  <TreeViewItem Header="banner.webp" IsSelected="True"/>
+                  <TreeViewItem Header="cover.jpg"/>
+                </TreeViewItem>
+                <TreeViewItem Header="icons"/>
+              </TreeViewItem>
+              <TreeViewItem Header="AWS S3">
+                <TreeViewItem Header="logs"/>
+                <TreeViewItem Header="backups"/>
+              </TreeViewItem>
+              <TreeViewItem Header="MinIO"/>
+            </TreeView>
+          </DockPanel>
+        </Border>
+      </Grid>
+
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="12"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="12"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource SurfaceCard}">
+          <StackPanel>
+            <TextBlock Text="Input" Style="{StaticResource TextTitle}"/>
+            <TextBlock Text="Default, placeholder, invalid, password, choice" Style="{StaticResource TextCaption}" Margin="0,4,0,12"/>
+            <UniformGrid Columns="2" Rows="2">
+              <controls:FormField Label="Bucket" Margin="0,0,12,10">
+                <TextBox controls:InputAssist.Placeholder="assets"/>
+              </controls:FormField>
+              <controls:FormField x:Name="NameField" Label="Connection name" Error="Name is required" Margin="0,0,0,10">
+                <TextBox controls:InputAssist.Placeholder="My R2 storage"/>
+              </controls:FormField>
+              <controls:FormField Label="Secret" Margin="0,0,12,0">
+                <PasswordBox controls:InputAssist.Placeholder="Access key secret"/>
+              </controls:FormField>
+              <controls:FormField Label="Region" Margin="0,0,0,0">
+                <ComboBox SelectedIndex="0">
+                  <ComboBoxItem Content="auto"/>
+                  <ComboBoxItem Content="us-east-1"/>
+                  <ComboBoxItem Content="eu-west-1"/>
+                </ComboBox>
+              </controls:FormField>
+            </UniformGrid>
+            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+              <CheckBox Content="Read only" IsChecked="True" Margin="0,0,16,0"/>
+              <CheckBox Content="Remember endpoint"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Grid.Row="2" Style="{StaticResource SurfaceCard}">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Text="DataGrid" Style="{StaticResource TextTitle}"/>
+            <TextBlock DockPanel.Dock="Top" Text="Object list" Style="{StaticResource TextCaption}" Margin="0,4,0,8"/>
+            <DataGrid x:Name="ObjectGrid" ItemsSource="{Binding Files}">
+              <DataGrid.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Open" InputGestureText="Enter">
+                    <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconTrayOpen}"/></MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="Copy key" InputGestureText="Ctrl+C"/>
+                  <MenuItem Header="Rename" IsEnabled="False"/>
+                  <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                  <MenuItem Header="Download">
+                    <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconDownload}"/></MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="Delete" controls:MenuAssist.IsDanger="True">
+                    <MenuItem.Icon><Path Style="{StaticResource ContextMenuDangerIconStyle}" Data="{StaticResource IconTrash}"/></MenuItem.Icon>
+                  </MenuItem>
+                </ContextMenu>
+              </DataGrid.ContextMenu>
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*">
+                  <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource GridCellText}"/>
+                  </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="90">
+                  <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource GridCellText}">
+                      <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+                  </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Modified" Binding="{Binding Modified}" Width="140">
+                  <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource GridCellText}"/>
+                  </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </DockPanel>
+        </Border>
+        <Border Grid.Row="4" Style="{StaticResource SurfaceCard}">
+          <StackPanel>
+            <TextBlock Text="Dialog / Toast" Style="{StaticResource TextTitle}" Margin="0,0,0,10"/>
+            <WrapPanel>
+              <Button Content="Dialog" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" Click="Dialog_Click"/>
+              <Button Content="Danger dialog" Style="{StaticResource DangerButton}" Margin="0,0,8,0" Click="DangerDialog_Click"/>
+              <Button Content="Info" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="InfoToast_Click"/>
+              <Button Content="Success" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="SuccessToast_Click"/>
+              <Button Content="Warning" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="WarningToast_Click"/>
+              <Button Content="Error" Style="{StaticResource GhostButton}" Click="ErrorToast_Click"/>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Grid>
+
+    <controls:ToastHost x:Name="Toasts" Grid.RowSpan="2"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"/>
+  </Grid>
+</controls:AppWindow>

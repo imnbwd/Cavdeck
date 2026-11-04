@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Header_Connections" xml:space="preserve"><value>接続</value></data>
+  <data name="Label_Language" xml:space="preserve"><value>言語</value></data>
+  <data name="Label_Theme" xml:space="preserve"><value>テーマ</value></data>
+  <data name="Nav_Workspace" xml:space="preserve"><value>ワークスペース</value></data>
+  <data name="Nav_Connections" xml:space="preserve"><value>接続</value></data>
+  <data name="Nav_Favorites" xml:space="preserve"><value>お気に入り</value></data>
+  <data name="Nav_Recent" xml:space="preserve"><value>最近使った項目</value></data>
+  <data name="Nav_Transfers" xml:space="preserve"><value>転送</value></data>
+  <data name="Nav_Explorer" xml:space="preserve"><value>エクスプローラー</value></data>
+  <data name="Nav_Storage" xml:space="preserve"><value>ストレージ</value></data>
+  <data name="Nav_EmptyConnections" xml:space="preserve"><value>ストレージ接続がありません</value></data>
+  <data name="Empty_Title" xml:space="preserve"><value>Cavdeck へようこそ</value></data>
+  <data name="Empty_Description" xml:space="preserve"><value>AWS S3、Cloudflare R2、MinIO、および互換オブジェクトストレージを管理するワークスペースです。</value></data>
+  <data name="Scaffold_Title" xml:space="preserve"><value>基盤の準備ができました</value></data>
+  <data name="Scaffold_Description" xml:space="preserve"><value>テーマの切り替え、言語の即時変更、MVVM、Velopack の更新機構が設定されています。ストレージ接続と転送機能は今後実装予定です。</value></data>
+  <data name="Update_NoticeAvailableTitle" xml:space="preserve"><value>Cavdeck の更新があります</value></data>
+  <data name="Update_NoticeReadyTitle" xml:space="preserve"><value>Cavdeck の更新準備が完了しました</value></data>
+  <data name="Update_ViewDetails" xml:space="preserve"><value>更新を表示</value></data>
+  <data name="Update_TrayAvailable" xml:space="preserve"><value>新バージョン：{0}</value></data>
+  <data name="Update_TrayReady" xml:space="preserve"><value>更新の準備完了：{0}</value></data>
+  <data name="Button_CheckUpdates" xml:space="preserve"><value>更新を確認</value></data>
+  <data name="Update_Idle" xml:space="preserve"><value>いつでも新しいバージョンを確認できます。</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>更新を確認しています…</value></data>
+  <data name="Update_NotConfigured" xml:space="preserve"><value>更新を確認するには CAVDECK_UPDATE_REPOSITORY を設定してください。</value></data>
+  <data name="Update_NotInstalled" xml:space="preserve"><value>アプリ内更新は公式インストール版でのみ利用できます。</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>最新バージョンです。</value></data>
+  <data name="Update_Downloaded" xml:space="preserve"><value>更新をダウンロードしました。転送中の安全確認機能が完成すると、再起動操作を使用できます。</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>更新の確認またはダウンロードに失敗しました。後でもう一度お試しください。</value></data>
+  <data name="Settings_SaveFailed" xml:space="preserve"><value>設定を保存できませんでした。</value></data>
+  <data name="Footer_NoConnections" xml:space="preserve"><value>アクティブな接続はありません</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>ライト</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>ダーク</value></data>
+  <data name="Theme_System" xml:space="preserve"><value>自動</value></data>
+  <data name="Dialog_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Dialog_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Dialog_Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Toast_Dismiss" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Window_Minimize" xml:space="preserve"><value>最小化</value></data>
+  <data name="Window_Maximize" xml:space="preserve"><value>最大化</value></data>
+  <data name="Window_Restore" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="Window_Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Window_SystemMenu" xml:space="preserve"><value>システムメニュー</value></data>
+  <data name="Tab_AllTabs" xml:space="preserve"><value>開いているすべてのタブ</value></data>
+  <data name="Tab_Duplicate" xml:space="preserve"><value>タブを複製</value></data>
+  <data name="Tab_UnsavedChanges" xml:space="preserve"><value>未保存の変更</value></data>
+  <data name="Tab_UnsavedConnectionTitle" xml:space="preserve"><value>保存していない接続の変更を破棄しますか？</value></data>
+  <data name="Tab_UnsavedConnectionMessage" xml:space="preserve"><value>この接続には未保存の変更があります。タブを閉じる前に接続を保存するには、編集を続けてください。</value></data>
+  <data name="Tab_DiscardChanges" xml:space="preserve"><value>変更を破棄</value></data>
+  <data name="Tab_KeepEditing" xml:space="preserve"><value>編集を続ける</value></data>
+  <data name="Tab_RestoreMissingConnection" xml:space="preserve"><value>接続が見つからないため、一部のタブの場所を復元できませんでした。</value></data>
+  <data name="Tab_LimitReached" xml:space="preserve"><value>タブの上限に達しました</value></data>
+  <data name="Tab_NewTip" xml:space="preserve"><value>新しいタブ (Ctrl+T)</value></data>
+  <data name="Tab_CloseTip" xml:space="preserve"><value>タブを閉じる (Ctrl+W)</value></data>
+  <data name="Tab_CloseWindowTip" xml:space="preserve"><value>ウィンドウを閉じる (Ctrl+W)</value></data>
+  <data name="Sidebar_CollapseTip" xml:space="preserve"><value>サイドバーを非表示 (Ctrl+B)</value></data>
+  <data name="Sidebar_ExpandTip" xml:space="preserve"><value>サイドバーを表示 (Ctrl+B)</value></data>
+  <data name="Appearance_Title" xml:space="preserve"><value>外観</value></data>
+  <data name="Appearance_Hint" xml:space="preserve"><value>言語とテーマ</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>設定</value></data>
+  <data name="Settings_Description" xml:space="preserve"><value>この PC での Cavdeck の表示と動作を設定します。</value></data>
+  <data name="Settings_AppearanceGroup" xml:space="preserve"><value>外観と言語</value></data>
+  <data name="About_Group" xml:space="preserve"><value>Cavdeck について</value></data>
+  <data name="About_UpdatesGroup" xml:space="preserve"><value>アップデート</value></data>
+  <data name="About_ViewLicense" xml:space="preserve"><value>ライセンスを見る</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Windows 向けのモダンで無料のオープンソース S3 クライアントです。</value></data>
+  <data name="About_VersionFormat" xml:space="preserve"><value>バージョン {0}</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>アプリの更新</value></data>
+  <data name="Settings_FollowSystem" xml:space="preserve"><value>システム設定を使用</value></data>
+  <data name="Settings_CurrentValue" xml:space="preserve"><value>現在: {0}</value></data>
+  <data name="Settings_English" xml:space="preserve"><value>英語</value></data>
+  <data name="Settings_Chinese" xml:space="preserve"><value>簡体字中国語</value></data>
+  <data name="Diagnostics_Group" xml:space="preserve"><value>診断</value></data>
+  <data name="Diagnostics_Title" xml:space="preserve"><value>ローカルエラーログ</value></data>
+  <data name="Diagnostics_Description" xml:space="preserve"><value>レポートにはアプリ情報とエラー ID が含まれますが、ファイル名、パス、アカウント情報、リクエスト内容、認証情報は含まれません。ログはこの PC に最大 7 日間保存されます。</value></data>
+  <data name="Diagnostics_Copy" xml:space="preserve"><value>診断レポートをコピー</value></data>
+  <data name="Diagnostics_OpenLogs" xml:space="preserve"><value>ログフォルダーを開く</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>診断レポートをコピーしました。</value></data>
+  <data name="Diagnostics_Preparing" xml:space="preserve"><value>診断レポートを準備しています…</value></data>
+  <data name="Diagnostics_Opening" xml:space="preserve"><value>ログフォルダーを開いています…</value></data>
+  <data name="Diagnostics_CopyFailed" xml:space="preserve"><value>レポートをコピーできませんでした。</value></data>
+  <data name="Diagnostics_OpenFailed" xml:space="preserve"><value>ログフォルダーを開けませんでした。</value></data>
+  <data name="Diagnostics_ErrorId" xml:space="preserve"><value>エラー ID: {0}</value></data>
+  <data name="Brand_Name" xml:space="preserve"><value>Cavdeck</value></data>
+  <data name="Diagnostics_StartupFailedTitle" xml:space="preserve"><value>Cavdeck — 起動エラー</value></data>
+  <data name="Diagnostics_StartupFailedMessage" xml:space="preserve"><value>Cavdeck を起動できませんでした。エラー ID: {0} ログ: {1}</value></data>
+  <data name="Diagnostics_FatalTitle" xml:space="preserve"><value>Cavdeck を終了する必要があります</value></data>
+  <data name="Diagnostics_FatalMessage" xml:space="preserve"><value>予期しないエラーが発生しました。Cavdeck を終了する必要があります。エラー ID: {0}。再起動後、設定画面から診断レポートをコピーできます。</value></data>
+  <data name="Status_NoItems" xml:space="preserve"><value>項目がありません</value></data>
+  <data name="Status_NoTransfers" xml:space="preserve"><value>転送 0 件</value></data>
+  <data name="Status_TabLimit" xml:space="preserve"><value>同時に開けるタブは最大 {0} 個です。開いているタブを1つ閉じてから、もう一度お試しください。</value></data>
+  <data name="Empty_FavoritesTitle" xml:space="preserve"><value>お気に入りはまだありません</value></data>
+  <data name="Empty_FavoritesDescription" xml:space="preserve"><value>接続、バケット、またはフォルダーを開き、パスの横にある星を選択してください。</value></data>
+  <data name="Empty_RecentTitle" xml:space="preserve"><value>最近使った項目はありません</value></data>
+  <data name="Empty_RecentDescription" xml:space="preserve"><value>開いた接続、バケット、フォルダーがここに表示されます。</value></data>
+  <data name="Empty_TransferHistoryTitle" xml:space="preserve"><value>転送履歴がありません</value></data>
+  <data name="Empty_TransferHistoryDescription" xml:space="preserve"><value>完了またはキャンセルした転送がここに表示されます。</value></data>
+  <data name="Empty_TransfersTitle" xml:space="preserve"><value>転送がありません</value></data>
+  <data name="Empty_TransfersDescription" xml:space="preserve"><value>アップロード、ダウンロード、コピーがここに表示されます。</value></data>
+  <data name="Nav_ConnectionsTip" xml:space="preserve"><value>接続。Ctrl+クリックで新しいタブを開きます。</value></data>
+  <data name="Nav_FavoritesTip" xml:space="preserve"><value>お気に入り</value></data>
+  <data name="Nav_RecentTip" xml:space="preserve"><value>最近使った項目</value></data>
+  <data name="Nav_TransfersTip" xml:space="preserve"><value>転送</value></data>
+  <data name="Connection_ListSummary" xml:space="preserve"><value>接続 {0} 件</value></data>
+  <data name="Connection_Add" xml:space="preserve"><value>接続を追加</value></data>
+  <data name="Connection_Back" xml:space="preserve"><value>すべての接続</value></data>
+  <data name="Connection_NewTitle" xml:space="preserve"><value>新しい接続</value></data>
+  <data name="Connection_EditTitle" xml:space="preserve"><value>接続を編集</value></data>
+  <data name="Connection_EmptyTitle" xml:space="preserve"><value>オブジェクトストレージを追加</value></data>
+  <data name="Connection_EmptyDescription" xml:space="preserve"><value>Cloudflare R2、Amazon S3、または MinIO に接続します。アクセスキーはこの PC の Windows 資格情報マネージャーに保存されます。</value></data>
+  <data name="Connection_Provider" xml:space="preserve"><value>プロバイダー</value></data>
+  <data name="Connection_Test" xml:space="preserve"><value>テスト</value></data>
+  <data name="Connection_Testing" xml:space="preserve"><value>テスト中…</value></data>
+  <data name="Connection_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Connection_Saving" xml:space="preserve"><value>保存中…</value></data>
+  <data name="Connection_Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="Connection_Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="Connection_DeleteTitle" xml:space="preserve"><value>この接続を削除しますか？</value></data>
+  <data name="Connection_DeleteMessage" xml:space="preserve"><value>{0} と保存済みのキーをこの PC から削除します。バケット内のファイルは削除されません。</value></data>
+  <data name="Connection_SavedTitle" xml:space="preserve"><value>接続を保存しました</value></data>
+  <data name="Connection_SavedMessage" xml:space="preserve"><value>{0} を使用できます。</value></data>
+  <data name="Connection_Name" xml:space="preserve"><value>接続名</value></data>
+  <data name="Connection_NamePlaceholder" xml:space="preserve"><value>自分の R2 ストレージ</value></data>
+  <data name="Connection_AccountId" xml:space="preserve"><value>アカウント ID</value></data>
+  <data name="Connection_AccountPlaceholder" xml:space="preserve"><value>Cloudflare アカウント ID</value></data>
+  <data name="Connection_Region" xml:space="preserve"><value>リージョン</value></data>
+  <data name="Connection_RegionPlaceholder" xml:space="preserve"><value>us-east-1</value></data>
+  <data name="Connection_Endpoint" xml:space="preserve"><value>エンドポイント</value></data>
+  <data name="Connection_EndpointPlaceholder" xml:space="preserve"><value>https://s3.example.com</value></data>
+  <data name="Connection_AccessKey" xml:space="preserve"><value>アクセスキー ID</value></data>
+  <data name="Connection_AccessKeyPlaceholder" xml:space="preserve"><value>アクセスキー ID</value></data>
+  <data name="Connection_Secret" xml:space="preserve"><value>シークレットアクセスキー</value></data>
+  <data name="Connection_SecretPlaceholder" xml:space="preserve"><value>シークレットアクセスキー</value></data>
+  <data name="Connection_SecretKeep" xml:space="preserve"><value>保存済みのキーを保持するには、シークレットを空欄のままにしてください。</value></data>
+  <data name="Connection_ShowSecret" xml:space="preserve"><value>表示</value></data>
+  <data name="Connection_HideSecret" xml:space="preserve"><value>非表示</value></data>
+  <data name="Connection_CredentialNote" xml:space="preserve"><value>キーはこの Windows ユーザーの Windows 資格情報マネージャーに保存されます。設定ファイルには書き込まれません。</value></data>
+  <data name="Connection_Advanced" xml:space="preserve"><value>詳細設定</value></data>
+  <data name="Connection_AdvancedHide" xml:space="preserve"><value>詳細設定を隠す</value></data>
+  <data name="Connection_ReadOnly" xml:space="preserve"><value>読み取り専用の接続</value></data>
+  <data name="Connection_ReadOnlyHint" xml:space="preserve"><value>この接続ではアップロードや削除を行いません。サーバー側のアクセス権に代わるものではありません。</value></data>
+  <data name="Connection_Bucket" xml:space="preserve"><value>バケットを限定</value></data>
+  <data name="Connection_BucketPlaceholder" xml:space="preserve"><value>空欄の場合はすべてのバケットを一覧表示</value></data>
+  <data name="Connection_BucketHint" xml:space="preserve"><value>キーにバケット一覧の権限がない場合に指定してください。</value></data>
+  <data name="Connection_Prefix" xml:space="preserve"><value>キープレフィックス</value></data>
+  <data name="Connection_PrefixPlaceholder" xml:space="preserve"><value>images/</value></data>
+  <data name="Connection_PrefixHint" xml:space="preserve"><value>このプレフィックスで始まるオブジェクトのみを表示します。</value></data>
+  <data name="Connection_PathStyle" xml:space="preserve"><value>パス形式の URL を使用</value></data>
+  <data name="Connection_PathStyleHint" xml:space="preserve"><value>MinIO と多くの互換サービスではこの形式が必要です。Amazon S3 は通常、仮想ホスト形式の URL を使用します。</value></data>
+  <data name="Connection_HttpWarning" xml:space="preserve"><value>このアドレスは HTTP を使用するため、通信は暗号化されません。</value></data>
+  <data name="Connection_ProviderHint_R2" xml:space="preserve"><value>アカウント ID を入力してください。エンドポイントは自動入力され、リージョンは auto に設定されます。</value></data>
+  <data name="Connection_ProviderHint_Aws" xml:space="preserve"><value>リージョンを入力してください。Amazon の既定のエンドポイントを使う場合は空欄にします。</value></data>
+  <data name="Connection_ProviderHint_Minio" xml:space="preserve"><value>サーバーのアドレスとポートを入力してください（例: http://127.0.0.1:9000）。</value></data>
+  <data name="Connection_ProviderHint_Compatible" xml:space="preserve"><value>S3 互換サービスのアドレスを入力してください。パス形式のアクセスは既定で有効です。</value></data>
+  <data name="Connection_PreviewEmpty" xml:space="preserve"><value>必須項目を入力すると、ここにエンドポイントが表示されます。</value></data>
+  <data name="Connection_Preview" xml:space="preserve"><value>エンドポイント {0} · リージョン {1}</value></data>
+  <data name="Connection_PreviewAws" xml:space="preserve"><value>Amazon のリージョン別エンドポイント · {0}</value></data>
+  <data name="Provider_R2" xml:space="preserve"><value>Cloudflare R2</value></data>
+  <data name="Provider_Aws" xml:space="preserve"><value>Amazon S3</value></data>
+  <data name="Provider_Minio" xml:space="preserve"><value>MinIO</value></data>
+  <data name="Provider_Compatible" xml:space="preserve"><value>S3 互換</value></data>
+  <data name="Connection_BadgeReadOnly" xml:space="preserve"><value>読み取り専用</value></data>
+  <data name="Connection_BadgeBucket" xml:space="preserve"><value>バケット {0}</value></data>
+  <data name="Connection_BadgePrefix" xml:space="preserve"><value>プレフィックス {0}</value></data>
+  <data name="Connection_TestSuccessBuckets" xml:space="preserve"><value>接続しました。{0} 個のバケットを表示できます。</value></data>
+  <data name="Connection_TestSuccessBucketOne" xml:space="preserve"><value>接続しました。1 個のバケットを表示できます。</value></data>
+  <data name="Connection_TestSuccessBucket" xml:space="preserve"><value>バケット {0} に接続しました。</value></data>
+  <data name="Connection_TestSuccessBucketPrefix" xml:space="preserve"><value>バケット {0} に接続しました。プレフィックスにアクセスできます。</value></data>
+  <data name="Connection_TestSuccessEmpty" xml:space="preserve"><value>接続しました。このアカウントにはまだバケットがありません。</value></data>
+  <data name="Connection_Failure_InvalidCredentials" xml:space="preserve"><value>キーが拒否されました</value></data>
+  <data name="Connection_Failure_InvalidCredentialsHint" xml:space="preserve"><value>アクセスキーまたはシークレットが正しくありません。リージョンやエンドポイントが一致しない場合も署名エラーになります。</value></data>
+  <data name="Connection_Failure_AccessDenied" xml:space="preserve"><value>アクセスが拒否されました</value></data>
+  <data name="Connection_Failure_AccessDeniedHint" xml:space="preserve"><value>キーは認証されましたが、この操作は許可されていません。アクセス可能なバケットとプレフィックスに接続を限定してください。</value></data>
+  <data name="Connection_Failure_Endpoint" xml:space="preserve"><value>エンドポイントまたはリージョンが正しくありません</value></data>
+  <data name="Connection_Failure_EndpointHint" xml:space="preserve"><value>このアドレスでサービスに接続できませんでした。ホスト、ポート、リージョンを確認してください。</value></data>
+  <data name="Connection_Failure_BucketNotFound" xml:space="preserve"><value>バケットが見つかりません</value></data>
+  <data name="Connection_Failure_BucketNotFoundHint" xml:space="preserve"><value>バケットが存在しないか、このキーには表示権限がありません。</value></data>
+  <data name="Connection_Failure_Network" xml:space="preserve"><value>ネットワークから応答がありません</value></data>
+  <data name="Connection_Failure_NetworkHint" xml:space="preserve"><value>サービスが時間内に応答しませんでした。ネットワーク、プロキシ、ファイアウォールを確認してください。</value></data>
+  <data name="Connection_Failure_CredentialMissing" xml:space="preserve"><value>保存済みのキーがありません</value></data>
+  <data name="Connection_Failure_CredentialMissingHint" xml:space="preserve"><value>この PC には、この接続のシークレットが保存されていません。再入力してください。</value></data>
+  <data name="Connection_Failure_InvalidConfiguration" xml:space="preserve"><value>接続設定が無効です</value></data>
+  <data name="Connection_Failure_InvalidConfigurationHint" xml:space="preserve"><value>バケット、プレフィックス、アドレスを確認してください。</value></data>
+  <data name="Connection_Failure_Unsupported" xml:space="preserve"><value>このストレージサービスは操作に対応していません</value></data>
+  <data name="Connection_Failure_UnsupportedHint" xml:space="preserve"><value>このストレージサービスで対応している操作を確認してください。</value></data>
+  <data name="Connection_Failure_ReadOnly" xml:space="preserve"><value>この接続は読み取り専用です</value></data>
+  <data name="Connection_Failure_ReadOnlyHint" xml:space="preserve"><value>読み取り専用の接続ではオブジェクトをアップロードまたは削除できません。</value></data>
+  <data name="Connection_Failure_Unknown" xml:space="preserve"><value>サービスから予期しないエラーが返されました</value></data>
+  <data name="Connection_Failure_UnknownHint" xml:space="preserve"><value>接続設定を確認して再試行してください。利用可能な技術的識別子は下に表示されます。</value></data>
+  <data name="Connection_Failure_Cancelled" xml:space="preserve"><value>テストをキャンセルしました</value></data>
+  <data name="Connection_Failure_CancelledHint" xml:space="preserve"><value>サービスから応答がある前にテストがキャンセルされました。</value></data>
+  <data name="Connection_TechnicalCode" xml:space="preserve"><value>エラーコード {0}</value></data>
+  <data name="Connection_TechnicalHttp" xml:space="preserve"><value>HTTP {0}</value></data>
+  <data name="Connection_TechnicalRequest" xml:space="preserve"><value>リクエスト ID {0}</value></data>
+  <data name="Connection_CopyDiagnostic" xml:space="preserve"><value>診断情報をコピー</value></data>
+  <data name="Connection_Copied" xml:space="preserve"><value>診断情報をコピーしました</value></data>
+  <data name="Connection_CopyFailed" xml:space="preserve"><value>診断情報をコピーできませんでした</value></data>
+  <data name="Connection_Issue_NameRequired" xml:space="preserve"><value>接続名を入力してください。</value></data>
+  <data name="Connection_Issue_NameInvalid" xml:space="preserve"><value>接続名は 80 文字以内にしてください。</value></data>
+  <data name="Connection_Issue_AccountRequired" xml:space="preserve"><value>Cloudflare アカウント ID を入力してください。</value></data>
+  <data name="Connection_Issue_AccountInvalid" xml:space="preserve"><value>URL 全体ではなく、アカウント ID のみを入力してください。</value></data>
+  <data name="Connection_Issue_RegionRequired" xml:space="preserve"><value>リージョンを入力してください。</value></data>
+  <data name="Connection_Issue_RegionInvalid" xml:space="preserve"><value>us-east-1 などのリージョンを使用してください。</value></data>
+  <data name="Connection_Issue_EndpointRequired" xml:space="preserve"><value>エンドポイントを入力してください。</value></data>
+  <data name="Connection_Issue_EndpointInvalid" xml:space="preserve"><value>パスを含まない http または https アドレスを指定してください。</value></data>
+  <data name="Connection_Issue_EndpointUserInfo" xml:space="preserve"><value>アドレスにキーを含めないでください。</value></data>
+  <data name="Connection_Issue_AccessKeyRequired" xml:space="preserve"><value>アクセスキー ID を入力してください。</value></data>
+  <data name="Connection_Issue_AccessKeyInvalid" xml:space="preserve"><value>アクセスキー ID に空白は使用できません。</value></data>
+  <data name="Connection_Issue_SecretRequired" xml:space="preserve"><value>シークレットアクセスキーを入力してください。</value></data>
+  <data name="Connection_Issue_BucketInvalid" xml:space="preserve"><value>バケット名に空白やスラッシュは使用できません。</value></data>
+  <data name="Connection_Issue_PrefixInvalid" xml:space="preserve"><value>プレフィックスに .. を含めたり、先頭にスラッシュを付けたりできません。</value></data>
+  <data name="Connection_LoadFailed" xml:space="preserve"><value>保存済みの接続を読み込めませんでした。</value></data>
+  <data name="Connection_SaveFailed" xml:space="preserve"><value>接続を保存できませんでした。</value></data>
+  <data name="Footer_OneConnection" xml:space="preserve"><value>接続 1 件</value></data>
+  <data name="Footer_ConnectionCount" xml:space="preserve"><value>接続 {0} 件</value></data>
+  <data name="Explorer_Open" xml:space="preserve"><value>開く</value></data>
+  <data name="Tab_CloseOthers" xml:space="preserve"><value>ほかのタブを閉じる</value></data>
+  <data name="Tab_RestoreClosed" xml:space="preserve"><value>閉じたタブを再度開く (Ctrl+Shift+T)</value></data>
+  <data name="Explorer_PickTitle" xml:space="preserve"><value>接続を開く</value></data>
+  <data name="Explorer_PickDescription" xml:space="preserve"><value>保存済みの接続を選択して、バケットとオブジェクトを参照します。</value></data>
+  <data name="Explorer_Filter" xml:space="preserve"><value>読み込んだ名前を絞り込むか、このプレフィックスを検索</value></data>
+  <data name="Explorer_SearchScope" xml:space="preserve"><value>検索範囲</value></data>
+  <data name="Explorer_ScopeLoaded" xml:space="preserve"><value>読み込み済み</value></data>
+  <data name="Explorer_ScopePrefix" xml:space="preserve"><value>プレフィックス</value></data>
+  <data name="Explorer_ScopeBucket" xml:space="preserve"><value>バケット</value></data>
+  <data name="Explorer_FilterLoaded" xml:space="preserve"><value>読み込み済みの項目を絞り込み</value></data>
+  <data name="Explorer_KeyPrefix" xml:space="preserve"><value>キープレフィックスで検索</value></data>
+  <data name="Explorer_ScanBucket" xml:space="preserve"><value>バケット全体をスキャン</value></data>
+  <data name="Explorer_SearchPlaceholder" xml:space="preserve"><value>ファイルまたはフォルダーを検索 (Ctrl+F)</value></data>
+  <data name="Explorer_Search" xml:space="preserve"><value>検索</value></data>
+  <data name="Explorer_LoadedFilterHint" xml:space="preserve"><value>このフォルダーで既に読み込まれた項目だけを絞り込みます。追加の項目を含めるにはさらに読み込んでください。</value></data>
+  <data name="Explorer_BucketFilterHint" xml:space="preserve"><value>読み込み済みのバケットを即座に絞り込みます。</value></data>
+  <data name="Explorer_KeyPrefixHint" xml:space="preserve"><value>現在のフォルダー内で、指定文字列から始まるキーを列挙します。大文字と小文字を区別し、リモートリクエストを実行します。</value></data>
+  <data name="Explorer_BucketScanHint" xml:space="preserve"><value>このバケット内のアクセス可能なキーをすべて走査して一致する文字列を探します。時間がかかる場合やリクエスト料金が発生する場合があります。</value></data>
+  <data name="Explorer_KeyPrefixNoMatchesHint" xml:space="preserve"><value>ここには指定した文字列で始まるキーがありません。プレフィックスを短くしてみてください。</value></data>
+  <data name="Explorer_KeyPrefixProgress" xml:space="preserve"><value>{0} 以下のキーを列挙中 · 確認したオブジェクト {1} 件 · 一覧リクエスト {2} 回 · 一致 {3} 件。</value></data>
+  <data name="Explorer_KeyPrefixLoading" xml:space="preserve"><value>このプレフィックスのキーを列挙しています…</value></data>
+  <data name="Explorer_KeyPrefixComplete" xml:space="preserve"><value>{0} でキープレフィックスの列挙が完了 · 確認したオブジェクト {1} 件 · 一覧リクエスト {2} 回 · 一致 {3} 件。</value></data>
+  <data name="Explorer_KeyPrefixIncomplete" xml:space="preserve"><value>{0} で結果数の上限 2,000 件に達して停止しました · 確認したオブジェクト {1} 件 · 一覧リクエスト {2} 回。結果は不完全です。</value></data>
+  <data name="Explorer_New" xml:space="preserve"><value>新規</value></data>
+  <data name="Explorer_NewTextFile" xml:space="preserve"><value>新しいテキストファイル</value></data>
+  <data name="Explorer_NewTextFileMessage" xml:space="preserve"><value>このフォルダーに空のテキストファイルを作成します。</value></data>
+  <data name="Explorer_More" xml:space="preserve"><value>その他</value></data>
+  <data name="Explorer_UploadFilesTip" xml:space="preserve"><value>このフォルダーにファイルをアップロード</value></data>
+  <data name="Explorer_UploadFiles" xml:space="preserve"><value>ファイルをアップロード…</value></data>
+  <data name="Explorer_UploadFolder" xml:space="preserve"><value>フォルダーをアップロード…</value></data>
+  <data name="Explorer_RenameTip" xml:space="preserve"><value>名前を変更 (F2)</value></data>
+  <data name="Explorer_DeleteTip" xml:space="preserve"><value>削除 (Del)</value></data>
+  <data name="Explorer_SearchPrefix" xml:space="preserve"><value>プレフィックスを検索</value></data>
+  <data name="Explorer_SearchCostHint" xml:space="preserve"><value>このプレフィックスとサブフォルダーをスキャンします。1 回のリクエストで最大 1,000 件を列挙し、プロバイダーのリクエスト料金が発生する場合があります。</value></data>
+  <data name="Explorer_SearchLoading" xml:space="preserve"><value>このプレフィックスとサブフォルダーをスキャンしています…</value></data>
+  <data name="Explorer_SearchNoMatches" xml:space="preserve"><value>一致するオブジェクトがありません</value></data>
+  <data name="Explorer_SearchNoMatchesHint" xml:space="preserve"><value>スキャンは完了しました。別の名前や、より限定したプレフィックスを試してください。</value></data>
+  <data name="Explorer_CancelScan" xml:space="preserve"><value>スキャンをキャンセル</value></data>
+  <data name="Explorer_SearchProgress" xml:space="preserve"><value>{0} とそのサブフォルダーを検索中 · 確認したオブジェクト {1} 件 · 一覧リクエスト {2} 回 · 一致 {3} 件。各リクエストにストレージ料金がかかる場合があります。</value></data>
+  <data name="Explorer_SearchComplete" xml:space="preserve"><value>{0} とそのサブフォルダーの検索完了 · 確認したオブジェクト {1} 件 · 一覧リクエスト {2} 回 · 一致 {3} 件。</value></data>
+  <data name="Explorer_SearchIncomplete" xml:space="preserve"><value>{0} でスキャンを一時停止 · 確認したオブジェクト {1} 件 · リクエスト {2} 回 · 一致 {3} 件。結果は一部のみです。続きを検索できます。</value></data>
+  <data name="Explorer_PreparingOperation" xml:space="preserve"><value>操作を準備中 · 確認したオブジェクト {0} 件 · 一覧リクエスト {1} 回 · 保存先の確認 {2} 回</value></data>
+  <data name="Explorer_DeletePreview" xml:space="preserve"><value>{1} から {0} 件のオブジェクトを削除しますか？ {2} 回の一覧リクエストで件数を確認しました。このプレビュー内のオブジェクトのみ削除されます。元に戻せません。</value></data>
+  <data name="Explorer_RenamePreview" xml:space="preserve"><value>{0} 件のオブジェクトの名前を {1} に変更しますか？保存先で競合が {2} 件見つかりました。プレビューでは一覧リクエスト {3} 回、存在確認 {4} 回を実行しました。このプレビュー内のオブジェクトのみ移動します。</value></data>
+  <data name="Explorer_PreviewChanged" xml:space="preserve"><value>プレビュー後に保存先が変更されました。オブジェクトは移動していません。操作内容を再確認してください。</value></data>
+  <data name="Explorer_FailureDetails" xml:space="preserve"><value>失敗したオブジェクトの完全なレポート</value></data>
+  <data name="Explorer_ConflictDetails" xml:space="preserve"><value>既に存在する保存先のオブジェクト</value></data>
+  <data name="Explorer_CopyReport" xml:space="preserve"><value>完全なレポートをコピー</value></data>
+  <data name="Explorer_Refresh" xml:space="preserve"><value>更新 (F5)</value></data>
+  <data name="Explorer_RefreshMenu" xml:space="preserve"><value>更新</value></data>
+  <data name="Explorer_Up" xml:space="preserve"><value>1 つ上の階層へ (Backspace)</value></data>
+  <data name="Explorer_Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="Explorer_Loading" xml:space="preserve"><value>読み込み中…</value></data>
+  <data name="Explorer_LoadMore" xml:space="preserve"><value>さらに読み込む</value></data>
+  <data name="Explorer_ReadOnly" xml:space="preserve"><value>読み取り専用</value></data>
+  <data name="Explorer_NewFolder" xml:space="preserve"><value>新しいフォルダー</value></data>
+  <data name="Explorer_NewFolderTitle" xml:space="preserve"><value>新しいフォルダー</value></data>
+  <data name="Explorer_NewFolderMessage" xml:space="preserve"><value>フォルダーはキープレフィックスです。空でも表示されます。</value></data>
+  <data name="Explorer_Create" xml:space="preserve"><value>作成</value></data>
+  <data name="Explorer_NameLabel" xml:space="preserve"><value>名前</value></data>
+  <data name="Explorer_Name" xml:space="preserve"><value>名前</value></data>
+  <data name="Explorer_Size" xml:space="preserve"><value>サイズ</value></data>
+  <data name="Explorer_Modified" xml:space="preserve"><value>更新日時</value></data>
+  <data name="Explorer_Kind" xml:space="preserve"><value>種類</value></data>
+  <data name="Explorer_KindFolder" xml:space="preserve"><value>フォルダー</value></data>
+  <data name="Explorer_KindFile" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Explorer_KindImage" xml:space="preserve"><value>画像</value></data>
+  <data name="Explorer_KindVideo" xml:space="preserve"><value>動画</value></data>
+  <data name="Explorer_KindAudio" xml:space="preserve"><value>音声</value></data>
+  <data name="Explorer_KindCode" xml:space="preserve"><value>コード</value></data>
+  <data name="Explorer_KindData" xml:space="preserve"><value>データ</value></data>
+  <data name="Explorer_KindText" xml:space="preserve"><value>テキスト</value></data>
+  <data name="Explorer_KindDocument" xml:space="preserve"><value>ドキュメント</value></data>
+  <data name="Explorer_KindPdf" xml:space="preserve"><value>PDF</value></data>
+  <data name="Explorer_KindArchive" xml:space="preserve"><value>アーカイブ</value></data>
+  <data name="Explorer_KindSheet" xml:space="preserve"><value>スプレッドシート</value></data>
+  <data name="Explorer_KindSlides" xml:space="preserve"><value>プレゼンテーション</value></data>
+  <data name="Explorer_KindFont" xml:space="preserve"><value>フォント</value></data>
+  <data name="Explorer_KindProgram" xml:space="preserve"><value>プログラム</value></data>
+  <data name="Explorer_ViewList" xml:space="preserve"><value>一覧</value></data>
+  <data name="Explorer_ViewIcons" xml:space="preserve"><value>アイコン</value></data>
+  <data name="Explorer_GridComfortable" xml:space="preserve"><value>標準グリッド</value></data>
+  <data name="Explorer_GridCompact" xml:space="preserve"><value>コンパクトグリッド</value></data>
+  <data name="Explorer_ShowDetails" xml:space="preserve"><value>詳細ペインを表示</value></data>
+  <data name="Explorer_HideDetails" xml:space="preserve"><value>詳細ペインを非表示</value></data>
+  <data name="Explorer_NameCopied" xml:space="preserve"><value>ファイル名をコピーしました</value></data>
+  <data name="Explorer_Region" xml:space="preserve"><value>リージョン</value></data>
+  <data name="Explorer_Buckets" xml:space="preserve"><value>バケット</value></data>
+  <data name="Explorer_Objects" xml:space="preserve"><value>オブジェクト</value></data>
+  <data name="Explorer_CopyDetailName" xml:space="preserve"><value>名前をコピー</value></data>
+  <data name="Explorer_DetailsBucket" xml:space="preserve"><value>バケット</value></data>
+  <data name="Explorer_DetailsCurrentFolder" xml:space="preserve"><value>現在のフォルダー</value></data>
+  <data name="Explorer_DetailsSelectionBreakdown" xml:space="preserve"><value>ファイル {0} 件 · フォルダー {1} 件</value></data>
+  <data name="Explorer_Details" xml:space="preserve"><value>詳細</value></data>
+  <data name="Explorer_Location" xml:space="preserve"><value>場所</value></data>
+  <data name="Explorer_Prefix" xml:space="preserve"><value>プレフィックス</value></data>
+  <data name="Explorer_ObjectKey" xml:space="preserve"><value>オブジェクトキー</value></data>
+  <data name="Explorer_Technical" xml:space="preserve"><value>ファイルのプロパティ</value></data>
+  <data name="Explorer_CopyName" xml:space="preserve"><value>ファイル名をコピー</value></data>
+  <data name="Explorer_ValueCopied" xml:space="preserve"><value>クリップボードにコピーしました</value></data>
+  <data name="Explorer_ETagHint" xml:space="preserve"><value>ストレージサービスが返したオブジェクトタグです。必ずしも MD5 チェックサムではありません。</value></data>
+  <data name="Explorer_ContentTypeHint" xml:space="preserve"><value>ファイルの MIME タイプ（HTTP Content-Type）です。</value></data>
+  <data name="Explorer_CopyETag" xml:space="preserve"><value>ETag をコピー</value></data>
+  <data name="Explorer_CopyContentType" xml:space="preserve"><value>Content-Type をコピー</value></data>
+  <data name="Explorer_Bytes" xml:space="preserve"><value>バイト</value></data>
+  <data name="Explorer_Key" xml:space="preserve"><value>キー</value></data>
+  <data name="Explorer_ETag" xml:space="preserve"><value>ETag</value></data>
+  <data name="Explorer_ContentType" xml:space="preserve"><value>コンテンツタイプ</value></data>
+  <data name="Explorer_HeaderUnavailable" xml:space="preserve"><value>利用できません</value></data>
+  <data name="Explorer_UriLabel" xml:space="preserve"><value>S3 URI</value></data>
+  <data name="Explorer_Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="Explorer_DeleteOneTitle" xml:space="preserve"><value>{0} を削除しますか？</value></data>
+  <data name="Explorer_DeleteManyTitle" xml:space="preserve"><value>{0} 件の項目を削除しますか？</value></data>
+  <data name="Explorer_DeleteFileMessage" xml:space="preserve"><value>バケットからオブジェクトを削除します。元に戻せません。</value></data>
+  <data name="Explorer_DeleteFolderMessage" xml:space="preserve"><value>フォルダーを削除すると、そのプレフィックス以下のすべてのオブジェクトが削除されます。元に戻せません。</value></data>
+  <data name="Explorer_Rename" xml:space="preserve"><value>名前を変更</value></data>
+  <data name="Explorer_RenameTitle" xml:space="preserve"><value>名前を変更</value></data>
+  <data name="Explorer_RenameMessage" xml:space="preserve"><value>最初に新しいオブジェクトへコピーし、コピーが成功した場合のみ元のオブジェクトを削除します。</value></data>
+  <data name="Explorer_Copy" xml:space="preserve"><value>コピー</value></data>
+  <data name="Explorer_Cut" xml:space="preserve"><value>切り取り</value></data>
+  <data name="Explorer_Paste" xml:space="preserve"><value>貼り付け</value></data>
+  <data name="Explorer_CutUploadTitle" xml:space="preserve"><value>切り取ったファイルをアップロードしますか？</value></data>
+  <data name="Explorer_CutUploadMessage" xml:space="preserve"><value>これらのファイルは Windows エクスプローラーで切り取られました。Cavdeck はコピーをアップロードできますが、元のローカルファイルは移動も削除もされません。</value></data>
+  <data name="Explorer_UploadCopies" xml:space="preserve"><value>コピーをアップロード</value></data>
+  <data name="Explorer_CopyKey" xml:space="preserve"><value>キーをコピー</value></data>
+  <data name="Explorer_CopyUri" xml:space="preserve"><value>S3 URI をコピー</value></data>
+  <data name="Explorer_CopyReady" xml:space="preserve"><value>Cavdeck 内でコピーする準備ができました</value></data>
+  <data name="Explorer_CopyTo" xml:space="preserve"><value>コピー先…</value></data>
+  <data name="Explorer_CopyToSummary" xml:space="preserve"><value>ファイル {0} 件、フォルダー {1} 件を選択中</value></data>
+  <data name="Explorer_CopyToConnection" xml:space="preserve"><value>コピー先の接続</value></data>
+  <data name="Explorer_CopyToBucket" xml:space="preserve"><value>バケット</value></data>
+  <data name="Explorer_CopyToFolder" xml:space="preserve"><value>フォルダー</value></data>
+  <data name="Explorer_CopyToConflict" xml:space="preserve"><value>オブジェクトが既に存在する場合</value></data>
+  <data name="Explorer_CopyToUp" xml:space="preserve"><value>上へ</value></data>
+  <data name="Explorer_CopyToNoWritable" xml:space="preserve"><value>書き込み可能なコピー先の接続がありません。</value></data>
+  <data name="Explorer_CopyToNoBuckets" xml:space="preserve"><value>この接続には利用可能なバケットがありません。</value></data>
+  <data name="Explorer_CopyToEmpty" xml:space="preserve"><value>ここにはサブフォルダーがありません。現在のフォルダーにコピーできます。</value></data>
+  <data name="Explorer_CopyToRelayHint" xml:space="preserve"><value>ファイルはこの PC を経由して転送されます。ネットワーク使用量やプロバイダーの料金が発生する場合があります。</value></data>
+  <data name="Transfer_CrossMove" xml:space="preserve"><value>移動</value></data>
+  <data name="Transfer_CrossMoving" xml:space="preserve"><value>移動中</value></data>
+  <data name="Transfer_CrossRemoving" xml:space="preserve"><value>移動元を削除中</value></data>
+  <data name="Explorer_CrossMoveBatchQueued" xml:space="preserve"><value>移動処理をキューに追加しました</value></data>
+  <data name="Transfer_CrossCopy" xml:space="preserve"><value>コピー</value></data>
+  <data name="Transfer_CrossCopying" xml:space="preserve"><value>コピー中</value></data>
+  <data name="Transfer_CrossVerifying" xml:space="preserve"><value>検証中</value></data>
+  <data name="Transfer_CrossChecksumVerified" xml:space="preserve"><value>SHA-256 検証済み</value></data>
+  <data name="Explorer_CrossBatchQueued" xml:space="preserve"><value>コピーの一括処理をキューに追加しました</value></data>
+  <data name="Explorer_CrossBatchQueuedHint" xml:space="preserve"><value>各オブジェクトの進行状況と結果は「転送」で確認できます。</value></data>
+  <data name="Transfer_BatchTitle" xml:space="preserve"><value>コピーの一括処理</value></data>
+  <data name="Transfer_BatchProgress" xml:space="preserve"><value>追加 {0} 件 · コピー {1} 件 · スキップ {2} 件 · 失敗 {3} 件 · 残り {4} 件</value></data>
+  <data name="Transfer_BatchScanning" xml:space="preserve"><value>元のフォルダーをスキャン中</value></data>
+  <data name="Transfer_BatchScanComplete" xml:space="preserve"><value>スキャン完了</value></data>
+  <data name="Transfer_BatchScanFailed" xml:space="preserve"><value>フォルダーのスキャンで確認が必要です</value></data>
+  <data name="Transfer_RetryBatch" xml:space="preserve"><value>一括処理を再試行</value></data>
+  <data name="Explorer_CrossCutUnsupported" xml:space="preserve"><value>接続をまたぐ切り取りはサポートされていません。代わりにオブジェクトをコピーしてください。</value></data>
+  <data name="Explorer_SourceConnectionMissing" xml:space="preserve"><value>元の接続は利用できなくなりました。</value></data>
+  <data name="Explorer_CutReady" xml:space="preserve"><value>Cavdeck 内で移動する準備ができました</value></data>
+  <data name="Explorer_ClipboardCount" xml:space="preserve"><value>この接続内で貼り付け可能な項目が {0} 件あります（別のタブの項目を含む）。</value></data>
+  <data name="Explorer_CopyNothingToDo" xml:space="preserve"><value>コピーまたは移動するオブジェクトがありません</value></data>
+  <data name="Explorer_PasteMoveCount" xml:space="preserve"><value>ここに移動 ({0})</value></data>
+  <data name="Explorer_CrossMoveQueuedHint" xml:space="preserve"><value>進行状況は「転送」で確認できます。移動元は移動先の検証後にのみ削除されます。</value></data>
+  <data name="Transfer_MoveBatchTitle" xml:space="preserve"><value>移動の一括処理</value></data>
+  <data name="Transfer_MoveBatchProgress" xml:space="preserve"><value>追加 {0} 件 · 移動 {1} 件 · スキップ {2} 件 · 失敗 {3} 件 · 残り {4} 件</value></data>
+  <data name="Explorer_PasteCount" xml:space="preserve"><value>貼り付け ({0})</value></data>
+  <data name="Explorer_SelectLoaded" xml:space="preserve"><value>読み込み済みの項目を選択</value></data>
+  <data name="Explorer_ClearSelection" xml:space="preserve"><value>選択を解除</value></data>
+  <data name="Explorer_CopyPlanning" xml:space="preserve"><value>操作を準備しています…</value></data>
+  <data name="Explorer_CopyChecking" xml:space="preserve"><value>コピー先を確認中 · {0}/{1}</value></data>
+  <data name="Explorer_CopyProgress" xml:space="preserve"><value>コピー中 · {0}/{1}</value></data>
+  <data name="Explorer_MoveProgress" xml:space="preserve"><value>移動元を削除中 · {0}/{1}</value></data>
+  <data name="Explorer_DeleteProgress" xml:space="preserve"><value>削除中 · {0}/{1}</value></data>
+  <data name="Explorer_StopOperation" xml:space="preserve"><value>停止</value></data>
+  <data name="Explorer_CopyCanceled" xml:space="preserve"><value>停止しました。完了した変更はそのまま残ります。再試行する前に更新して確認してください。</value></data>
+  <data name="Explorer_KeyCopied" xml:space="preserve"><value>キーをコピーしました</value></data>
+  <data name="Explorer_UriCopied" xml:space="preserve"><value>S3 URI をコピーしました</value></data>
+  <data name="Explorer_CopyFailed" xml:space="preserve"><value>クリップボードにコピーできませんでした</value></data>
+  <data name="Explorer_ConflictTitle" xml:space="preserve"><value>一部のオブジェクトは既に存在します</value></data>
+  <data name="Explorer_ConflictMessage" xml:space="preserve"><value>コピー先に既存のオブジェクトが {0} 件あります。「上書き」は置き換え、「スキップ」は既存のものを残して残りをコピーします。</value></data>
+  <data name="Explorer_Overwrite" xml:space="preserve"><value>上書き</value></data>
+  <data name="Explorer_Skip" xml:space="preserve"><value>スキップ</value></data>
+  <data name="Explorer_NameEmpty" xml:space="preserve"><value>名前を入力してください。</value></data>
+  <data name="Explorer_NameSeparator" xml:space="preserve"><value>名前に / または \ は使用できません。</value></data>
+  <data name="Explorer_NameReserved" xml:space="preserve"><value>名前に . または .. は使用できません。</value></data>
+  <data name="Explorer_NameControl" xml:space="preserve"><value>名前に制御文字は使用できません。</value></data>
+  <data name="Explorer_NameTooLong" xml:space="preserve"><value>この名前ではオブジェクトキーが長すぎます。</value></data>
+  <data name="Explorer_NameExists" xml:space="preserve"><value>この名前は既に使われています</value></data>
+  <data name="Explorer_NameExistsMessage" xml:space="preserve"><value>別の名前を選択してください。既存のオブジェクトは変更されません。</value></data>
+  <data name="Explorer_IntoItself" xml:space="preserve"><value>フォルダーをそれ自身にコピーすることはできません。</value></data>
+  <data name="Explorer_CopyUnsupported" xml:space="preserve"><value>このストレージサービスはサーバー側のオブジェクトコピーに対応していません。</value></data>
+  <data name="Explorer_PartialTitle" xml:space="preserve"><value>エラーを伴って終了しました</value></data>
+  <data name="Explorer_ResultPartial" xml:space="preserve"><value>成功 {0} 件、スキップ {1} 件、失敗 {2} 件。</value></data>
+  <data name="Explorer_ResultDone" xml:space="preserve"><value>成功 {0} 件、スキップ {1} 件。</value></data>
+  <data name="Explorer_EmptyTitle" xml:space="preserve"><value>このプレフィックスは空です</value></data>
+  <data name="Explorer_EmptyDescription" xml:space="preserve"><value>ここにはまだ何も保存されていません。「新しいフォルダー」で空のプレフィックスを作成できます。</value></data>
+  <data name="Explorer_NoBucketsTitle" xml:space="preserve"><value>バケットがありません</value></data>
+  <data name="Explorer_NoBucketsDescription" xml:space="preserve"><value>このキーで参照できるバケットがありません。接続を編集し、開けるバケットに限定してください。</value></data>
+  <data name="Explorer_NoMatches" xml:space="preserve"><value>読み込み済みの名前に一致する項目がありません</value></data>
+  <data name="Explorer_NoMatchesHint" xml:space="preserve"><value>このフィルターは読み込み済みの項目のみを確認します。さらに読み込むか、プレフィックスを開いてください。</value></data>
+  <data name="Explorer_StatusBuckets" xml:space="preserve"><value>バケット {0} 個</value></data>
+  <data name="Explorer_StatusItems" xml:space="preserve"><value>項目 {0} 件</value></data>
+  <data name="Explorer_StatusMore" xml:space="preserve"><value>項目 {0} 件 · 続きあり</value></data>
+  <data name="Explorer_StatusSelected" xml:space="preserve"><value>選択 {0} 件</value></data>
+  <data name="Explorer_StatusSelectedLoaded" xml:space="preserve"><value>読み込み済みの項目から {0} 件を選択 · 続きあり</value></data>
+  <data name="Transfer_Upload" xml:space="preserve"><value>アップロード</value></data>
+  <data name="Transfer_UploadFolder" xml:space="preserve"><value>フォルダーをアップロード</value></data>
+  <data name="Transfer_Download" xml:space="preserve"><value>ダウンロード</value></data>
+  <data name="Transfer_PickFiles" xml:space="preserve"><value>アップロードするファイルを選択</value></data>
+  <data name="Transfer_PickFolder" xml:space="preserve"><value>アップロードするフォルダーを選択</value></data>
+  <data name="Transfer_PickDestination" xml:space="preserve"><value>ダウンロードの保存先を選択</value></data>
+  <data name="Transfer_DropHint" xml:space="preserve"><value>ドロップしてアップロード</value></data>
+  <data name="Transfer_ConflictTitle" xml:space="preserve"><value>ファイルが既に存在する場合</value></data>
+  <data name="Transfer_ConflictMessage" xml:space="preserve"><value>この選択は一括処理全体に適用されます。「上書き」を選ばない限り、既存のファイルはそのまま残ります。</value></data>
+  <data name="Transfer_ConflictDetectedMessage" xml:space="preserve"><value>コピー先に「{0}」が既に存在します。この一括処理での扱いを選択してください。置き換えると以前の内容が失われる場合があります。</value></data>
+  <data name="Transfer_RememberChoice" xml:space="preserve"><value>今後の転送でもこの選択を使用</value></data>
+  <data name="Transfer_CheckingConflicts" xml:space="preserve"><value>既存のファイルを確認しています…</value></data>
+  <data name="Transfer_NoticeSkipped" xml:space="preserve"><value>既存のファイルを {0} 件スキップしました</value></data>
+  <data name="Transfer_ConflictCheckFailed" xml:space="preserve"><value>コピー先に既存ファイルがあるか確認できませんでした。転送は開始していません。</value></data>
+  <data name="Transfer_ConflictPreferenceNotSaved" xml:space="preserve"><value>転送の設定を保存できませんでした</value></data>
+  <data name="Transfer_Skip" xml:space="preserve"><value>既存のものをスキップ</value></data>
+  <data name="Transfer_Rename" xml:space="preserve"><value>両方残す</value></data>
+  <data name="Transfer_Overwrite" xml:space="preserve"><value>上書き</value></data>
+  <data name="Transfer_Start" xml:space="preserve"><value>開始</value></data>
+  <data name="Transfer_Queued" xml:space="preserve"><value>{0} 件をキューに追加しました</value></data>
+  <data name="Transfer_NotQueued" xml:space="preserve"><value>{0} 件をキューに追加できませんでした</value></data>
+  <data name="Transfer_Rejected" xml:space="preserve"><value>転送を開始しませんでした</value></data>
+  <data name="Transfer_ReadOnly" xml:space="preserve"><value>この接続は読み取り専用です。</value></data>
+  <data name="Transfer_Summary" xml:space="preserve"><value>実行中 {0} 件 · 待機中 {1} 件</value></data>
+  <data name="Transfer_Footer" xml:space="preserve"><value>実行中 {0} 件 · 待機中 {1} 件</value></data>
+  <data name="Transfer_Concurrency" xml:space="preserve"><value>同時転送数</value></data>
+  <data name="Transfer_ConcurrencyHelp" xml:space="preserve"><value>アップロード、ダウンロード、コピーを同時に実行できる最大数です。値を大きくするとネットワーク資源の使用量が増えます。</value>
+  </data>
+  <data name="Transfer_ConcurrencySaveFailed" xml:space="preserve"><value>転送設定を保存できませんでした。以前の値に戻しました。</value>
+  </data>
+  <data name="Transfer_ActionFailed" xml:space="preserve"><value>転送操作を完了できませんでした。再試行してください。</value>
+  </data>
+  <data name="Transfer_Active" xml:space="preserve"><value>現在</value></data>
+  <data name="Transfer_History" xml:space="preserve"><value>履歴</value></data>
+  <data name="Transfer_Pause" xml:space="preserve"><value>一時停止</value></data>
+  <data name="Transfer_Resume" xml:space="preserve"><value>再開</value></data>
+  <data name="Transfer_Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="Transfer_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Transfer_QueuedState" xml:space="preserve"><value>待機中</value></data>
+  <data name="Transfer_Uploading" xml:space="preserve"><value>アップロード中</value></data>
+  <data name="Transfer_Downloading" xml:space="preserve"><value>ダウンロード中</value></data>
+  <data name="Transfer_Paused" xml:space="preserve"><value>一時停止中</value></data>
+  <data name="Transfer_Waiting" xml:space="preserve"><value>再試行待ち</value></data>
+  <data name="Transfer_Skipped" xml:space="preserve"><value>スキップ済み</value></data>
+  <data name="Transfer_Completed" xml:space="preserve"><value>完了</value></data>
+  <data name="Transfer_SizeVerified" xml:space="preserve"><value>サイズ確認済み</value></data>
+  <data name="Transfer_ChecksumVerified" xml:space="preserve"><value>チェックサム検証済み</value></data>
+  <data name="Transfer_Failed" xml:space="preserve"><value>失敗</value></data>
+  <data name="Transfer_Cancelled" xml:space="preserve"><value>キャンセル済み</value></data>
+  <data name="Transfer_FailureNetwork" xml:space="preserve"><value>ネットワークでエラーが発生しました。自動的に再試行します。</value></data>
+  <data name="Transfer_FailureThrottled" xml:space="preserve"><value>ストレージサービスから速度を落とすよう要求されました。</value></data>
+  <data name="Transfer_FailureDenied" xml:space="preserve"><value>アクセスが拒否されました。</value></data>
+  <data name="Transfer_FailureMissing" xml:space="preserve"><value>ファイルが見つかりませんでした。</value></data>
+  <data name="Transfer_FailureConflict" xml:space="preserve"><value>ファイルが別の場所で変更されたため、変更せずに残しました。</value></data>
+  <data name="Transfer_FailureIntegrity" xml:space="preserve"><value>転送したデータが元のデータと一致しません。</value></data>
+  <data name="Transfer_FailureLocal" xml:space="preserve"><value>ローカルファイルが見つかりません。</value></data>
+  <data name="Transfer_FailureBusy" xml:space="preserve"><value>ファイルは使用中です。</value></data>
+  <data name="Transfer_FailureDisk" xml:space="preserve"><value>ディスクの空き容量がありません。</value></data>
+  <data name="Transfer_FailureConnection" xml:space="preserve"><value>この接続は利用できなくなりました。</value></data>
+  <data name="Transfer_FailurePath" xml:space="preserve"><value>パスが無効です。</value></data>
+  <data name="Transfer_FailureUnknown" xml:space="preserve"><value>転送に失敗しました。</value></data>
+  <data name="Transfer_CloseTitle" xml:space="preserve"><value>転送がまだ完了していません</value></data>
+  <data name="Transfer_CloseMessage" xml:space="preserve"><value>{0} 件の転送が未完了です。今すぐ閉じても進行状況は保存され、再開可能な転送は次回再開されます。</value></data>
+  <data name="Transfer_CloseAnyway" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Transfer_Finished" xml:space="preserve"><value>{0} が完了しました</value></data>
+  <data name="Transfer_CouldNotFinish" xml:space="preserve"><value>{0} は完了しませんでした</value></data>
+  <data name="Preview_Content" xml:space="preserve"><value>内容</value></data>
+  <data name="Preview_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Preview_Preview" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="Preview_Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="Preview_SaveOpen" xml:space="preserve"><value>保存して開く</value></data>
+  <data name="Preview_DiscardOpen" xml:space="preserve"><value>破棄して開く</value></data>
+  <data name="Preview_SaveContinue" xml:space="preserve"><value>保存して続行</value></data>
+  <data name="Preview_DiscardContinue" xml:space="preserve"><value>破棄して続行</value></data>
+  <data name="Preview_UnsavedGeneric" xml:space="preserve"><value>{0} に未保存の変更があります。続行する前にどうしますか？</value></data>
+  <data name="Preview_UnsavedSelect" xml:space="preserve"><value>{0} に未保存の変更があります。{1} を選択する前にどうしますか？</value></data>
+  <data name="Preview_SaveSelect" xml:space="preserve"><value>保存して選択</value></data>
+  <data name="Preview_DiscardSelect" xml:space="preserve"><value>破棄して選択</value></data>
+  <data name="Preview_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Preview_UnsavedTarget" xml:space="preserve"><value>{0} に未保存の変更があります。{1} を開く前にどうしますか？</value></data>
+  <data name="Preview_NextSelection" xml:space="preserve"><value>次の選択項目</value></data>
+  <data name="Preview_Saving" xml:space="preserve"><value>保存中…</value></data>
+  <data name="Preview_ReloadFailed" xml:space="preserve"><value>最新バージョンを読み込めませんでした。編集中の内容は保持されています。</value></data>
+  <data name="Preview_DownloadLatest" xml:space="preserve"><value>最新版をダウンロード</value></data>
+  <data name="Preview_KeepDraft" xml:space="preserve"><value>下書きを保持</value></data>
+  <data name="Preview_NoVersion" xml:space="preserve"><value>リモートのバージョンを確認できませんでした</value></data>
+  <data name="Preview_NoVersionDetail" xml:space="preserve"><value>ストレージサービスから ETag が提供されませんでした。再読み込みして最新のファイルを確認するか、明示的に上書きしてください。編集中の内容は保持されます。</value></data>
+  <data name="Preview_SaveTip" xml:space="preserve"><value>保存 (Ctrl+S)</value></data>
+  <data name="Preview_Revert" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="Preview_Discard" xml:space="preserve"><value>保存しない</value></data>
+  <data name="Preview_Stay" xml:space="preserve"><value>編集を続ける</value></data>
+  <data name="Preview_Unsaved" xml:space="preserve"><value>このファイルには未保存の変更があります。</value></data>
+  <data name="Preview_Saved" xml:space="preserve"><value>保存済み</value></data>
+  <data name="Preview_Dirty" xml:space="preserve"><value>未保存</value></data>
+  <data name="Preview_ReadOnly" xml:space="preserve"><value>読み取り専用</value></data>
+  <data name="Preview_Loading" xml:space="preserve"><value>開いています…</value></data>
+  <data name="Preview_TooLarge" xml:space="preserve"><value>このファイルのサイズは {0} です。大きすぎるため、安全に開けません。</value></data>
+  <data name="Preview_External" xml:space="preserve"><value>このファイル形式のプレビューには対応していません。別のアプリで開いてください。</value></data>
+  <data name="Preview_ExternalCopy" xml:space="preserve"><value>別のプログラムではコピーを開きます。そこでの変更は元のファイルには反映されません。</value></data>
+  <data name="Preview_Shell" xml:space="preserve"><value>アプリで開く</value></data>
+  <data name="Preview_ShellOpened" xml:space="preserve"><value>コピーを開きました</value></data>
+  <data name="Preview_ShellFailed" xml:space="preserve"><value>コピーを開けませんでした</value></data>
+  <data name="Preview_Download" xml:space="preserve"><value>ダウンロード</value></data>
+  <data name="Preview_NotText" xml:space="preserve"><value>このファイルは、変更を保存し直せるテキスト形式ではありません。</value></data>
+  <data name="Preview_ImageFailed" xml:space="preserve"><value>この画像を表示できませんでした。</value></data>
+  <data name="Preview_Conflict" xml:space="preserve"><value>リモートファイルが変更されました</value></data>
+  <data name="Preview_ConflictDetail" xml:space="preserve"><value>再読み込みすると編集内容が破棄されます。上書きするとリモートのオブジェクトが置き換わります。</value></data>
+  <data name="Preview_ConditionalSaveUnsupported" xml:space="preserve"><value>保存するには明示的な上書きが必要です</value></data>
+  <data name="Preview_ConditionalSaveUnsupportedDetail" xml:space="preserve"><value>このストレージサービスでは、保存時にリモートファイルの変更を確認できません。再読み込みすると編集内容が破棄されます。上書きすると、変更を確認せずにリモートファイルが置き換わります。</value></data>
+  <data name="Preview_Reload" xml:space="preserve"><value>再読み込み</value></data>
+  <data name="Preview_Overwrite" xml:space="preserve"><value>上書き</value></data>
+  <data name="Preview_Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="Preview_OpenFailed" xml:space="preserve"><value>ファイルを開けませんでした。</value></data>
+  <data name="Preview_SaveFailed" xml:space="preserve"><value>ファイルを保存できませんでした。</value></data>
+  <data name="Connection_Failure_PreconditionFailed" xml:space="preserve"><value>オブジェクトが変更されました</value></data>
+  <data name="Connection_Failure_PreconditionFailedHint" xml:space="preserve"><value>再読み込みするか、もう一度保存してリモートのコピーを上書きしてください。</value></data>
+  <data name="Share_Menu" xml:space="preserve"><value>共有リンク…</value></data>
+  <data name="Share_Title" xml:space="preserve"><value>共有リンク</value></data>
+  <data name="Share_Kind" xml:space="preserve"><value>リンクの種類</value></data>
+  <data name="Share_ChooseHint" xml:space="preserve"><value>このオブジェクトに他の人がアクセスする方法を選んでください。</value></data>
+  <data name="Share_Temporary" xml:space="preserve"><value>一時的なダウンロードリンク</value></data>
+  <data name="Share_Public" xml:space="preserve"><value>公開 URL</value></data>
+  <data name="Share_Expires" xml:space="preserve"><value>有効期限</value></data>
+  <data name="Share_PublicBase" xml:space="preserve"><value>公開バケットの URL</value></data>
+  <data name="Share_PublicHint" xml:space="preserve"><value>このバケットの HTTPS ルートを入力してください（例: https://cdn.example.com）。バケットはあらかじめ公開読み取りを許可している必要があります。この操作で権限は変更されません。</value></data>
+  <data name="Share_TemporaryHint" xml:space="preserve"><value>リンクを知っている人は有効期限までオブジェクトをダウンロードできます。公開ドメインが設定されていても、S3 API ホストを使用します。</value></data>
+  <data name="Share_InvalidBase" xml:space="preserve"><value>クエリやフラグメントを含まない有効な HTTPS URL を入力してください。</value></data>
+  <data name="Share_Create" xml:space="preserve"><value>リンクを作成</value></data>
+  <data name="Share_PublicStatus" xml:space="preserve"><value>公開 · 有効期限なし</value></data>
+  <data name="Share_ExpiryStatus" xml:space="preserve"><value>一時的 · {0} に期限切れ</value></data>
+  <data name="Share_Url" xml:space="preserve"><value>共有 URL</value></data>
+  <data name="Share_PublicCaution" xml:space="preserve"><value>この URL は、バケットの公開ドメインとオブジェクトの権限でアクセスが許可されている場合にのみ使用できます。</value></data>
+  <data name="Share_Sensitive" xml:space="preserve"><value>このリンクは機密情報として扱ってください。資格情報の無効化やアクセスルールの変更により、予定より早く使えなくなる場合があります。</value></data>
+  <data name="Share_Ready" xml:space="preserve"><value>リンクを作成しました</value></data>
+  <data name="Share_Copy" xml:space="preserve"><value>リンクをコピー</value></data>
+  <data name="Share_Copied" xml:space="preserve"><value>リンクをコピーしました</value></data>
+  <data name="Share_Failed" xml:space="preserve"><value>リンクを作成できませんでした</value></data>
+  <data name="Share_15Minutes" xml:space="preserve"><value>15 分</value></data>
+  <data name="Share_1Hour" xml:space="preserve"><value>1 時間</value></data>
+  <data name="Share_24Hours" xml:space="preserve"><value>24 時間</value></data>
+  <data name="Share_7Days" xml:space="preserve"><value>7 日</value></data>
+  <data name="Places_AddFavorite" xml:space="preserve"><value>現在の場所をお気に入りに追加</value></data>
+  <data name="Places_ToggleFavorite" xml:space="preserve"><value>バケットのお気に入りを切り替え</value></data>
+  <data name="Places_RemoveFavorite" xml:space="preserve"><value>お気に入りから削除</value></data>
+  <data name="Places_RemoveRecent" xml:space="preserve"><value>最近使った項目から削除</value></data>
+  <data name="Places_OpenNewTab" xml:space="preserve"><value>新しいタブで開く</value></data>
+  <data name="Places_ClearRecent" xml:space="preserve"><value>最近使った項目を消去</value></data>
+  <data name="Places_ClearRecentConfirm" xml:space="preserve"><value>このデバイスの最近訪れた場所をすべて削除しますか？</value></data>
+  <data name="Places_FavoritesHint" xml:space="preserve"><value>このデバイスに保存された場所</value></data>
+  <data name="Places_RecentHint" xml:space="preserve"><value>最近訪れた場所（最大 50 件）</value></data>
+  <data name="Places_AllBuckets" xml:space="preserve"><value>すべてのバケット</value></data>
+  <data name="Places_MissingConnection" xml:space="preserve"><value>この接続は利用できなくなりました</value></data>
+  <data name="Places_SaveFailed" xml:space="preserve"><value>場所を保存できませんでした</value></data>
+  <data name="Places_StatusCount" xml:space="preserve"><value>場所 {0} 件</value></data>
+  <data name="Places_Browse" xml:space="preserve"><value>接続を参照</value></data>
+  <data name="Places_Connection" xml:space="preserve"><value>接続</value></data>
+  <data name="Places_Location" xml:space="preserve"><value>場所</value></data>
+  <data name="Places_Visited" xml:space="preserve"><value>訪問日時</value></data>
+  <data name="Connection_OpenNewTab" xml:space="preserve"><value>新しいタブで開く</value></data>
+  <data name="Nav_StorageTip" xml:space="preserve"><value>ストレージ</value></data>
+  <data name="Transfer_FailedMarkTip" xml:space="preserve"><value>転送に失敗しました</value></data>
+  <data name="Tray_UnfinishedTitle" xml:space="preserve"><value>転送がまだ完了していません</value></data>
+  <data name="Tray_UnfinishedMessage" xml:space="preserve"><value>実行中 {0} 件、待機中または再試行中 {1} 件、一時停止中 {2} 件。Cavdeck を終了すると、これらの転送は停止します。</value></data>
+  <data name="Tray_ExplicitExitMessage" xml:space="preserve"><value>転送がまだ完了していません。終了すると停止します。</value></data>
+  <data name="Tray_KeepBackground" xml:space="preserve"><value>バックグラウンドで続行</value></data>
+  <data name="Tray_ExitApplication" xml:space="preserve"><value>Cavdeck を終了</value></data>
+  <data name="Tray_Unavailable" xml:space="preserve"><value>システムトレイを利用できません。ウィンドウを開いたままにするか、Cavdeck を終了してください。</value></data>
+  <data name="Tray_Open" xml:space="preserve"><value>Cavdeck を開く</value></data>
+  <data name="Tray_Transfers" xml:space="preserve"><value>転送</value></data>
+  <data name="Tray_Connections" xml:space="preserve"><value>接続</value></data>
+  <data name="Tray_Favorites" xml:space="preserve"><value>お気に入り</value></data>
+  <data name="Tray_Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Tray_Status" xml:space="preserve"><value>実行中 {0} 件 · 待機中 {1} 件 · 一時停止中 {2} 件 · 失敗 {3} 件</value></data>
+  <data name="Tray_StatusIdle" xml:space="preserve"><value>実行中の転送はありません</value></data>
+  <data name="Tray_TooltipIdle" xml:space="preserve"><value>Cavdeck · 待機中</value></data>
+  <data name="Tray_TooltipBusy" xml:space="preserve"><value>Cavdeck · 実行中 {0} 件、待機中 {1} 件</value></data>
+  <data name="Tray_TooltipFailed" xml:space="preserve"><value>Cavdeck · 失敗 {0} 件</value></data>
+  <data name="Tray_SettingsGroup" xml:space="preserve"><value>ウィンドウとバックグラウンド</value></data>
+  <data name="Tray_CloseLabel" xml:space="preserve"><value>ウィンドウを閉じたとき</value></data>
+  <data name="Tray_CloseHelp" xml:space="preserve"><value>終了時には未完了の転送がある場合に確認します。非表示にすると転送は続行されます。</value></data>
+  <data name="Tray_CloseExit" xml:space="preserve"><value>Cavdeck を終了</value></data>
+  <data name="Tray_CloseHide" xml:space="preserve"><value>システムトレイに隠す</value></data>
+  <data name="Tray_ActivationFailed" xml:space="preserve"><value>Cavdeck は既に実行中ですが、ウィンドウを表示できませんでした。</value></data>
+  <data name="Settings_BrowseGroup" xml:space="preserve"><value>ファイルの参照</value></data>
+  <data name="Settings_BrowserView" xml:space="preserve"><value>既定の表示</value></data>
+  <data name="Settings_BrowserViewHelp" xml:space="preserve"><value>ファイルブラウザー内でのオブジェクトの表示方法を選択します。</value></data>
+  <data name="Settings_GridDensity" xml:space="preserve"><value>アイコンの間隔</value></data>
+  <data name="Settings_GridDensityHelp" xml:space="preserve"><value>アイコン表示時の間隔を調整します。</value></data>
+  <data name="Settings_Comfortable" xml:space="preserve"><value>標準</value></data>
+  <data name="Settings_Compact" xml:space="preserve"><value>コンパクト</value></data>
+  <data name="Settings_DetailsPane" xml:space="preserve"><value>詳細ペイン</value></data>
+  <data name="Settings_DetailsPaneHelp" xml:space="preserve"><value>選択したファイルの横に詳細領域を表示します。</value></data>
+  <data name="Settings_Show" xml:space="preserve"><value>表示</value></data>
+  <data name="Settings_TransferGroup" xml:space="preserve"><value>ダウンロードと転送</value></data>
+  <data name="Settings_DownloadDestination" xml:space="preserve"><value>ダウンロード先</value></data>
+  <data name="Settings_DownloadDestinationHelp" xml:space="preserve"><value>フォルダーを選択するか、毎回確認します。</value></data>
+  <data name="Settings_AskEveryTime" xml:space="preserve"><value>毎回確認</value></data>
+  <data name="Settings_AskOnConflict" xml:space="preserve"><value>必要な場合のみ確認</value></data>
+  <data name="Settings_UseDefaultFolder" xml:space="preserve"><value>選択したフォルダーを使用</value></data>
+  <data name="Settings_DownloadFolder" xml:space="preserve"><value>ダウンロードフォルダー</value></data>
+  <data name="Settings_DownloadFolderHelp" xml:space="preserve"><value>フォルダーを選ぶと直接ダウンロードできます。フォルダーが利用できない場合は確認画面を表示します。</value></data>
+  <data name="Settings_ChooseFolder" xml:space="preserve"><value>フォルダーを選択…</value></data>
+  <data name="Settings_DownloadNotSelected" xml:space="preserve"><value>フォルダーが選択されていません</value></data>
+  <data name="Settings_InvalidDownloadDirectory" xml:space="preserve"><value>存在していてアクセス可能なフォルダーを選択してください。</value></data>
+  <data name="Settings_Conflict" xml:space="preserve"><value>ファイルが既に存在する場合</value></data>
+  <data name="Settings_ConflictHelp" xml:space="preserve"><value>アップロードとダウンロードに適用されます。一致するファイルがあるときのみ確認します。上書きには必ず明示的な選択が必要です。</value></data>
+  <data name="Settings_Concurrency" xml:space="preserve"><value>同時転送数</value></data>
+  <data name="Settings_ConcurrencyHelp" xml:space="preserve"><value>同時に実行できるアップロード、ダウンロード、コピーの最大数です。</value></data>
+  <data name="Nav_MoreConnectionActions" xml:space="preserve"><value>接続のその他の操作</value></data>
+  <data name="Nav_LoadingConnections" xml:space="preserve"><value>接続を読み込んでいます…</value></data>
+  <data name="Nav_RetryConnections" xml:space="preserve"><value>再試行</value></data>
+  <data name="Explorer_ScopeFolder" xml:space="preserve"><value>現在のフォルダー</value></data>
+  <data name="Explorer_SearchFolder" xml:space="preserve"><value>現在のフォルダーとサブフォルダーを検索</value></data>
+  <data name="Explorer_FolderScanHint" xml:space="preserve"><value>このフォルダーとサブフォルダーで一致するオブジェクト名やフォルダー名をスキャンします。ストレージのリクエスト料金が発生する場合があります。</value></data>
+  <data name="Explorer_ClearSearch" xml:space="preserve"><value>検索をクリア</value></data>
+  <data name="Explorer_ContinueSearch" xml:space="preserve"><value>検索を続行</value></data>
+  <data name="Explorer_StopSearch" xml:space="preserve"><value>検索を停止</value></data>
+  <data name="Explorer_SearchReady" xml:space="preserve"><value>検索の準備完了</value></data>
+  <data name="Explorer_SearchReadyHint" xml:space="preserve"><value>Enter キーを押すか「検索」を選択して、指定した範囲をスキャンします。</value></data>
+  <data name="Explorer_SearchPartialEmpty" xml:space="preserve"><value>スキャン済みの範囲に一致なし</value></data>
+  <data name="Explorer_SearchPartialEmptyHint" xml:space="preserve"><value>検索は未完了です。スキャンを続行するか、検索語を変更するか、範囲を絞ってください。</value></data>
+  <data name="Explorer_SearchFailed" xml:space="preserve"><value>{0} で検索が中断されました · 確認したオブジェクト {1} 件 · リクエスト {2} 回 · 一致 {3} 件。再試行できます。</value></data>
+  <data name="Explorer_SearchStopped" xml:space="preserve"><value>{0} で検索を停止 · 確認したオブジェクト {1} 件 · リクエスト {2} 回 · 一致 {3} 件。</value></data>
+  <data name="Explorer_SearchDisplayLimit" xml:space="preserve"><value>表示上限の 6,000 件に達しました。範囲を絞るか検索条件を変更してください。</value></data>
+  <data name="Explorer_BucketsNoMatches" xml:space="preserve"><value>一致するバケットがありません</value></data>
+  <data name="Explorer_BucketsNoMatchesHint" xml:space="preserve"><value>別の名前を試すか、フィルターを解除してすべてのバケットを表示してください。</value></data>
+  <data name="Transfer_FilterLabel" xml:space="preserve"><value>転送を絞り込み</value></data>
+  <data name="Transfer_FilterAll" xml:space="preserve"><value>すべての状態</value></data>
+  <data name="Transfer_FilterRunning" xml:space="preserve"><value>実行中</value></data>
+  <data name="Transfer_FilterQueued" xml:space="preserve"><value>待機中</value></data>
+  <data name="Transfer_FilterPaused" xml:space="preserve"><value>一時停止中</value></data>
+  <data name="Transfer_FilterFailed" xml:space="preserve"><value>失敗</value></data>
+  <data name="Transfer_FilterCompleted" xml:space="preserve"><value>完了</value></data>
+  <data name="Transfer_FilterCancelled" xml:space="preserve"><value>キャンセル済み</value></data>
+  <data name="Transfer_ShowItems" xml:space="preserve"><value>転送項目を表示</value></data>
+  <data name="Transfer_HideItems" xml:space="preserve"><value>転送項目を非表示</value></data>
+  <data name="Transfer_ShowDetails" xml:space="preserve"><value>転送の詳細を表示</value></data>
+  <data name="Transfer_HideDetails" xml:space="preserve"><value>転送の詳細を非表示</value></data>
+  <data name="Transfer_Source" xml:space="preserve"><value>転送元</value></data>
+  <data name="Transfer_Destination" xml:space="preserve"><value>転送先</value></data>
+  <data name="Transfer_NoticeCompleted" xml:space="preserve"><value>{0} 件の転送が完了しました</value></data>
+  <data name="Transfer_NoticeFailed" xml:space="preserve"><value>{0} 件の転送が完了しませんでした</value></data>
+  <data name="Empty_TransferFilteredTitle" xml:space="preserve"><value>一致する転送がありません</value></data>
+  <data name="Empty_TransferFilteredDescription" xml:space="preserve"><value>別の状態フィルターを試してください。</value></data>
+  <data name="Transfer_BatchOlderItemsHint" xml:space="preserve"><value>展開できる最近の項目がありません。集計には古い項目も含まれています。</value></data>
+  <data name="Preview_PdfDownloading" xml:space="preserve"><value>プレビュー用の PDF をダウンロード中…</value></data>
+  <data name="Preview_PdfProgress" xml:space="preserve"><value>{0} / {1} · {2}%</value></data>
+  <data name="Preview_PdfCancel" xml:space="preserve"><value>プレビューをキャンセル</value></data>
+  <data name="Preview_PdfCanceled" xml:space="preserve"><value>PDF のプレビューをキャンセルしました。再試行するか、ファイルをダウンロードできます。</value></data>
+  <data name="Preview_PdfFailed" xml:space="preserve"><value>PDF ビューアーを利用できません。再試行、ダウンロード、または別のアプリで開くことができます。</value></data>
+  <data name="Preview_PdfDownloadFailed" xml:space="preserve"><value>PDF プレビュー用のダウンロードに失敗しました。再試行するか、ファイルをダウンロードしてください。</value></data>
+  <data name="Preview_ExpandPane" xml:space="preserve"><value>プレビューを拡大</value></data>
+  <data name="Preview_RestorePane" xml:space="preserve"><value>分割表示に戻す</value></data>
+  <data name="Preview_UnsavedStatus" xml:space="preserve"><value>未保存の変更</value></data>
+  <data name="Preview_OpenExternalTip" xml:space="preserve"><value>アプリで開く（ローカルコピー。編集内容は同期されません）</value></data>
+  <data name="Preview_Downloading" xml:space="preserve"><value>プレビュー用にダウンロード中…</value></data>
+  <data name="Preview_DownloadProgress" xml:space="preserve"><value>{0} / {1} · {2}%</value></data>
+  <data name="Preview_CancelDownload" xml:space="preserve"><value>プレビューをキャンセル</value></data>
+  <data name="Preview_DownloadCanceled" xml:space="preserve"><value>プレビューをキャンセルしました。再試行するか、ファイルをダウンロードできます。</value></data>
+  <data name="Preview_DownloadFailed" xml:space="preserve"><value>プレビューのダウンロードに失敗しました。再試行するか、ファイルをダウンロードしてください。</value></data>
+  <data name="Settings_TabGeneral" xml:space="preserve"><value>一般</value></data>
+  <data name="Settings_TabBrowsing" xml:space="preserve"><value>ファイルの参照</value></data>
+  <data name="Settings_TabTransfers" xml:space="preserve"><value>転送</value></data>
+  <data name="Settings_TabAbout" xml:space="preserve"><value>アプリ情報</value></data>
+  <data name="Settings_TabShortcuts" xml:space="preserve"><value>ショートカット</value></data>
+  <data name="Shortcuts_GlobalGroup" xml:space="preserve"><value>Cavdeck を開く</value></data>
+  <data name="Shortcuts_GlobalTitle" xml:space="preserve"><value>グローバルショートカット</value></data>
+  <data name="Shortcuts_GlobalHelp" xml:space="preserve"><value>トレイに隠れている場合も含め、どこからでも Cavdeck を前面に表示します。Cavdeck の実行中のみ動作します。</value></data>
+  <data name="Shortcuts_Enable" xml:space="preserve"><value>有効にする</value></data>
+  <data name="Shortcuts_Combination" xml:space="preserve"><value>キーの組み合わせ</value></data>
+  <data name="Shortcuts_ChangeHotkey" xml:space="preserve"><value>クリックして新しいショートカットを設定</value></data>
+  <data name="Shortcuts_CaptureHelp" xml:space="preserve"><value>組み合わせをクリックし、Ctrl+Alt または Ctrl+Shift と文字、数字、利用可能なファンクションキーを押してください。Esc でキャンセル、Tab でフォーカス移動。Windows キーを使う組み合わせは予約されています。</value></data>
+  <data name="Shortcuts_Recording" xml:space="preserve"><value>ショートカットを入力…</value></data>
+  <data name="Shortcuts_StatusDisabled" xml:space="preserve"><value>無効 · このショートカットは登録されていません。</value></data>
+  <data name="Shortcuts_StatusActive" xml:space="preserve"><value>使用可能 · このショートカットで Cavdeck を開くか前面に表示できます。</value></data>
+  <data name="Shortcuts_StatusUnavailable" xml:space="preserve"><value>無効 · ショートカットを登録できませんでした。別の組み合わせを選ぶか、一度無効にしてから再度有効にしてください。</value></data>
+  <data name="Shortcuts_InvalidGesture" xml:space="preserve"><value>Ctrl+Alt または Ctrl+Shift と文字、数字、利用可能なファンクションキーを組み合わせてください。予約済みのショートカットは使用できません。</value></data>
+  <data name="Shortcuts_RegistrationConflict" xml:space="preserve"><value>利用不可 · 別のアプリまたは Windows が既に使用している可能性があります。以前のショートカットは変更されません。</value></data>
+  <data name="Shortcuts_ReferenceGroup" xml:space="preserve"><value>キーボードショートカット</value></data>
+  <data name="Shortcuts_ReferenceHelp" xml:space="preserve"><value>画面ごとに利用できるショートカットです。この一覧は読み取り専用です。ファイル操作は選択状態と権限で許可されている場合に使用できます。</value></data>
+  <data name="Shortcuts_GroupTabs" xml:space="preserve"><value>タブとワークスペース</value></data>
+  <data name="Shortcuts_GroupExplorer" xml:space="preserve"><value>ファイルとフォルダー</value></data>
+  <data name="Shortcuts_GroupEditing" xml:space="preserve"><value>編集とナビゲーション</value></data>
+  <data name="Shortcuts_NewTab" xml:space="preserve"><value>新しいタブ</value></data>
+  <data name="Shortcuts_ReopenTab" xml:space="preserve"><value>閉じたタブを再度開く</value></data>
+  <data name="Shortcuts_CloseTab" xml:space="preserve"><value>現在のタブを閉じる</value></data>
+  <data name="Shortcuts_NextTab" xml:space="preserve"><value>次のタブ</value></data>
+  <data name="Shortcuts_PreviousTab" xml:space="preserve"><value>前のタブ</value></data>
+  <data name="Shortcuts_SelectTab" xml:space="preserve"><value>タブ 1～8 に切り替え</value></data>
+  <data name="Shortcuts_LastTab" xml:space="preserve"><value>最後のタブ</value></data>
+  <data name="Shortcuts_Sidebar" xml:space="preserve"><value>サイドバーを表示／非表示</value></data>
+  <data name="Shortcuts_Search" xml:space="preserve"><value>ファイル検索にフォーカス</value></data>
+  <data name="Shortcuts_Refresh" xml:space="preserve"><value>現在の場所を更新</value></data>
+  <data name="Shortcuts_ParentFolder" xml:space="preserve"><value>親フォルダーへ移動</value></data>
+  <data name="Shortcuts_Open" xml:space="preserve"><value>選択した項目を開く</value></data>
+  <data name="Shortcuts_Rename" xml:space="preserve"><value>選択した項目の名前を変更</value></data>
+  <data name="Shortcuts_Delete" xml:space="preserve"><value>選択した項目を削除</value></data>
+  <data name="Shortcuts_Copy" xml:space="preserve"><value>選択した項目をコピー</value></data>
+  <data name="Shortcuts_Cut" xml:space="preserve"><value>選択した項目を切り取り</value></data>
+  <data name="Shortcuts_Paste" xml:space="preserve"><value>現在のフォルダーに貼り付け</value></data>
+  <data name="Shortcuts_SavePreview" xml:space="preserve"><value>編集したテキストプレビューを保存</value></data>
+  <data name="Shortcuts_Back" xml:space="preserve"><value>メニューを閉じる／設定を終了／拡大したプレビューを元に戻す</value></data>
+  <data name="Connection_TestUnexpectedHint" xml:space="preserve"><value>接続テストを完了できませんでした。接続設定を確認して再試行してください。</value></data>
+  <data name="Transfer_BatchScanError" xml:space="preserve"><value>フォルダーのスキャンに失敗しました。この一括処理を再試行してください。</value></data>
+  <data name="Transfer_UnknownState" xml:space="preserve"><value>不明な状態</value></data>
+  <data name="About_ResourcesGroup" xml:space="preserve"><value>リソースとサポート</value></data>
+  <data name="About_ProjectPage" xml:space="preserve"><value>プロジェクトページ</value></data>
+  <data name="About_Documentation" xml:space="preserve"><value>ドキュメント</value></data>
+  <data name="About_ReportIssue" xml:space="preserve"><value>問題を報告</value></data>
+  <data name="About_PrivacyLicenseGroup" xml:space="preserve"><value>プライバシーとライセンス</value></data>
+  <data name="About_PrivacyTitle" xml:space="preserve"><value>データは利用者が管理</value></data>
+  <data name="About_PrivacySummary" xml:space="preserve"><value>設定とログは端末内に保存され、認証情報は Windows 資格情報マネージャーで保護されます。診断レポートは選択した場合のみ共有されます。更新確認では GitHub Releases に接続します。</value></data>
+  <data name="About_LicenseTitle" xml:space="preserve"><value>ソフトウェアライセンス</value></data>
+  <data name="About_LicenseSummary" xml:space="preserve"><value>GNU GPL-3.0-or-later の無料オープンソースソフトウェアです。商用利用が可能で、寄付は任意です。</value></data>
+  <data name="About_OpenLinkFailed" xml:space="preserve"><value>リンクを開けませんでした。既定のブラウザー設定を確認して再試行してください。</value></data>
+  <data name="Settings_RestoreTabs" xml:space="preserve"><value>前回のタブを復元</value></data>
+  <data name="Settings_RestoreTabsHelp" xml:space="preserve"><value>次回起動時にタブと保存先を復元します。オフにすると接続一覧から開始し、現在のタブは閉じません。</value></data>
+  <data name="Settings_TransferCompletionNotice" xml:space="preserve"><value>転送完了の通知</value></data>
+  <data name="Settings_TransferCompletionNoticeHelp" xml:space="preserve"><value>完了またはスキップした転送をアプリ内にまとめて通知します。失敗の通知は常に表示します。</value></data>
+  <data name="Settings_Enable" xml:space="preserve"><value>有効</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>更新をダウンロード中… {0}%</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>新しいバージョン {0} が利用できます。</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>バージョン {0} の準備ができました。再起動してインストールできます。</value></data>
+  <data name="Update_DownloadButton" xml:space="preserve"><value>更新をダウンロード</value></data>
+  <data name="Update_RestartNow" xml:space="preserve"><value>再起動して更新</value></data>
+  <data name="Update_Later" xml:space="preserve"><value>後で</value></data>
+  <data name="Update_AutoCheck" xml:space="preserve"><value>更新を自動確認</value></data>
+  <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Cavdeck の起動後に、作業を中断せず更新を確認します。</value></data>
+  <data name="Update_BackgroundDownload" xml:space="preserve"><value>更新をバックグラウンドでダウンロード</value></data>
+  <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>更新を自動ダウンロードします。インストールには確認が必要です。</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>未完了の転送があります</value></data>
+  <data name="Update_TransfersMessage" xml:space="preserve"><value>更新のために再起動する前に、待機中・実行中・再試行待ち・一時停止中の転送をすべて完了またはキャンセルしてください。</value></data>
+  <data name="Update_RestartTitle" xml:space="preserve"><value>Cavdeck の更新をインストール</value></data>
+  <data name="Update_RestartMessage" xml:space="preserve"><value>作業内容を保存して Cavdeck を終了し、更新をインストールした後に再起動します。続行しますか？</value></data>
+  <data name="Update_SaveFailed" xml:space="preserve"><value>作業内容を保存できませんでした。更新を中止し、Cavdeck は開いたままにします。</value></data>
+  <data name="Update_InstallFailed" xml:space="preserve"><value>更新を開始できませんでした。Cavdeck は終了します。再度起動してお試しください。</value></data>
+  <data name="Connection_DeleteImpact" xml:space="preserve"><value>関連する {0} 個のタブを閉じ、{1} 件の転送タスクまたはスキャンをキャンセルします。リモートファイルは削除されません。</value></data>
+  <data name="Connection_ChangeTitle" xml:space="preserve"><value>接続を更新</value></data>
+  <data name="Connection_ChangeTransfers" xml:space="preserve"><value>保存すると、関連する {0} 件の転送タスクまたはスキャンがキャンセルされます。サーバーに送信済みのリクエストは完了している場合があります。続行しますか？</value></data>
+  <data name="Connection_RefreshFailed" xml:space="preserve"><value>接続は保存されましたが、一部のタブを更新できませんでした。再読み込みしてください。</value></data>
+  <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>この接続は読み取り専用になりました。未保存の下書きは保持されています。破棄または閉じる前にコピーしてください。</value></data>
+  <data name="Preview_CopyDraft" xml:space="preserve"><value>下書きをコピー</value></data>
+  <data name="Connection_ReconnectPending" xml:space="preserve"><value>接続が更新されました。未保存の下書きを処理し、再読み込みして再接続してください。再接続までファイル操作は利用できません。</value></data>
+  <data name="Transfer_DropDestination" xml:space="preserve"><value>アップロード先: {0}</value></data>
+  <data name="Transfer_ClearFailed" xml:space="preserve"><value>失敗を消去</value></data>
+  <data name="Transfer_ClearHistory" xml:space="preserve"><value>履歴を消去</value></data>
+  <data name="Transfer_ClearFailedTitle" xml:space="preserve"><value>失敗した転送履歴を消去しますか？</value></data>
+  <data name="Transfer_ClearHistoryTitle" xml:space="preserve"><value>完了した転送履歴を消去しますか？</value></data>
+  <data name="Transfer_ClearRecordsMessage" xml:space="preserve"><value>この端末の転送履歴のみ削除します。ローカルファイルやリモートオブジェクトは削除されません。進行中の転送とマルチパートの後処理が必要な記録は残ります。</value></data>
+  <data name="Transfer_RemoveRecords" xml:space="preserve"><value>履歴を削除</value></data>
+  <data name="Transfer_RemoveRecord" xml:space="preserve"><value>履歴を削除</value></data>
+  <data name="Transfer_RemovedCount" xml:space="preserve"><value>転送履歴 {0} 件を削除しました。</value></data>
+  <data name="Transfer_NothingRemovable" xml:space="preserve"><value>安全に削除できる記録はありません。マルチパートの後処理が必要な記録は残ります。</value></data>
+  <data name="Transfer_ErrorUnavailable" xml:space="preserve"><value>情報なし</value></data>
+  <data name="Transfer_FailureDetails" xml:space="preserve"><value>失敗の詳細</value></data>
+  <data name="Transfer_FailureCategory" xml:space="preserve"><value>カテゴリ:</value></data>
+  <data name="Transfer_ErrorCode" xml:space="preserve"><value>エラーコード:</value></data>
+  <data name="Transfer_Attempts" xml:space="preserve"><value>試行回数:</value></data>
+  <data name="Transfer_Retryable" xml:space="preserve"><value>再試行可能:</value></data>
+  <data name="Transfer_Yes" xml:space="preserve"><value>はい</value></data>
+  <data name="Transfer_No" xml:space="preserve"><value>いいえ</value></data>
+  <data name="Transfer_AdvicePermission" xml:space="preserve"><value>接続認証情報、書き込み権限、バケットへのアクセスを確認して再試行してください。</value></data>
+  <data name="Transfer_AdviceNetwork" xml:space="preserve"><value>ネットワークとエンドポイントを確認し、サービス復旧後に再試行してください。</value></data>
+  <data name="Transfer_AdviceLocal" xml:space="preserve"><value>ローカルファイルが存在し、アクセスできることを確認して再試行してください。</value></data>
+  <data name="Transfer_AdviceConflict" xml:space="preserve"><value>送信元または送信先が変更されています。競合時の動作を確認してください。</value></data>
+  <data name="Transfer_AdviceGeneral" xml:space="preserve"><value>エラーコードと接続設定を確認し、問題解決後に再試行してください。</value></data>
+  <data name="Transfer_FailurePrivacy" xml:space="preserve"><value>元のエラーメッセージにはパスや認証情報が含まれる可能性があるため表示しません。</value></data>
+  <data name="Transfer_CopyFailure" xml:space="preserve"><value>診断概要をコピー</value></data>
+  <data name="Transfer_FailureCopied" xml:space="preserve"><value>診断概要をコピーしました。</value></data>
+  <data name="Explorer_SortedAscending" xml:space="preserve"><value>昇順で並べ替え</value></data>
+  <data name="Explorer_SortedDescending" xml:space="preserve"><value>降順で並べ替え</value></data>
+  <data name="Ui_ActionFailed" xml:space="preserve"><value>操作を完了できませんでした。もう一度お試しください。</value></data>
+  <data name="Config_RecoveryTitle" xml:space="preserve"><value>設定の復旧に関するお知らせ</value></data>
+  <data name="Config_SettingsBackupRestored" xml:space="preserve"><value>設定を有効なバックアップから復元しました。バックアップまたは保存した元ファイルの場所：
+{0}</value></data>
+  <data name="Config_SettingsDefaults" xml:space="preserve"><value>設定ファイルが破損しており、有効なバックアップもありません。既定の設定を一時的に使用します。破損したファイルの保存先：
+{0}</value></data>
+  <data name="Config_ConnectionsBackupRestored" xml:space="preserve"><value>保存済み接続を有効なバックアップから復元しました。バックアップまたは保存した元ファイルの場所：
+{0}</value></data>
+  <data name="Config_ConnectionsUnavailable" xml:space="preserve"><value>保存済み接続を読み込めませんでした。接続データは削除・上書きしていません。元ファイルとバックアップを確認してください：
+{0}
+修復して再試行するまで接続を変更しないでください。</value></data>
+  <data name="Toast_DismissNamed" xml:space="preserve"><value>通知を閉じる：{0}</value></data>
+  <data name="Toast_ToneInformation" xml:space="preserve"><value>情報</value></data>
+  <data name="Toast_ToneSuccess" xml:space="preserve"><value>成功</value></data>
+  <data name="Toast_ToneWarning" xml:space="preserve"><value>警告</value></data>
+  <data name="Toast_ToneError" xml:space="preserve"><value>エラー</value></data>
+  <data name="Toast_CopyDiagnostics" xml:space="preserve"><value>診断情報をコピー</value></data>
+  <data name="Toast_CopyHelpText" xml:space="preserve"><value>ファイル名、パス、アカウント情報、認証情報を含まない診断レポートをコピーします。</value></data>
+  <data name="Toast_Copied" xml:space="preserve"><value>診断レポートをコピーしました。</value></data>
+  <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>失敗した転送を表示</value></data>
+</root>

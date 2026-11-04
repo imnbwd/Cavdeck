@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <StartupObject>Cavdeck.App.App</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Keep the project/namespace stable; only the shipped assembly and apphost use the product name. -->
+    <AssemblyName>Cavdeck</AssemblyName>
+    <RootNamespace>Cavdeck.App</RootNamespace>
+    <AssemblyTitle>Cavdeck</AssemblyTitle>
+    <Product>Cavdeck</Product>
+    <Description>Windows desktop client for S3-compatible object storage</Description>
+    <ApplicationIcon>Assets\Cavdeck.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Cavdeck.App.Tests" />
+    <!-- Native EXE icon is set above; this WPF resource is also used for window and title-bar icons. -->
+    <None Remove="Assets\Cavdeck.ico" />
+    <Resource Include="Assets\Cavdeck.ico" />
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+    <ProjectReference Include="..\Cavdeck.Application\Cavdeck.Application.csproj" />
+    <ProjectReference Include="..\Cavdeck.Infrastructure\Cavdeck.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="H.NotifyIcon.Wpf" />
+    <PackageReference Include="Velopack" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+  <!-- Keep the design catalog and screenshot utilities out of non-Debug app builds. -->
+  <ItemGroup Condition="'$(Configuration)' != 'Debug'">
+    <Page Remove="Views\DesignCatalogWindow.xaml" />
+    <Compile Remove="Views\DesignCatalogWindow.xaml.cs" />
+  </ItemGroup>
+  <!-- WebView2's NuGet package exposes both WPF and WinForms wrappers.
+       Cavdeck hosts only the WPF control; avoid shipping the unused WinForms assembly. -->
+  <Target Name="RemoveUnusedWebView2WinFormsReference"
+          BeforeTargets="ResolveAssemblyReferences"
+          Condition="'$(UseWPF)' == 'true' and '$(UseWindowsForms)' != 'true'">
+    <ItemGroup>
+      <_UnusedWebView2WinFormsReference Include="@(Reference)"
+          Condition="'%(Reference.Filename)' == 'Microsoft.Web.WebView2.WinForms'" />
+      <Reference Remove="@(_UnusedWebView2WinFormsReference)" />
+    </ItemGroup>
+  </Target>
+</Project>

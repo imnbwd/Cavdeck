@@ -1,0 +1,71 @@
+# Build and IDE outputs
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+artifacts/
+*.nupkg
+*.snupkg
+
+# Local environment and credentials
+**/secrets.json
+**/.env
+**/.env.*
+!**/.env.example
+*.pfx
+*.p12
+*.pem
+*.key
+
+# Local Cavdeck preferences and connection catalogs
+**/Cavdeck/settings.json
+**/Cavdeck/connections.json
+**/Cavdeck/places.json
+**/settings.local.json
+**/connections.local.json
+**/places.local.json
+**/AppData/Roaming/Cavdeck/
+**/AppData/Local/Cavdeck/
+
+# Local databases and SQLite sidecars
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.sqlite3-journal
+
+# Test outputs and local manual-release evidence
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+MANUAL_RELEASE_RESULTS-*.md
+tests/release-evidence/
+tests/manual-results/
+
+# Diagnostics, caches, and temporary files
+*.log
+*.dmp
+*.mdmp
+cavdeck-diagnostic*.txt
+cavdeck-diagnostic*.json
+**/Cavdeck/Logs/
+**/Cavdeck/Diagnostics/
+**/Cavdeck/Cache/
+**/Cavdeck/Temp/
+**/cavdeck-design/
+*.tmp
+*.bak
+
+# Local manual QA plan (kept outside source control)
+/tests/MANUAL_RELEASE_CHECKLIST.md

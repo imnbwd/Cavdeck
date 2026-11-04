@@ -1,0 +1,387 @@
+using System.Text;
+using Cavdeck.Application.Abstractions;
+using Cavdeck.Application.Preview;
+using Cavdeck.Domain.Preview;
+using Cavdeck.Domain.Storage;
+using Xunit;
+
+namespace Cavdeck.Application.Tests;
+
+public sealed class PreviewServiceTests
+{
+    [Fact]
+    public async Task Open_decodes_text_and_keeps_the_etag()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(12, "\"abc\"", "application/json"),
+            Body = """{"ok":true}"""u8.ToArray()
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "notes.json", "notes.json", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.Text, opened.Kind);
+        Assert.Equal("""{"ok":true}""", opened.Text);
+        Assert.Equal("\"abc\"", opened.Head?.ETag);
+        Assert.Equal("application/json", opened.Head?.ContentType);
+        Assert.Equal(1, store.Reads);
+    }
+
+    [Fact]
+    public async Task Open_does_not_download_a_text_file_over_the_cap()
+    {
+        var store = new PreviewStore { Head = Head(PreviewRules.MaxTextBytes + 1, "\"big\"", "text/plain") };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "notes.txt", "notes.txt", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.TooLarge, opened.Kind);
+        Assert.Equal(0, store.Reads);
+    }
+
+    [Fact]
+    public async Task Pdf_returns_metadata_without_buffering_body()
+    {
+        var store = new PreviewStore { Head = Head(20_000_000, "\"pdf\"", "application/pdf") };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "report.pdf", "report.pdf", CancellationToken.None);
+        Assert.Equal(PreviewLoadKind.Pdf, opened.Kind);
+        Assert.Equal(0, store.Reads);
+        Assert.Null(opened.Image);
+    }
+
+    [Fact]
+    public async Task Oversize_pdf_does_not_download()
+    {
+        var store = new PreviewStore { Head = Head(PreviewRules.MaxPdfBytes + 1, "\"big\"", "application/pdf") };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "report.pdf", "report.pdf", CancellationToken.None);
+        Assert.Equal(PreviewLoadKind.TooLarge, opened.Kind);
+        Assert.Equal(0, store.Reads);
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_streams_to_file_and_release_cleans_it()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            var progress = new RecordedProgress();
+            var file = await downloader.PrepareAsync(
+                Connection(), "assets", "report.pdf", "report.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, progress, CancellationToken.None);
+            Assert.EndsWith(".pdf", file);
+            Assert.Equal(store.Body, await File.ReadAllBytesAsync(file));
+            Assert.Equal(store.Body.Length, progress.LastBytes);
+            downloader.Release(file);
+            Assert.False(File.Exists(file));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_blocks_large_objects_before_network_io()
+    {
+        var store = new PreviewStore { Body = new byte[4] };
+        var downloader = new PreviewFileDownloader(new SingleFactory(store), TempDirectory());
+        await Assert.ThrowsAsync<IOException>(() => downloader.PrepareAsync(
+            Connection(), "assets", "large.pdf", "large.pdf", 1025, 1024, null, CancellationToken.None));
+        Assert.Equal(0, store.Downloads);
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_detects_object_growth_and_removes_partial_file()
+    {
+        var store = new PreviewStore { Body = new byte[2048] };
+        var root = TempDirectory();
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            await Assert.ThrowsAsync<IOException>(() => downloader.PrepareAsync(
+                Connection(), "assets", "changed.pdf", "changed.pdf", 512, 1024, null, CancellationToken.None));
+            Assert.Empty(Directory.GetFiles(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_detects_short_download_and_removes_partial_file()
+    {
+        var store = new PreviewStore { Body = new byte[10] };
+        var root = TempDirectory();
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            await Assert.ThrowsAsync<IOException>(() => downloader.PrepareAsync(
+                Connection(), "assets", "incomplete.pdf", "incomplete.pdf", 11, 1024, null, CancellationToken.None));
+            Assert.Empty(Directory.GetFiles(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_cancel_after_write_removes_file()
+    {
+        var store = new PreviewStore { Body = new byte[512], CancelAfterWrite = true };
+        var root = TempDirectory();
+        using var cancellation = new CancellationTokenSource();
+        store.CancellationSource = cancellation;
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => downloader.PrepareAsync(
+                Connection(), "assets", "cancel.pdf", "cancel.pdf", 512, 1024, null, cancellation.Token));
+            Assert.Empty(Directory.GetFiles(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Bounded_preparation_provider_error_removes_partial_file()
+    {
+        var store = new PreviewStore { Body = new byte[30], ThrowAfterWrite = true };
+        var root = TempDirectory();
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            await Assert.ThrowsAsync<IOException>(() => downloader.PrepareAsync(
+                Connection(), "assets", "error.pdf", "error.pdf", 30, 1024, null, CancellationToken.None));
+            Assert.Empty(Directory.GetFiles(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Preparation_cannot_write_into_a_different_directory_using_file_name()
+    {
+        var store = new PreviewStore { Body = [1, 2] };
+        var root = TempDirectory();
+        try
+        {
+            var downloader = new PreviewFileDownloader(new SingleFactory(store), root);
+            var file = await downloader.PrepareAsync(
+                Connection(), "assets", "other", "../data.pdf", 2, 1024, null, CancellationToken.None);
+            Assert.Equal(Path.GetFullPath(root), Path.GetDirectoryName(file));
+            downloader.Release(file);
+            Assert.Empty(Directory.GetFiles(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    private static string TempDirectory() =>
+        Path.Combine(Path.GetTempPath(), "cavdeck-preview-tests", Guid.NewGuid().ToString("N"));
+
+    private static void RemoveDirectory(string path)
+    {
+        if (Directory.Exists(path))
+            Directory.Delete(path, recursive: true);
+    }
+
+    private sealed class RecordedProgress : IProgress<long>
+    {
+        public long LastBytes { get; private set; }
+        public void Report(long value) => LastBytes = value;
+    }
+
+    [Fact]
+    public async Task Truncated_body_is_not_editable()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(4, "\"v\"", "text/plain"),
+            Body = "note"u8.ToArray(),
+            Truncate = true
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "notes.txt", "notes.txt", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.TooLarge, opened.Kind);
+        Assert.Null(opened.Text);
+    }
+
+    [Fact]
+    public async Task Invalid_utf8_is_not_editable()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(1, "\"v\"", "text/plain"),
+            Body = [0xFF]
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "notes.txt", "notes.txt", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.NotText, opened.Kind);
+        Assert.Null(opened.Text);
+    }
+
+    [Fact]
+    public async Task Save_sends_if_match_and_keeps_the_content_type()
+    {
+        var store = new PreviewStore();
+        var saved = await new PreviewService(new SingleFactory(store)).SaveTextAsync(
+            Connection(), "assets", "notes.txt", "next", TextCharset.Utf8, false,
+            "text/plain", "\"abc\"", CancellationToken.None);
+
+        Assert.Equal(PreviewSaveKind.Saved, saved.Kind);
+        Assert.Equal("text/plain", store.SavedType);
+        Assert.Equal("\"abc\"", store.SavedMatch);
+        Assert.Equal("next", Encoding.UTF8.GetString(store.SavedBytes!));
+    }
+
+    [Fact]
+    public async Task Save_reports_a_conflict()
+    {
+        var store = new PreviewStore { Conflict = true };
+        var saved = await new PreviewService(new SingleFactory(store)).SaveTextAsync(
+            Connection(), "assets", "notes.txt", "next", TextCharset.Utf8, false,
+            "text/plain", "\"abc\"", CancellationToken.None);
+
+        Assert.Equal(PreviewSaveKind.Conflict, saved.Kind);
+        Assert.Equal(StorageFailureKind.PreconditionFailed, saved.Failure?.Kind);
+    }
+
+    [Fact]
+    public async Task Unsupported_conditional_save_requires_explicit_overwrite()
+    {
+        var store = new PreviewStore { ConditionalOverwriteUnsupported = true };
+        var service = new PreviewService(new SingleFactory(store));
+
+        var guarded = await service.SaveTextAsync(Connection(), "assets", "notes.txt", "draft",
+            TextCharset.Utf8, false, "text/plain", "etag", CancellationToken.None);
+        Assert.Equal(PreviewSaveKind.RequiresOverwrite, guarded.Kind);
+        Assert.Null(store.SavedBytes);
+
+        var explicitOverwrite = await service.SaveTextAsync(Connection(), "assets", "notes.txt", "draft",
+            TextCharset.Utf8, false, "text/plain", null, CancellationToken.None);
+        Assert.Equal(PreviewSaveKind.Saved, explicitOverwrite.Kind);
+        Assert.Equal("draft", Encoding.UTF8.GetString(store.SavedBytes!));
+    }
+
+    private static ObjectHead Head(long size, string etag, string type) =>
+        new("assets", "notes.txt", size, etag, type);
+
+    private static StorageConnection Connection() => new(
+        Guid.NewGuid(), "Local", StorageProviderKind.Minio, "http://127.0.0.1:9000", "us-east-1", "ref");
+
+    [Fact]
+    public async Task Save_rechecks_read_only_policy_and_deleted_connections_including_overwrite()
+    {
+        var old = Connection();
+        var store = new PreviewStore();
+        var catalog = new MutableConnectionCatalog(old with { IsReadOnly = true });
+        var service = new PreviewService(new SingleFactory(store), catalog);
+        foreach (var etag in new string?[] { "version", null })
+        {
+            var saved = await service.SaveTextAsync(old, "assets", "notes.txt", "draft",
+                TextCharset.Utf8, false, "text/plain", etag, CancellationToken.None);
+            Assert.Equal(PreviewSaveKind.Failed, saved.Kind);
+            Assert.Equal(StorageFailureKind.ReadOnly, saved.Failure?.Kind);
+            Assert.Null(store.SavedBytes);
+        }
+        catalog.Current = null;
+        var deleted = await service.SaveTextAsync(old, "assets", "notes.txt", "draft",
+            TextCharset.Utf8, false, "text/plain", null, CancellationToken.None);
+        Assert.Equal(StorageFailureKind.CredentialMissing, deleted.Failure?.Kind);
+        Assert.Null(store.SavedBytes);
+    }
+
+    private sealed class SingleFactory(IObjectStorageProvider provider) : IObjectStorageProviderFactory
+    {
+        public IObjectStorageProvider Create(StorageProviderKind kind) => provider;
+    }
+
+    private sealed class PreviewStore : IObjectStorageProvider
+    {
+        public bool ConditionalOverwriteUnsupported { get; set; }
+        public ObjectHead Head { get; set; } = new("assets", "notes.txt", 0, null, null);
+        public byte[] Body { get; set; } = [];
+        public bool Truncate { get; set; }
+        public bool Conflict { get; set; }
+        public bool CancelAfterWrite { get; set; }
+        public bool ThrowAfterWrite { get; set; }
+        public CancellationTokenSource? CancellationSource { get; set; }
+        public int Downloads { get; private set; }
+        public int Reads { get; private set; }
+        public string? SavedType { get; private set; }
+        public string? SavedMatch { get; private set; }
+        public byte[]? SavedBytes { get; private set; }
+
+        public StorageProviderKind Kind => StorageProviderKind.Minio;
+        public ProviderCapabilities Capabilities { get; } = ConnectionPlanner.Capabilities(StorageProviderKind.Minio);
+
+        public Task<IReadOnlyList<StorageBucket>> ListBucketsAsync(
+            StorageConnection connection, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<StoragePage<StorageObject>> ListObjectsAsync(
+            StorageConnection connection, string bucket, string prefix, string? continuationToken, int pageSize,
+            CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<PrefixPage> ListPrefixAsync(
+            StorageConnection connection, string bucket, string prefix, string? continuationToken, int pageSize,
+            CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<bool> ObjectExistsAsync(
+            StorageConnection connection, string bucket, string key, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task CopyObjectAsync(
+            StorageConnection connection, string sourceBucket, string sourceKey, string destinationBucket,
+            string destinationKey, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task UploadAsync(
+            StorageConnection connection, string bucket, string key, Stream content, string? contentType,
+            IProgress<long>? progress, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public async Task DownloadAsync(
+            StorageConnection connection, string bucket, string key, Stream destination, IProgress<long>? progress,
+            CancellationToken cancellationToken)
+        {
+            Downloads++;
+            await destination.WriteAsync(Body, cancellationToken);
+            progress?.Report(Body.Length);
+            if (CancelAfterWrite)
+                CancellationSource?.Cancel();
+            if (ThrowAfterWrite)
+                throw new IOException("Injected remote download interruption.");
+        }
+
+        public Task DeleteAsync(
+            StorageConnection connection, string bucket, string key, CancellationToken cancellationToken) =>
+            throw new NotSupportedException();
+
+        public Task<ObjectHead> HeadObjectAsync(
+            StorageConnection connection, string bucket, string key, CancellationToken cancellationToken) =>
+            Task.FromResult(Head);
+
+        public Task<ObjectBody> ReadObjectAsync(
+            StorageConnection connection, string bucket, string key, int maxBytes, CancellationToken cancellationToken)
+        {
+            Reads++;
+            return Task.FromResult(new ObjectBody(Head, Body, Truncate));
+        }
+
+        public Task<ObjectHead> ReplaceObjectAsync(
+            StorageConnection connection, string bucket, string key, Stream content, string? contentType,
+            string? ifMatchETag, CancellationToken cancellationToken)
+        {
+            if (ConditionalOverwriteUnsupported && !string.IsNullOrWhiteSpace(ifMatchETag))
+                throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+                    "ConditionalOverwriteUnsupported", null, null, null));
+            if (Conflict)
+                throw new StorageException(new StorageFailure(
+                    StorageFailureKind.PreconditionFailed, "PreconditionFailed", 412, null, null));
+            SavedType = contentType;
+            SavedMatch = ifMatchETag;
+            using var buffer = new MemoryStream();
+            content.CopyTo(buffer);
+            SavedBytes = buffer.ToArray();
+            return Task.FromResult(Head with { SizeBytes = SavedBytes.Length, ETag = "\"next\"" });
+        }
+    }
+}
