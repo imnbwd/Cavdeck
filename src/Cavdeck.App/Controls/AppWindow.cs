@@ -6,6 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Markup;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Cavdeck.App.Localization;
@@ -139,6 +140,7 @@ public class AppWindow : Window
         if (_texts != null)
             _texts.PropertyChanged -= OnTextsChanged;
         _texts = texts;
+        ApplyUiLanguage();
         _texts.PropertyChanged += OnTextsChanged;
         UpdateChromeText();
     }
@@ -231,7 +233,23 @@ public class AppWindow : Window
         System.Windows.Automation.AutomationProperties.SetName(button, label);
     }
 
-    private void OnTextsChanged(object? sender, PropertyChangedEventArgs e) => UpdateChromeText();
+    private void OnTextsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(LocalizationService.CurrentLanguage))
+            ApplyUiLanguage();
+
+        UpdateChromeText();
+    }
+
+    private void ApplyUiLanguage()
+    {
+        if (_texts is null)
+            return;
+
+        // WPF uses FrameworkElement.Language when selecting glyphs from
+        // GlobalUserInterface.CompositeFont (e.g. Microsoft YaHei UI for zh-CN).
+        Language = XmlLanguage.GetLanguage(_texts.CurrentLanguage);
+    }
 
     private void SystemMenu_Click(object sender, RoutedEventArgs e)
     {
