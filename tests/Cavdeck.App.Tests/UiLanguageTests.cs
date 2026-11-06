@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using Cavdeck.App.Controls;
 using Cavdeck.App.Localization;
 using Xunit;
@@ -31,9 +32,10 @@ public sealed class UiLanguageTests
                 foreach (var language in new[] { "zh-CN", "en-US", "ja-JP", "de-DE" })
                 {
                     texts.ChangeLanguage(language);
+                    var expectedLanguage = XmlLanguage.GetLanguage(language).IetfLanguageTag;
 
-                    Assert.Equal(language, window.Language.IetfLanguageTag);
-                    Assert.Equal(language, content.Language.IetfLanguageTag);
+                    Assert.Equal(expectedLanguage, window.Language.IetfLanguageTag);
+                    Assert.Equal(expectedLanguage, content.Language.IetfLanguageTag);
                 }
             }
             catch (Exception exception)
