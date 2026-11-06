@@ -68,7 +68,7 @@
   <Style x:Key="AppWindowStyle" TargetType="controls:AppWindow">
     <Setter Property="Icon" Value="pack://application:,,,/Assets/Cavdeck.ico"/>
     <Setter Property="WindowStyle" Value="None"/>
-    <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI"/>
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
     <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
     <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
