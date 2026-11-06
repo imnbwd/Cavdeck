@@ -48,7 +48,14 @@ public partial class ExplorerView : UserControl
         _objectsGridReflowTimer.Tick += ObjectsGridReflowTimer_Tick;
         DataContextChanged += (_, _) => { ClearDropFeedback(); HookLanguage(); };
         Loaded += (_, _) => { ClearDropFeedback(); HookLanguage(); };
-        IsVisibleChanged += (_, _) => { if (!IsVisible) ClearDropFeedback(); };
+        IsVisibleChanged += (_, _) =>
+        {
+            if (!IsVisible)
+            {
+                _explorer?.CancelGoToPath();
+                ClearDropFeedback();
+            }
+        };
         Unloaded += (_, _) =>
         {
             _objectsGridReflowTimer.Stop();
@@ -95,6 +102,7 @@ public partial class ExplorerView : UserControl
         ClearPendingEmptyObjectsFocus();
         if (_explorer is null)
             return;
+        _explorer.CancelGoToPath();
         _explorer.PropertyChanged -= OnExplorerChanged;
         _explorer.SelectionSyncRequested -= OnSelectionSyncRequested;
         _explorer.Rows.CollectionChanged -= MarqueeRowsChanged;

@@ -21,7 +21,10 @@ public sealed class JsonPlaceStore : IPlaceStore
         await using var stream = await Task.Run(() => new FileStream(_filePath, FileMode.Open,
             FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous), cancellationToken);
         var loaded = await JsonSerializer.DeserializeAsync<PlaceSnapshot>(stream, Options, cancellationToken);
-        return new PlaceSnapshot(loaded?.Favorites ?? [], loaded?.Recent ?? []);
+        return new PlaceSnapshot(loaded?.Favorites ?? [], loaded?.Recent ?? [])
+        {
+            PathHistory = loaded?.PathHistory ?? []
+        };
     }
 
     public async Task SaveAsync(PlaceSnapshot snapshot, CancellationToken cancellationToken = default)

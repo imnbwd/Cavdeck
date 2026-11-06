@@ -9,6 +9,7 @@ public sealed record PrefixSearchCursor(string? ContinuationToken, int Offset);
 public sealed record PrefixSearchResult(string Prefix, IReadOnlyList<ObjectEntry> Matches,
     int ScannedObjects, int Requests, bool Complete, PrefixSearchCursor? Cursor = null);
 public sealed record OperationScanProgress(int ScannedObjects, int ListRequests, int ExistenceChecks);
+public sealed record ResolvedExplorerPath(string Bucket, BrowseResult Listing, ObjectHead? File = null);
 public enum CopyStage { Checking, Copying, Removing, Deleting }
 public sealed record CopyProgress(CopyStage Stage, int Completed, int Total);
 public sealed record DeletePreview(Guid ConnectionId, string Bucket, IReadOnlyList<string> Keys, int ListRequests)
@@ -172,11 +173,80 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         var visible = VisiblePrefix(connection, prefix);
         var page = await Provider(connection).ListPrefixAsync(
             connection, bucket, visible, continuationToken, PageSize, cancellationToken);
-        return new BrowseResult(
-            visible,
-            ObjectLayout.Compose(visible, page.CommonPrefixes, page.Objects),
-            page.ContinuationToken);
+        return ComposePage(visible, page);
     }
+
+    public Task<ResolvedExplorerPath?> ResolvePathAsync(
+        StorageConnection connection, string bucket, string currentPrefix, string input,
+        CancellationToken cancellationToken) =>
+        ResolvePathAsync(connection, bucket, currentPrefix, new ExplorerPathInput(input), cancellationToken);
+
+    public async Task<ResolvedExplorerPath?> ResolvePathAsync(
+        StorageConnection connection, string sourceBucket, string currentPrefix, ExplorerPathInput input,
+        CancellationToken cancellationToken)
+    {
+        var root = ObjectLayout.RootPrefix(connection);
+        var current = VisiblePrefix(connection, currentPrefix);
+        var issue = ExplorerPath.ParseTarget(input, sourceBucket, root, current, out var bucket, out var path);
+        if (issue != ExplorerPathIssue.None)
+            throw new StorageException(ObjectLayout.Named("ExplorerPath_" + issue));
+
+        ObjectAccess.Ensure(connection, bucket, path.Key, write: false);
+        if (!path.Key.StartsWith(root, StringComparison.Ordinal))
+            throw new StorageException(new StorageFailure(
+                StorageFailureKind.AccessDenied, "RestrictedPrefix", null, null, null));
+        var parent = path.Key[..(path.Key.LastIndexOf('/') + 1)];
+        // The provider normalizes browse prefixes. Refuse a path that would list a different key.
+        if (ObjectLayout.NormalizePrefix(parent) != parent)
+            throw new StorageException(ObjectLayout.Named("ExplorerPath_Unbrowsable"));
+        cancellationToken.ThrowIfCancellationRequested();
+        var provider = Provider(connection);
+        if (!path.DirectoryOnly)
+        {
+            ObjectHead? file = null;
+            try
+            {
+                file = await provider.HeadObjectAsync(connection, bucket, path.Key, cancellationToken);
+            }
+            catch (StorageException exception) when (IsMissingObject(exception.Failure))
+            {
+                // Some S3-compatible HEAD responses have a bare 404 with no error body.
+            }
+
+            if (file is not null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var listing = await BrowseAsync(connection, bucket, parent, null, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                return new ResolvedExplorerPath(bucket, listing, file);
+            }
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (input.FileOnly)
+            return null;
+        var prefix = path.DirectoryOnly ? path.Key : path.Key + "/";
+        if (!ExplorerPath.FitsKey(prefix))
+            return null;
+        if (ObjectLayout.NormalizePrefix(prefix) != prefix)
+            return null;
+        var page = await provider.ListPrefixAsync(connection, bucket, prefix, null, PageSize, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var exists = prefix == root
+            || page.CommonPrefixes.Any(child => child.Length > prefix.Length && child.StartsWith(prefix, StringComparison.Ordinal))
+            || page.Objects.Any(item => item.Key.StartsWith(prefix, StringComparison.Ordinal))
+            || await provider.ObjectExistsAsync(connection, bucket, prefix, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return exists ? new ResolvedExplorerPath(bucket, ComposePage(prefix, page)) : null;
+    }
+
+    private static bool IsMissingObject(StorageFailure failure) =>
+        failure.Kind is StorageFailureKind.BucketNotFound or StorageFailureKind.Unknown
+        && (AlreadyGone(failure.ErrorCode) || failure.ErrorCode == "404"
+            || failure.ErrorCode is null && failure.StatusCode == 404);
+
+    private static BrowseResult ComposePage(string prefix, PrefixPage page) =>
+        new(prefix, ObjectLayout.Compose(prefix, page.CommonPrefixes, page.Objects), page.ContinuationToken);
 
     public async Task<MutationReport> CreateFolderAsync(
         StorageConnection connection, string bucket, string? prefix, string name,
@@ -819,9 +889,11 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
             : null;
     }
 
-    private static bool AlreadyGone(StorageException exception) =>
-        string.Equals(exception.Failure.ErrorCode, "NoSuchKey", StringComparison.OrdinalIgnoreCase)
-        || string.Equals(exception.Failure.ErrorCode, "NotFound", StringComparison.OrdinalIgnoreCase);
+    private static bool AlreadyGone(StorageException exception) => AlreadyGone(exception.Failure.ErrorCode);
+
+    private static bool AlreadyGone(string? errorCode) =>
+        string.Equals(errorCode, "NoSuchKey", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(errorCode, "NotFound", StringComparison.OrdinalIgnoreCase);
 
     private IObjectStorageProvider Provider(StorageConnection connection) =>
         providers.Create(connection.Provider);

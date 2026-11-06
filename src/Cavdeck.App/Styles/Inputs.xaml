@@ -478,8 +478,10 @@
                   CornerRadius="{DynamicResource RadiusSmall}"
                   Padding="{TemplateBinding Padding}"
                   SnapsToDevicePixels="True">
-            <ScrollViewer Focusable="False" HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+            <ScrollViewer Focusable="False"
+                          HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                          VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                          CanContentScroll="True">
               <ItemsPresenter/>
             </ScrollViewer>
           </Border>

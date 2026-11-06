@@ -20,7 +20,7 @@ public sealed class ShortcutSettingsTests
         var groups = ShortcutCatalog.Create(new LocalizationService());
         Assert.Equal(3, groups.Count);
         Assert.Equal(8, groups[0].Items.Count);
-        Assert.Equal(9, groups[1].Items.Count);
+        Assert.Equal(10, groups[1].Items.Count);
         Assert.Equal(2, groups[2].Items.Count);
         Assert.All(groups, group =>
         {
@@ -33,6 +33,8 @@ public sealed class ShortcutSettingsTests
         });
         Assert.Contains(groups[0].Items, item => item.Keys == "Ctrl + Shift + Tab");
         Assert.Contains(groups[1].Items, item => item.Keys == "Ctrl + V");
+        Assert.Contains(groups[1].Items, item => item.Keys == "Ctrl + G"
+            && item.Action == new LocalizationService()["ExplorerPath_Title"]);
         Assert.Contains(groups[2].Items, item => item.Keys == "Ctrl + S");
     }
 

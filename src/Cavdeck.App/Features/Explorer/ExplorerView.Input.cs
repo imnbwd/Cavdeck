@@ -63,7 +63,10 @@ public partial class ExplorerView
             e.Handled = true;
             return;
         }
-        if (IsEditingFocus())
+        var editing = IsEditingFocus();
+        if (TryExecuteWorkspaceShortcut(explorer, e, editing, SearchInput.IsKeyboardFocusWithin))
+            return;
+        if (editing)
             return;
 
         if (e.Key == Key.F5 && explorer.CanRefresh)
@@ -109,12 +112,35 @@ public partial class ExplorerView
             explorer.CutCommand.Execute(null);
             e.Handled = true;
         }
-        else if (e.Key == Key.V && Keyboard.Modifiers == ModifierKeys.Control && explorer.CanPaste)
-        {
-            explorer.PasteCommand.Execute(null);
-            e.Handled = true;
-        }
     }
+
+    internal static bool TryExecuteWorkspaceShortcut(ExplorerViewModel explorer, KeyEventArgs e,
+        bool editing = false, bool searchFocused = false)
+    {
+        if (!IsWorkspaceShortcut(e.Key, Keyboard.Modifiers, editing, searchFocused))
+            return false;
+
+        ICommand? command = e.Key switch
+        {
+            Key.G => explorer.GoToPathCommand,
+            Key.V when explorer.CanPaste => explorer.PasteCommand,
+            _ => null
+        };
+        if (command?.CanExecute(null) != true)
+            return false;
+
+        e.Handled = true;
+        command.Execute(null);
+        return true;
+    }
+
+    internal static bool IsWorkspaceShortcut(Key key, ModifierKeys modifiers, bool editing, bool searchFocused) =>
+        modifiers == ModifierKeys.Control && (key switch
+        {
+            Key.G => !editing || searchFocused,
+            Key.V => !editing,
+            _ => false
+        });
 
     private static bool IsEditingFocus()
     {

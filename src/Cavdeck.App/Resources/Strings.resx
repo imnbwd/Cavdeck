@@ -817,4 +817,25 @@ Repair the file and retry before changing connections.</value></data>
   <data name="Toast_CopyHelpText" xml:space="preserve"><value>Copies a sanitized report without file names, paths, account details, or credentials.</value></data>
   <data name="Toast_Copied" xml:space="preserve"><value>Diagnostic report copied.</value></data>
   <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>View failed transfers</value></data>
+  <data name="ExplorerPath_Title" xml:space="preserve"><value>Go to Path</value></data>
+  <data name="ExplorerPath_Description" xml:space="preserve"><value>Use / from the current bucket’s accessible root. Other paths are relative. Paste an s3:// URI to go to a named bucket.</value></data>
+  <data name="ExplorerPath_Label" xml:space="preserve"><value>Path</value></data>
+  <data name="ExplorerPath_Placeholder" xml:space="preserve"><value>Enter a folder or file path</value></data>
+  <data name="ExplorerPath_Go" xml:space="preserve"><value>Go</value></data>
+  <data name="ExplorerPath_Loading" xml:space="preserve"><value>Looking up path…</value></data>
+  <data name="ExplorerPath_Required" xml:space="preserve"><value>Enter a path.</value></data>
+  <data name="ExplorerPath_Unsupported" xml:space="preserve"><value>Local paths and other URL formats aren’t supported here.</value></data>
+  <data name="ExplorerPath_Invalid" xml:space="preserve"><value>A path can’t contain control characters, empty segments, “.” or “..”.</value></data>
+  <data name="ExplorerPath_TooLong" xml:space="preserve"><value>The object key exceeds 1,024 UTF-8 bytes.</value></data>
+  <data name="ExplorerPath_NotFound" xml:space="preserve"><value>No file or folder matches this path.</value></data>
+  <data name="ExplorerPath_Failed" xml:space="preserve"><value>Couldn’t look up the path.</value></data>
+  <data name="ExplorerPath_BucketMode" xml:space="preserve"><value>Bucket path</value></data>
+  <data name="ExplorerPath_BucketModeHint" xml:space="preserve"><value>Treat the first segment as the bucket name, for example assets/images/.</value></data>
+  <data name="ExplorerPath_Recent" xml:space="preserve"><value>Recent folders</value></data>
+  <data name="ExplorerPath_History" xml:space="preserve"><value>Input history</value></data>
+  <data name="ExplorerPath_ClearHistory" xml:space="preserve"><value>Clear input history</value></data>
+  <data name="ExplorerPath_ClearHistoryConfirm" xml:space="preserve"><value>Clear the Go to Path input history for this connection?</value></data>
+  <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>Explorer can’t open this folder without changing its key.</value></data>
+  <data name="ExplorerPath_Menu" xml:space="preserve"><value>Go to Path…</value></data>
+  <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>Go to Path (Ctrl+G)</value></data>
 </root>

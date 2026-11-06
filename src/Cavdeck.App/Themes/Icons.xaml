@@ -38,6 +38,7 @@
   <StreamGeometry x:Key="IconFolder">M2.4,6 H6.1 L7.3,4.4 H13.6 V12.6 H2.4 Z</StreamGeometry>
   <!-- Navigate to the parent folder. Distinct from the top-line arrow (IconUp) and upload action. -->
   <StreamGeometry x:Key="IconFolderUp">M2.5,3.7 H6 L7.4,5.3 H12.8 Q13.5,5.3 13.5,6 V12 Q13.5,12.7 12.8,12.7 H3.2 Q2.5,12.7 2.5,12 Z M8,10.8 V7.7 M6.5,9.2 L8,7.7 L9.5,9.2</StreamGeometry>
+  <StreamGeometry x:Key="IconGoToPath">M2.5,3.7 H6 L7.4,5.3 H12.8 Q13.5,5.3 13.5,6 V12 Q13.5,12.7 12.8,12.7 H3.2 Q2.5,12.7 2.5,12 Z M5.3,9 H10.7 M8.9,7.2 L10.7,9 L8.9,10.8</StreamGeometry>
   <StreamGeometry x:Key="IconFolderFileGlyph">M3,5.2 H6.2 L7.2,3 H13 V13 H3 Z</StreamGeometry>
   <StreamGeometry x:Key="IconFile">M4,3 H12 Q13,3 13,4 V12 Q13,13 12,13 H4 Q3,13 3,12 V4 Q3,3 4,3 Z</StreamGeometry>
   <!-- Recognizable unknown-file fallback: folded corner and an interior mark, in the shared 16px frame. -->

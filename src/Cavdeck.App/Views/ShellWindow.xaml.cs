@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using Cavdeck.App.Controls;
 using Cavdeck.App.ViewModels;
 using Cavdeck.App.Features.Diagnostics;
+using Cavdeck.App.Features.Explorer;
 using Cavdeck.App.Services;
 using Cavdeck.Application.Shell;
 using Cavdeck.Application.Abstractions;
@@ -189,6 +190,15 @@ public partial class ShellWindow : AppWindow
             e.Handled = true;
             return;
         }
+
+        // A directory change can remove the focused row and leave focus on the shell.
+        // Explorer owns these gestures when focus is within the workspace.
+        if (ExplorerView.IsWorkspaceShortcut(e.Key, Keyboard.Modifiers, editing: false, searchFocused: false)
+            && _viewModel.ShowExplorer && !_viewModel.IsSettingsOpen && !_viewModel.IsStorageMenuOpen
+            && _viewModel.ActiveTab?.Workspace is ExplorerWorkspace workspace
+            && IsWorkspaceShortcutShellSource(e.OriginalSource as DependencyObject, this)
+            && ExplorerView.TryExecuteWorkspaceShortcut(workspace.Explorer, e))
+            return;
 
         // Tab navigation remains available even when the current file editor has focus.
         var ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
@@ -766,6 +776,20 @@ public partial class ShellWindow : AppWindow
 
     private static bool IsTyping() =>
         Keyboard.FocusedElement is TextBox or PasswordBox or ComboBox;
+
+    internal static bool IsWorkspaceShortcutShellSource(DependencyObject? source, Window shell)
+    {
+        for (var node = source; node is Visual or System.Windows.Media.Media3D.Visual3D;
+             node = VisualTreeHelper.GetParent(node))
+        {
+            if (node is ExplorerView or TextBoxBase or PasswordBox or ComboBox or MenuBase)
+                return false;
+            if (ReferenceEquals(node, shell))
+                return true;
+        }
+
+        return false;
+    }
 
     private static bool IsCloseButton(DependencyObject? node)
     {
