@@ -133,8 +133,22 @@ public partial class ExplorerView
     private void Root_ContextMenuOpening(object sender, ContextMenuEventArgs e) =>
         Explorer?.RefreshPasteAvailability();
 
-    private void Root_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) =>
+    private void EmptyObjectsArea_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        // The empty-state surface has no interactive child. Give it keyboard focus
+        // so Explorer shortcuts continue to work after the object list disappears.
+        if (sender is UIElement surface && !surface.IsKeyboardFocusWithin)
+            surface.Focus();
+    }
+
+    private void Root_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
         Explorer?.RefreshPasteAvailability();
+
+        // Any intentional focus move into Explorer supersedes a pending focus restore.
+        if (_restoreEmptyObjectsFocus && e.NewFocus is DependencyObject focused && IsWithin(focused, Root))
+            ClearPendingEmptyObjectsFocus();
+    }
 
     private void Filter_KeyDown(object sender, KeyEventArgs e)
     {

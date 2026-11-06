@@ -12,6 +12,21 @@ public sealed class ExplorerKeyboardFocusTests
         .Single(grid => (string?)grid.Attribute(Xaml + "Name") == "ObjectsGrid");
 
     [Fact]
+    public void Empty_directory_surface_accepts_programmatic_focus_without_adding_a_tab_stop()
+    {
+        var xml = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckExplorerView.xaml"));
+        var root = xml.Root!;
+        var empty = xml.Descendants(Wpf + "Grid").Single(element =>
+            (string?)element.Attribute(Xaml + "Name") == "EmptyObjectsArea");
+
+        Assert.Equal("Root_LostKeyboardFocus", (string?)root.Attribute("LostKeyboardFocus"));
+        Assert.Equal("Root_GotKeyboardFocus", (string?)root.Attribute("GotKeyboardFocus"));
+        Assert.Equal("True", (string?)empty.Attribute("Focusable"));
+        Assert.Equal("False", (string?)empty.Attribute("KeyboardNavigation.IsTabStop"));
+        Assert.Equal("EmptyObjectsArea_PreviewMouseDown", (string?)empty.Attribute("PreviewMouseDown"));
+    }
+
+    [Fact]
     public void File_list_is_one_tab_stop_but_retains_native_row_interactions()
     {
         var xml = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckExplorerView.xaml"));

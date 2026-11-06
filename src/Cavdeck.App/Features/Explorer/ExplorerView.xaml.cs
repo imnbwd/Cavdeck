@@ -24,6 +24,8 @@ public partial class ExplorerView : UserControl
     private int _iconAnchor;
     private int _iconCaret = -1;
     private double _iconTileWidth = 164;
+    private IInputElement? _focusAfterBrowserHidden;
+    private bool _restoreEmptyObjectsFocus;
     private readonly ContextMenu _gridFileMenu;
     private readonly ContextMenu _iconsFileMenu;
     private readonly ContextMenu _gridDirectoryMenu;
@@ -90,6 +92,7 @@ public partial class ExplorerView : UserControl
     {
         CancelMarquee();
         ClearDropFeedback();
+        ClearPendingEmptyObjectsFocus();
         if (_explorer is null)
             return;
         _explorer.PropertyChanged -= OnExplorerChanged;
@@ -173,6 +176,98 @@ public partial class ExplorerView : UserControl
             // ordinary window resizing. Reflow only for this targeted change.
             ScheduleObjectsGridReflow();
         }
+
+        if (e.PropertyName is nameof(ExplorerViewModel.IsBusy)
+            or nameof(ExplorerViewModel.ShowEmptyObjects)
+            or nameof(ExplorerViewModel.ShowObjectList)
+            or nameof(ExplorerViewModel.ShowObjectIcons)
+            or nameof(ExplorerViewModel.ShowError)
+            or nameof(ExplorerViewModel.ShowEmptyBuckets)
+            or nameof(ExplorerViewModel.ShowNoMatches)
+            or nameof(ExplorerViewModel.ShowSearchPrompt)
+            or nameof(ExplorerViewModel.ShowSearchPartialEmpty))
+            TryRestoreEmptyObjectsFocus();
+    }
+
+    private void Root_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source)
+            return;
+
+        // Only consider focus that was inside a browser list. Losing focus while a
+        // list remains visible (e.g. Tab to the toolbar) is intentional navigation.
+        FrameworkElement? browser = IsWithin(source, ObjectsGrid) ? ObjectsGrid
+            : IsWithin(source, ObjectsIcons) ? ObjectsIcons
+            : IsWithin(source, BucketsGrid) ? BucketsGrid
+            : null;
+        if (browser is null)
+            return;
+
+        var nextFocus = e.NewFocus;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (!IsLoaded || !IsVisible || browser.IsVisible
+                || nextFocus is DependencyObject next && IsWithin(next, Root))
+                return;
+
+            _focusAfterBrowserHidden = nextFocus;
+            _restoreEmptyObjectsFocus = true;
+            TryRestoreEmptyObjectsFocus();
+        }, DispatcherPriority.Input);
+    }
+
+    private void TryRestoreEmptyObjectsFocus()
+    {
+        if (!_restoreEmptyObjectsFocus || !IsLoaded || !IsVisible)
+            return;
+
+        if (Explorer is not { } explorer)
+        {
+            ClearPendingEmptyObjectsFocus();
+            return;
+        }
+
+        // Navigation temporarily clears the rows before setting IsBusy. Do not
+        // restore focus during that transient state; wait for the final view state.
+        if (explorer.IsBusy)
+            return;
+
+        if (!explorer.ShowEmptyObjects)
+        {
+            if (explorer.ShowObjectList || explorer.ShowObjectIcons || explorer.ShowError
+                || explorer.ShowEmptyBuckets || explorer.ShowNoMatches
+                || explorer.ShowSearchPrompt || explorer.ShowSearchPartialEmpty
+                || !explorer.ShowObjects)
+                ClearPendingEmptyObjectsFocus();
+            return;
+        }
+
+        var expectedFocus = _focusAfterBrowserHidden;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (!_restoreEmptyObjectsFocus)
+                return;
+            if (!IsLoaded || !IsVisible
+                || Explorer is not { IsBusy: false, ShowEmptyObjects: true })
+                return;
+
+            // Do not steal focus if the user moved to another control while the
+            // destination was loading. Restore only if focus has not changed.
+            if (!ReferenceEquals(Keyboard.FocusedElement, expectedFocus))
+            {
+                ClearPendingEmptyObjectsFocus();
+                return;
+            }
+
+            ClearPendingEmptyObjectsFocus();
+            EmptyObjectsArea.Focus();
+        }, DispatcherPriority.Input);
+    }
+
+    private void ClearPendingEmptyObjectsFocus()
+    {
+        _restoreEmptyObjectsFocus = false;
+        _focusAfterBrowserHidden = null;
     }
 
     private void OnLanguageChanged(object? sender, PropertyChangedEventArgs e) => ApplyHeaders();
