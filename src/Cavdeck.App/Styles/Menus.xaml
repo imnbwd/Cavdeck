@@ -57,6 +57,7 @@
               </Grid>
             </Border>
             <Popup x:Name="PART_Popup"
+                   Language="{Binding Language, RelativeSource={RelativeSource TemplatedParent}}"
                    Placement="Right"
                    HorizontalOffset="-4"
                    AllowsTransparency="True"
@@ -141,7 +142,16 @@
     </Setter>
   </Style>
 
+  <!-- Popups are separate presentation roots. Copy the active UI language from
+       their placement target so CJK glyph fallback stays consistent with the shell. -->
+  <Style TargetType="ToolTip">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
+    <Setter Property="Language" Value="{Binding PlacementTarget.Language, RelativeSource={RelativeSource Self}}"/>
+  </Style>
+
   <Style TargetType="ContextMenu">
+    <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
+    <Setter Property="Language" Value="{Binding PlacementTarget.Language, RelativeSource={RelativeSource Self}}"/>
     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
