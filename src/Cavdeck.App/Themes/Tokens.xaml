@@ -9,6 +9,9 @@
   <sys:Double x:Key="Space5">24</sys:Double>
   <sys:Double x:Key="Space6">32</sys:Double>
 
+  <!-- Keep the UI font family centralized; WPF uses the active Language for CJK glyph fallback. -->
+  <FontFamily x:Key="FontFamilyUi">Segoe UI Variable, Segoe UI</FontFamily>
+
   <sys:Double x:Key="FontSizeCaption">11</sys:Double>
   <sys:Double x:Key="FontSizeSmall">12</sys:Double>
   <sys:Double x:Key="FontSizeBody">13</sys:Double>

@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Markup;
 using Cavdeck.App.Localization;
 
 namespace Cavdeck.App.Controls;
@@ -30,7 +31,10 @@ public sealed class DialogService
         var dialog = new AppDialog(request with { CloseText = closeText })
         {
             ConfirmPrimary = confirm,
-            ConfirmPrimaryAsync = confirmAsync
+            ConfirmPrimaryAsync = confirmAsync,
+            // AppDialog is a separate Window, so it must receive the same UI language
+            // as the owner instead of retaining WPF's default en-US language.
+            Language = XmlLanguage.GetLanguage(_texts.CurrentLanguage)
         };
         var ownerWindow = owner
             ?? System.Windows.Application.Current?.Windows.OfType<Window>().FirstOrDefault(window => window.IsActive)

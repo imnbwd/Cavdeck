@@ -23,7 +23,7 @@
       </ResourceDictionary.MergedDictionaries>
       <!-- Window styles in a merged dictionary are not applied. Keep this one here. -->
       <Style TargetType="Window">
-        <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUi}"/>
         <Setter Property="FontSize" Value="{DynamicResource FontSizeBody}"/>
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>

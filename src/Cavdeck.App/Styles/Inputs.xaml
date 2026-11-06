@@ -223,6 +223,7 @@
                      Margin="10,0,32,0"
                      Foreground="{TemplateBinding Foreground}"/>
             <Popup x:Name="PART_Popup"
+                   Language="{Binding Language, RelativeSource={RelativeSource TemplatedParent}}"
                    Placement="Bottom"
                    AllowsTransparency="True"
                    PopupAnimation="Fade"
