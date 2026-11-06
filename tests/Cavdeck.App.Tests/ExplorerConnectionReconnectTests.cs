@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Cavdeck.App.Tests;
 
-public sealed class ExplorerConnectionReconnectTests
+public sealed partial class ExplorerConnectionReconnectTests
 {
     [Theory]
     [InlineData(false)]
@@ -92,6 +92,10 @@ public sealed class ExplorerConnectionReconnectTests
     private sealed class Provider : IObjectStorageProvider, IObjectStorageProviderFactory
     {
         public List<string> BrowsedEndpoints { get; } = [];
+        public List<(string Prefix, string? Token)> BrowsedPages { get; } = [];
+        public List<string> BrowsedBuckets { get; } = [];
+        public Func<string, string?, CancellationToken, Task<PrefixPage>>? Browse { get; init; }
+        public Func<CancellationToken, Task<StoragePage<StorageObject>>>? Search { get; init; }
         public StorageProviderKind Kind => StorageProviderKind.Minio;
         public ProviderCapabilities Capabilities => ConnectionPlanner.Capabilities(Kind);
         public IObjectStorageProvider Create(StorageProviderKind kind) => this;
@@ -100,6 +104,10 @@ public sealed class ExplorerConnectionReconnectTests
             string? continuationToken, int pageSize, CancellationToken cancellationToken)
         {
             BrowsedEndpoints.Add(connection.Endpoint);
+            BrowsedPages.Add((prefix, continuationToken));
+            BrowsedBuckets.Add(bucket);
+            if (Browse is not null)
+                return Browse(prefix, continuationToken, cancellationToken);
             return Task.FromResult(new PrefixPage([], [new StorageObject(bucket, prefix + "notes.txt",
                 4, DateTimeOffset.UnixEpoch, "etag", "text/plain")], null));
         }
@@ -111,9 +119,10 @@ public sealed class ExplorerConnectionReconnectTests
         public Task<IReadOnlyList<StorageBucket>> ListBucketsAsync(StorageConnection connection,
             CancellationToken cancellationToken) => throw new NotSupportedException();
         public Task<StoragePage<StorageObject>> ListObjectsAsync(StorageConnection connection, string bucket,
-            string prefix, string? continuationToken, int pageSize, CancellationToken cancellationToken) => throw new NotSupportedException();
+            string prefix, string? continuationToken, int pageSize, CancellationToken cancellationToken) =>
+            Search?.Invoke(cancellationToken) ?? throw new NotSupportedException();
         public Task<bool> ObjectExistsAsync(StorageConnection connection, string bucket, string key,
-            CancellationToken cancellationToken) => throw new NotSupportedException();
+            CancellationToken cancellationToken) => Task.FromResult(false);
         public Task CopyObjectAsync(StorageConnection connection, string sourceBucket, string sourceKey,
             string destinationBucket, string destinationKey, CancellationToken cancellationToken) => throw new NotSupportedException();
         public Task UploadAsync(StorageConnection connection, string bucket, string key, Stream content,
@@ -123,6 +132,7 @@ public sealed class ExplorerConnectionReconnectTests
         public Task DeleteAsync(StorageConnection connection, string bucket, string key,
             CancellationToken cancellationToken) => throw new NotSupportedException();
         public Task<ObjectHead> ReplaceObjectAsync(StorageConnection connection, string bucket, string key,
-            Stream content, string? contentType, string? ifMatchETag, CancellationToken cancellationToken) => throw new NotSupportedException();
+            Stream content, string? contentType, string? ifMatchETag, CancellationToken cancellationToken) =>
+            Task.FromResult(new ObjectHead(bucket, key, content.Length, "saved-etag", contentType));
     }
 }

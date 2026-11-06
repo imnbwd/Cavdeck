@@ -4,6 +4,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Cavdeck.Application.Abstractions;
+using Cavdeck.Application.Explorer;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Domain.Storage;
 using Cavdeck.Domain.Transfers;
@@ -14,6 +15,70 @@ namespace Cavdeck.Infrastructure.Tests;
 
 public sealed class S3ObjectTransferIntegrationTests
 {
+    [Fact]
+    public async Task Minio_resolves_a_copied_uri_and_empty_marker_across_buckets()
+    {
+        var endpoint = Environment.GetEnvironmentVariable("CAVDECK_TEST_MINIO_ENDPOINT");
+        if (string.IsNullOrEmpty(endpoint))
+            return;
+
+        var access = Environment.GetEnvironmentVariable("CAVDECK_TEST_MINIO_ACCESS_KEY") ?? "testadmin";
+        var secret = Environment.GetEnvironmentVariable("CAVDECK_TEST_MINIO_SECRET_KEY") ?? "testsecret123";
+        using var setup = new AmazonS3Client(new BasicAWSCredentials(access, secret), new AmazonS3Config
+        {
+            ServiceURL = endpoint, AuthenticationRegion = "us-east-1", ForcePathStyle = true,
+            RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED,
+            ResponseChecksumValidation = ResponseChecksumValidation.WHEN_REQUIRED
+        });
+        var source = "cavdeck-path-source-" + Guid.NewGuid().ToString("N");
+        var target = "cavdeck-path-target-" + Guid.NewGuid().ToString("N");
+        const string file = "scope/資料%20 report.txt";
+        const string marker = "scope/empty/";
+        var created = new List<string>();
+        try
+        {
+            foreach (var bucket in new[] { source, target })
+            {
+                await setup.PutBucketAsync(new PutBucketRequest { BucketName = bucket });
+                created.Add(bucket);
+            }
+            await setup.PutObjectAsync(new PutObjectRequest { BucketName = target, Key = file, ContentBody = "test" });
+            using var markerData = new MemoryStream();
+            await setup.PutObjectAsync(new PutObjectRequest { BucketName = target, Key = marker, InputStream = markerData });
+
+            var connection = new StorageConnection(Guid.NewGuid(), "MinIO", StorageProviderKind.Minio,
+                endpoint, "us-east-1", "test", IsReadOnly: true, KeyPrefix: "scope/", ForcePathStyle: true);
+            using var factory = new S3ProviderFactory(new MemoryVault(access, secret));
+            var explorer = new ExplorerService(factory);
+
+            var resolved = await explorer.ResolvePathAsync(connection, source, "scope/",
+                ObjectLayout.ObjectUri(target, file), default);
+            Assert.Equal(target, resolved?.Bucket);
+            Assert.Equal(file, resolved?.File?.Key);
+            Assert.Equal("scope/", resolved?.Listing.Prefix);
+
+            var empty = await explorer.ResolvePathAsync(connection, source, "scope/",
+                new ExplorerPathInput(target + "/empty/", BucketPath: true), default);
+            Assert.Equal(target, empty?.Bucket);
+            Assert.Equal(marker, empty?.Listing.Prefix);
+            Assert.Empty(empty!.Listing.Entries);
+
+            var denied = await Assert.ThrowsAsync<StorageException>(() => explorer.ResolvePathAsync(
+                connection with { RestrictedBucket = source }, source, "scope/", ObjectLayout.ObjectUri(target, file), default));
+            Assert.Equal("RestrictedBucket", denied.Failure.ErrorCode);
+        }
+        finally
+        {
+            if (created.Contains(target))
+            {
+                await setup.DeleteObjectAsync(target, file);
+                await setup.DeleteObjectAsync(target, marker);
+            }
+            foreach (var bucket in created)
+                await setup.DeleteBucketAsync(bucket);
+        }
+    }
+
     [Fact]
     public async Task Minio_ranged_response_and_multipart_roundtrip()
     {

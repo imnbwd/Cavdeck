@@ -6,6 +6,34 @@ namespace Cavdeck.Application.Tests;
 public sealed class PlaceLibraryTests
 {
     [Fact]
+    public async Task Path_history_deduplicates_caps_and_clears_by_connection()
+    {
+        var store = new MemoryStore();
+        var library = new PlaceLibrary(store);
+        var id = Guid.NewGuid();
+        var other = Guid.NewGuid();
+        var entry = new PathHistoryEntry(id, "assets", "", new("first"), "assets", "file", true, DateTimeOffset.UtcNow);
+        await library.RecordVisitAsync(other, "assets", "", path: entry with { ConnectionId = other });
+        for (var index = 0; index < PlaceLibrary.PathHistoryLimit; index++)
+            await library.RecordVisitAsync(id, "assets", "", path: entry with { Key = $"file-{index}" });
+        var replaced = entry with { Key = "file-0", Input = new("s3://assets/file-0") };
+        await library.RecordVisitAsync(id, "assets", "", path: replaced);
+        Assert.Equal(PlaceLibrary.PathHistoryLimit, library.PathHistory.Count(item => item.ConnectionId == id));
+        Assert.Equal(replaced, library.PathHistory.First(item => item.ConnectionId == id));
+        await library.RecordVisitAsync(id, "assets", "", path: entry);
+        Assert.Equal(PlaceLibrary.PathHistoryLimit + 1, library.PathHistory.Count);
+
+        var restored = new PlaceLibrary(store);
+        await restored.LoadAsync();
+        Assert.Equal(library.PathHistory, restored.PathHistory);
+        await restored.ClearPathHistoryAsync(id);
+        Assert.Equal(other, Assert.Single(restored.PathHistory).ConnectionId);
+        Assert.Equal(2, restored.Recent.Count);
+        await restored.PruneConnectionsAsync(new HashSet<Guid> { id });
+        Assert.Empty(restored.PathHistory);
+    }
+
+    [Fact]
     public async Task Favorites_toggle_and_recent_visits_are_distinct()
     {
         var store = new MemoryStore();

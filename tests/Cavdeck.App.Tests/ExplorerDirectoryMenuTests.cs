@@ -27,7 +27,7 @@ public sealed class ExplorerDirectoryMenuTests
             (string?)element.Attribute(Xaml + "Key") == "CurrentDirectoryMenu");
         Assert.Equal("False", (string?)menu.Attribute(Xaml + "Shared"));
         Assert.Contains("PlacementTarget.DataContext", (string?)menu.Attribute("DataContext"));
-        Assert.Equal(new[] { "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem", "Separator", "MenuItem", "MenuItem" },
+        Assert.Equal(new[] { "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem" },
             menu.Elements().Select(element => element.Name.LocalName));
 
         foreach (var (name, handler) in new[]
@@ -62,9 +62,16 @@ public sealed class ExplorerDirectoryMenuTests
         Assert.Equal(new[] { "NewFolderCommand", "NewTextFileCommand" },
             entries[3].Elements(Wpf + "MenuItem").Select(item =>
                 ((string?)item.Attribute("Command"))!.Split('.').Last().TrimEnd('}')));
-        Assert.Contains("RefreshCommand", (string?)entries[4].Attribute("Command"));
-        Assert.Equal("F5", (string?)entries[4].Attribute("InputGestureText"));
-        Assert.Contains("ToggleFavoriteCommand", (string?)entries[5].Attribute("Command"));
+        Assert.Equal("{Binding Explorer.GoToPathCommand}", (string?)entries[4].Attribute("Command"));
+        Assert.Equal("{Binding Texts[ExplorerPath_Menu]}", (string?)entries[4].Attribute("Header"));
+        Assert.Equal("Ctrl+G", (string?)entries[4].Attribute("InputGestureText"));
+        Assert.Equal("{StaticResource IconGoToPath}",
+            (string?)entries[4].Descendants(Wpf + "Path").Single().Attribute("Data"));
+        Assert.Single(view.Descendants(Wpf + "MenuItem"), entry =>
+            (string?)entry.Attribute("Command") == "{Binding Explorer.GoToPathCommand}");
+        Assert.Contains("RefreshCommand", (string?)entries[5].Attribute("Command"));
+        Assert.Equal("F5", (string?)entries[5].Attribute("InputGestureText"));
+        Assert.Contains("ToggleFavoriteCommand", (string?)entries[6].Attribute("Command"));
         Assert.All(menu.Descendants(Wpf + "Path"), path =>
             Assert.Equal("{StaticResource ContextMenuIconStyle}", (string?)path.Attribute("Style")));
         Assert.All(menu.Elements(Wpf + "Separator"), separator =>

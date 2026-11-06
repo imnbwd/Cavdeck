@@ -8,6 +8,205 @@ namespace Cavdeck.Application.Tests;
 public sealed class ExplorerServiceTests
 {
     [Fact]
+    public async Task Uri_does_not_browse_a_normalized_alias_of_a_literal_prefix()
+    {
+        var store = new MemoryStorage();
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var failure = await Assert.ThrowsAsync<StorageException>(() => service.ResolvePathAsync(
+            Connection() with { KeyPrefix = null }, "assets", "", "s3://other/ leading/file.txt", default));
+
+        Assert.Equal("ExplorerPath_Unbrowsable", failure.Failure.ErrorCode);
+        Assert.Empty(store.HeadKeys);
+        Assert.Empty(store.BrowsedPrefixes);
+    }
+
+    [Fact]
+    public async Task Recalling_a_deleted_file_does_not_open_a_same_named_folder()
+    {
+        var store = new MemoryStorage
+        {
+            HeadFailure = StorageFailureClassifier.FromS3("NoSuchKey", 404, null, null),
+            PrefixPage = new PrefixPage(["images/file/child/"], [], null)
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var result = await service.ResolvePathAsync(Connection(), "assets", "images/",
+            new ExplorerPathInput("s3://assets/images/file", FileOnly: true), default);
+
+        Assert.Null(result);
+        Assert.Equal("images/file", Assert.Single(store.HeadKeys));
+        Assert.Empty(store.BrowsedPrefixes);
+    }
+
+    [Fact]
+    public async Task Explicit_uri_uses_the_named_bucket_and_literal_key_with_a_single_listing()
+    {
+        var store = new MemoryStorage();
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var result = await service.ResolvePathAsync(Connection(), "source", "images/current/",
+            "s3://assets/images/資料%20#?.txt", default);
+
+        Assert.NotNull(result);
+        Assert.Equal("assets", result.Bucket);
+        Assert.Equal("assets", result.File?.Bucket);
+        Assert.Equal("images/資料%20#?.txt", Assert.Single(store.HeadKeys));
+        Assert.Equal("assets", Assert.Single(store.BrowsedBuckets));
+        Assert.Equal("images/", Assert.Single(store.BrowsedPrefixes));
+    }
+
+    [Theory]
+    [InlineData("s3://other/images/file", "assets", "RestrictedBucket")]
+    [InlineData("s3://assets/images-other/file", null, "RestrictedPrefix")]
+    [InlineData("s3://assets/images", null, "RestrictedPrefix")]
+    public async Task Explicit_uri_rejects_out_of_scope_targets_before_remote_requests(
+        string input, string? restrictedBucket, string code)
+    {
+        var store = new MemoryStorage();
+        var service = new ExplorerService(new SingleFactory(store));
+        var connection = Connection() with { RestrictedBucket = restrictedBucket };
+
+        var failure = await Assert.ThrowsAsync<StorageException>(() =>
+            service.ResolvePathAsync(connection, "assets", "images/current/", input, default));
+
+        Assert.Equal(code, failure.Failure.ErrorCode);
+        Assert.Empty(store.HeadKeys);
+        Assert.Empty(store.BrowsedPrefixes);
+    }
+
+    [Theory]
+    [InlineData("child-file", "folder")]
+    [InlineData("child-prefix", "folder/")]
+    [InlineData("listed-marker", "folder/")]
+    [InlineData("head-marker", "folder/")]
+    [InlineData("missing", "folder")]
+    public async Task Go_to_path_checks_directory_evidence_and_returns_the_first_page(string evidence, string input)
+    {
+        const string prefix = "images/current/folder/";
+        StorageObject Item(string key) => new("assets", key, 0, DateTimeOffset.UnixEpoch, null, null);
+        var store = new MemoryStorage
+        {
+            PrefixPage = new PrefixPage(
+                evidence == "child-prefix" ? [prefix + "sub/"] : [],
+                evidence == "child-file" ? [Item(prefix + "file.txt")] :
+                    evidence == "listed-marker" ? [Item(prefix)] : [],
+                evidence == "child-file" ? "next" : null),
+            Existing = evidence == "head-marker" ? [prefix] : [],
+            HeadFailure = StorageFailureClassifier.FromS3(null, 404, "head-request", null)
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var result = await service.ResolvePathAsync(Connection(), "assets", "images/current/", input, default);
+
+        Assert.Equal(prefix, Assert.Single(store.BrowsedPrefixes));
+        if (input.EndsWith('/'))
+            Assert.Empty(store.HeadKeys);
+        else
+            Assert.Equal(prefix[..^1], Assert.Single(store.HeadKeys));
+        if (evidence is "head-marker" or "missing")
+            Assert.Equal(prefix, Assert.Single(store.ExistenceKeys));
+        else
+            Assert.Empty(store.ExistenceKeys);
+        if (evidence == "missing")
+        {
+            Assert.Null(result);
+            return;
+        }
+
+        Assert.NotNull(result);
+        Assert.Null(result.File);
+        Assert.Equal(prefix, result.Listing.Prefix);
+        Assert.Equal(store.PrefixPage.ContinuationToken, result.Listing.ContinuationToken);
+        Assert.Equal(evidence is "child-prefix" or "child-file" ? 1 : 0, result.Listing.Entries.Count);
+    }
+
+    [Theory]
+    [InlineData("/photos/Logo", "images/photos/", true)]
+    [InlineData("/photos/Logo/", "images/photos/Logo/", false)]
+    public async Task Go_to_path_prefers_exact_file_unless_directory_is_requested(
+        string input, string expectedPrefix, bool isFile)
+    {
+        var store = new MemoryStorage
+        {
+            PrefixPage = new PrefixPage(["images/photos/Logo/child/"], [], null)
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var result = await service.ResolvePathAsync(Connection(), "assets", "images/current/", input, default);
+
+        Assert.NotNull(result);
+        Assert.Equal(expectedPrefix, result.Listing.Prefix);
+        Assert.Equal(expectedPrefix, Assert.Single(store.BrowsedPrefixes));
+        if (isFile)
+        {
+            Assert.Equal("images/photos/Logo", Assert.Single(store.HeadKeys));
+            Assert.Equal("images/photos/Logo", result.File?.Key);
+            Assert.Equal("mock-etag", result.File?.ETag);
+        }
+        else
+        {
+            Assert.Empty(store.HeadKeys);
+            Assert.Null(result.File);
+        }
+    }
+
+    [Fact]
+    public async Task Go_to_path_keeps_the_accessible_root_even_when_empty_and_enforces_scope()
+    {
+        var store = new MemoryStorage();
+        var service = new ExplorerService(new SingleFactory(store));
+        var connection = Connection() with { RestrictedBucket = "assets", IsReadOnly = true };
+
+        var root = await service.ResolvePathAsync(connection, "assets", "images/current/", "/", default);
+
+        Assert.Equal("images/", root?.Listing.Prefix);
+        Assert.Empty(root!.Listing.Entries);
+        Assert.Empty(store.ExistenceKeys);
+        var wrongBucket = await Assert.ThrowsAsync<StorageException>(() =>
+            service.ResolvePathAsync(connection, "other", "images/", "/", default));
+        var wrongPrefix = await Assert.ThrowsAsync<StorageException>(() =>
+            service.ResolvePathAsync(connection, "assets", "images-other/", "file", default));
+        Assert.Equal("RestrictedBucket", wrongBucket.Failure.ErrorCode);
+        Assert.Equal("RestrictedPrefix", wrongPrefix.Failure.ErrorCode);
+        Assert.Equal("images/", Assert.Single(store.BrowsedPrefixes));
+        Assert.Empty(store.HeadKeys);
+    }
+
+    [Theory]
+    [InlineData(StorageFailureKind.AccessDenied, "AccessDenied", 403)]
+    [InlineData(StorageFailureKind.InvalidCredentials, "InvalidAccessKeyId", 403)]
+    [InlineData(StorageFailureKind.Network, null, null)]
+    [InlineData(StorageFailureKind.BucketNotFound, "NoSuchBucket", 404)]
+    public async Task Go_to_path_preserves_head_failures(StorageFailureKind kind, string? code, int? status)
+    {
+        var failure = new StorageFailure(kind, code, status, "request-id", null);
+        var store = new MemoryStorage { HeadFailure = failure };
+        var service = new ExplorerService(new SingleFactory(store));
+
+        var thrown = await Assert.ThrowsAsync<StorageException>(() =>
+            service.ResolvePathAsync(Connection(), "assets", "images/", "file", default));
+
+        Assert.Same(failure, thrown.Failure);
+        Assert.Empty(store.BrowsedPrefixes);
+        Assert.Empty(store.ExistenceKeys);
+    }
+
+    [Fact]
+    public async Task Go_to_path_cancellation_after_listing_stops_the_marker_check()
+    {
+        using var stop = new CancellationTokenSource();
+        var store = new MemoryStorage { AfterBrowse = stop.Cancel };
+        var service = new ExplorerService(new SingleFactory(store));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            service.ResolvePathAsync(Connection(), "assets", "images/", "folder/", stop.Token));
+
+        Assert.Single(store.BrowsedPrefixes);
+        Assert.Empty(store.ExistenceKeys);
+    }
+
+    [Fact]
     public async Task Prefix_search_scans_every_page_under_the_current_prefix()
     {
         var store = new MemoryStorage
@@ -721,6 +920,12 @@ public sealed class ExplorerServiceTests
         public bool ChangeSourceBeforeConditionalDelete { get; set; }
         public HashSet<string> FailCopies { get; set; } = [];
         public PrefixPage PrefixPage { get; set; } = new([], [], null);
+        public List<string> BrowsedPrefixes { get; } = [];
+        public List<string> BrowsedBuckets { get; } = [];
+        public List<string> HeadKeys { get; } = [];
+        public System.Collections.Concurrent.ConcurrentQueue<string> ExistenceKeys { get; } = new();
+        public StorageFailure? HeadFailure { get; init; }
+        public Action? AfterBrowse { get; init; }
         public StorageObject[] Objects { get; set; } = [];
         public StorageObject[][]? Pages { get; set; }
         public int PageSize { get; private set; }
@@ -759,12 +964,16 @@ public sealed class ExplorerServiceTests
             CancellationToken cancellationToken)
         {
             PageSize = pageSize;
+            BrowsedPrefixes.Add(prefix);
+            BrowsedBuckets.Add(bucket);
+            AfterBrowse?.Invoke();
             return Task.FromResult(PrefixPage);
         }
 
         public async Task<bool> ObjectExistsAsync(
             StorageConnection connection, string bucket, string key, CancellationToken cancellationToken)
         {
+            ExistenceKeys.Enqueue(key);
             if (ExistenceDelay > TimeSpan.Zero)
             {
                 var active = Interlocked.Increment(ref _activeChecks);
@@ -825,9 +1034,14 @@ public sealed class ExplorerServiceTests
         }
 
         public Task<ObjectHead> HeadObjectAsync(
-            StorageConnection connection, string bucket, string key, CancellationToken cancellationToken) =>
-            Task.FromResult(new ObjectHead(bucket, key,
-                ExistingObjects.Contains((bucket, key)) ? 1 : 0, "mock-etag", null));
+            StorageConnection connection, string bucket, string key, CancellationToken cancellationToken)
+        {
+            HeadKeys.Add(key);
+            return HeadFailure is { } failure
+                ? Task.FromException<ObjectHead>(new StorageException(failure))
+                : Task.FromResult(new ObjectHead(bucket, key,
+                    ExistingObjects.Contains((bucket, key)) ? 1 : 0, "mock-etag", null));
+        }
 
         public Task<ObjectBody> ReadObjectAsync(
             StorageConnection connection, string bucket, string key, int maxBytes, CancellationToken cancellationToken) =>

@@ -817,4 +817,25 @@
   <data name="Toast_CopyHelpText" xml:space="preserve"><value>复制已脱敏的诊断报告，不包含文件名、路径、账户信息或凭据。</value></data>
   <data name="Toast_Copied" xml:space="preserve"><value>已复制诊断报告。</value></data>
   <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>查看失败传输</value></data>
+  <data name="ExplorerPath_Title" xml:space="preserve"><value>前往路径</value></data>
+  <data name="ExplorerPath_Description" xml:space="preserve"><value>以 / 开头可从当前存储桶的可访问根目录定位，其余路径相对于当前文件夹。也可以粘贴 s3:// URI，打开指定存储桶中的路径。</value></data>
+  <data name="ExplorerPath_Label" xml:space="preserve"><value>路径</value></data>
+  <data name="ExplorerPath_Placeholder" xml:space="preserve"><value>输入文件夹或文件路径</value></data>
+  <data name="ExplorerPath_Go" xml:space="preserve"><value>前往</value></data>
+  <data name="ExplorerPath_Loading" xml:space="preserve"><value>正在查找路径…</value></data>
+  <data name="ExplorerPath_Required" xml:space="preserve"><value>请输入路径。</value></data>
+  <data name="ExplorerPath_Unsupported" xml:space="preserve"><value>此处不支持本地路径或其他 URL 格式。</value></data>
+  <data name="ExplorerPath_Invalid" xml:space="preserve"><value>路径中不能包含控制字符、空段、. 或 ..。</value></data>
+  <data name="ExplorerPath_TooLong" xml:space="preserve"><value>对象键的 UTF-8 长度超过 1,024 字节。</value></data>
+  <data name="ExplorerPath_NotFound" xml:space="preserve"><value>找不到此路径对应的文件或文件夹。</value></data>
+  <data name="ExplorerPath_Failed" xml:space="preserve"><value>无法查找此路径。</value></data>
+  <data name="ExplorerPath_BucketMode" xml:space="preserve"><value>存储桶路径</value></data>
+  <data name="ExplorerPath_BucketModeHint" xml:space="preserve"><value>将第一段作为存储桶名称，例如 assets/images/。</value></data>
+  <data name="ExplorerPath_Recent" xml:space="preserve"><value>最近访问的文件夹</value></data>
+  <data name="ExplorerPath_History" xml:space="preserve"><value>输入历史</value></data>
+  <data name="ExplorerPath_ClearHistory" xml:space="preserve"><value>清除输入历史</value></data>
+  <data name="ExplorerPath_ClearHistoryConfirm" xml:space="preserve"><value>清除当前连接的「前往路径」输入历史？</value></data>
+  <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>资源管理器无法在保留原始对象键的情况下打开此文件夹。</value></data>
+  <data name="ExplorerPath_Menu" xml:space="preserve"><value>前往路径…</value></data>
+  <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>前往路径（Ctrl+G）</value></data>
 </root>

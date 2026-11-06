@@ -30,6 +30,7 @@ public static class ShortcutCatalog
             new(texts["Shortcuts_GroupExplorer"],
             [
                 Entry("Shortcuts_Search", "Ctrl + F"),
+                Entry("ExplorerPath_Title", "Ctrl + G"),
                 Entry("Shortcuts_Refresh", "F5"),
                 Entry("Shortcuts_ParentFolder", "Backspace"),
                 Entry("Shortcuts_Open", "Enter"),

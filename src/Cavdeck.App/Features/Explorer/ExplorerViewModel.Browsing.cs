@@ -119,13 +119,14 @@ public sealed partial class ExplorerViewModel
         return GoToAsync(crumb.Location.Bucket, crumb.Location.Prefix, crumb.Location.Buckets);
     }
 
-    private async Task GoToAsync(string? bucket, string prefix, bool buckets, bool userMove = true)
+    private async Task GoToAsync(string? bucket, string prefix, bool buckets, bool userMove = true,
+        ResolvedExplorerPath? resolvedPath = null, PathHistoryEntry? pathHistory = null)
     {
         if (_connection is null || _disposed || _reconnectPending)
             return;
         if (userMove && _preview.IsDirty)
         {
-            _afterLeave = () => GoToAsync(bucket, prefix, buckets, userMove: true);
+            _afterLeave = () => GoToAsync(bucket, prefix, buckets, userMove: true, resolvedPath, pathHistory);
             _preview.MarkLeavePending();
             return;
         }
@@ -136,6 +137,8 @@ public sealed partial class ExplorerViewModel
         SetDropTarget(false);
         _operation?.Cancel();
         CancelSearch();
+        if (resolvedPath is not null)
+            ClearFilter();
         var generation = ++_generation;
         var token = ResetBrowse();
         _bucket = buckets ? null : bucket;
@@ -159,13 +162,15 @@ public sealed partial class ExplorerViewModel
         {
             if (buckets)
                 await LoadBucketsCoreAsync(generation, token);
+            else if (resolvedPath is not null)
+                ApplyObjectPage(resolvedPath.Listing, append: false, resolvedPath.File);
             else
                 await LoadObjectsCoreAsync(generation, token, append: false);
             if (generation == _generation && userMove && _error.Length == 0)
             {
                 try
                 {
-                    await _places.RecordVisitAsync(_connection.Id, _bucket, _prefix, token);
+                    await _places.RecordVisitAsync(_connection.Id, _bucket, _prefix, token, pathHistory);
                 }
                 catch (OperationCanceledException) { }
                 catch (Exception)
@@ -204,19 +209,41 @@ public sealed partial class ExplorerViewModel
         var result = await _explorer.BrowseAsync(_connection!, _bucket!, _prefix, append ? _continuation : null, token);
         if (generation != _generation)
             return;
+        ApplyObjectPage(result, append);
+    }
+
+    private void ApplyObjectPage(BrowseResult result, bool append, ObjectHead? file = null)
+    {
         _prefix = result.Prefix;
         _continuation = result.ContinuationToken;
+        var entries = result.Entries;
         if (!append)
+        {
             _loaded.Clear();
-        _loaded.AddRange(result.Entries);
+            _injectedPathKey = null;
+            if (file is not null && !entries.Any(entry => entry.Key == file.Key))
+            {
+                _injectedPathKey = file.Key;
+                entries = [.. entries, new ObjectEntry(ObjectEntryKind.File, ObjectLayout.DisplayName(file.Key),
+                    file.Key, file.SizeBytes, null, file.ETag)];
+            }
+        }
+        else if (_injectedPathKey is not null)
+            entries = entries.Where(entry => entry.Key != _injectedPathKey).ToList();
+        _loaded.AddRange(entries);
         // Keep the default Name-ascending view incremental: do not reset existing
         // row instances (and therefore selection) every time another page loads.
         if (append && _sorted && _sort == ListingSort.Name && !_descending && !HasFilter)
-            ExplorerNameSortedPage.Append(Rows, result.Entries, _texts);
+            ExplorerNameSortedPage.Append(Rows, entries, _texts);
         else
             PublishRows(append && !_sorted && !HasFilter);
         RebuildCrumbs();
-        if (_selected.Count == 0)
+        if (file is not null && Rows.FirstOrDefault(row => row.Entry.Key == file.Key) is { } target)
+        {
+            ApplySelection([target], file);
+            SelectionSyncRequested?.Invoke(this, EventArgs.Empty);
+        }
+        else if (_selected.Count == 0)
             RefreshContextDetail();
     }
 

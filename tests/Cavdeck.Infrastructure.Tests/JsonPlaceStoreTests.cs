@@ -15,12 +15,17 @@ public sealed class JsonPlaceStoreTests
         {
             var path = Path.Combine(directory, "places.json");
             var store = new JsonPlaceStore(path);
+            await File.WriteAllTextAsync(path, """{"Favorites":[],"Recent":[]}""");
+            Assert.Empty((await store.LoadAsync()).PathHistory);
             var place = new SavedPlace(Guid.NewGuid(), "assets", "images/", DateTimeOffset.UtcNow);
-            await store.SaveAsync(new PlaceSnapshot([place], [place]));
+            var history = new PathHistoryEntry(place.ConnectionId, "source", "old/", new("assets/images/", true),
+                "assets", "images/", false, place.VisitedAt);
+            await store.SaveAsync(new PlaceSnapshot([place], [place]) { PathHistory = [history] });
 
             var loaded = await new JsonPlaceStore(path).LoadAsync();
             Assert.Equal(place, Assert.Single(loaded.Favorites));
             Assert.Equal(place, Assert.Single(loaded.Recent));
+            Assert.Equal(history, Assert.Single(loaded.PathHistory));
             Assert.DoesNotContain("SecretAccessKey", await File.ReadAllTextAsync(path));
         }
         finally

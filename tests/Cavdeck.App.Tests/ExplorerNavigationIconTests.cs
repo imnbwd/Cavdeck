@@ -11,6 +11,28 @@ public sealed class ExplorerNavigationIconTests
     private static readonly XNamespace Xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
 
     [Fact]
+    public void Go_to_path_is_a_localized_navigation_button_with_a_distinct_icon()
+    {
+        var view = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckExplorerView.xaml"));
+        var button = Assert.Single(view.Descendants(Wpf + "Button"), element =>
+            (string?)element.Attribute("Command") == "{Binding Explorer.GoToPathCommand}");
+        Assert.Equal("{Binding Explorer.RefreshCommand}", (string?)button.ElementsBeforeSelf().Last().Attribute("Command"));
+        Assert.Contains("Explorer.ShowObjects", (string?)button.Attribute("Visibility"));
+        Assert.Equal("{Binding Texts[ExplorerPath_Tooltip]}", (string?)button.Attribute("ToolTip"));
+        Assert.Equal("{Binding Texts[ExplorerPath_Title]}", (string?)button.Attribute("AutomationProperties.Name"));
+        Assert.Equal("{StaticResource ExplorerTool}", (string?)button.Attribute("Style"));
+
+        var glyph = Assert.Single(button.Elements(Wpf + "Path"));
+        Assert.Equal("{StaticResource IconGlyph}", (string?)glyph.Attribute("Style"));
+        Assert.Equal("{StaticResource IconGoToPath}", (string?)glyph.Attribute("Data"));
+        var geometry = Read("IconGoToPath");
+        var stroke = new Pen(Brushes.Black, 1.5);
+        Assert.True(geometry.StrokeContains(stroke, new Point(10.7, 9)));
+        Assert.NotEqual(Read("IconFolderUp").ToString(), geometry.ToString());
+        Assert.True(new Rect(0, 0, 16, 16).Contains(geometry.GetRenderBounds(stroke)));
+    }
+
+    [Fact]
     public void Up_button_uses_a_parent_folder_icon_without_changing_its_navigation_command()
     {
         var view = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckExplorerView.xaml"));

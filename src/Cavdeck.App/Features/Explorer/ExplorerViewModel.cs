@@ -55,6 +55,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private string? _bucket;
     private string _prefix = "";
     private string? _continuation;
+    private string? _injectedPathKey;
     private string _filter = "";
     private int _searchScopeIndex;
     private string _searchDisplayPrefix = "";
@@ -98,6 +99,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private readonly PreviewPaneViewModel _preview;
     private Func<Task>? _afterLeave;
     private bool _showPreviewForClose;
+    private int _leaveConfirmationId;
 
     public ExplorerViewModel(
         ExplorerService explorer,
@@ -145,6 +147,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         transfers.BatchChanged += OnCopyBatchChanged;
 
         RefreshCommand = CreateAsyncCommand(_ => RefreshAsync());
+        GoToPathCommand = new RelayCommand(_ => RunUiOperation(() => GoToPathAsync(ShowGoToPathPrompt)),
+            _ => CanGoToPath);
         LoadMoreCommand = CreateAsyncCommand(_ => LoadMoreAsync());
         RunSearchCommand = CreateAsyncCommand(_ => RunSearchAsync());
         ContinueSearchCommand = CreateAsyncCommand(_ => RunSearchAsync(continueExisting: true));
@@ -206,6 +210,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     public string PathText { get; private set; } = "";
 
     public ICommand RefreshCommand { get; }
+    public RelayCommand GoToPathCommand { get; }
     public ICommand LoadMoreCommand { get; }
     public ICommand RunSearchCommand { get; }
     public ICommand ContinueSearchCommand { get; }
@@ -429,8 +434,14 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     // The tab remains alive until the editor resolves the pending leave.
     public Task<bool> ConfirmLeaveAsync()
     {
+        CancelGoToPath();
+        return ConfirmLeaveAsync(CancellationToken.None);
+    }
+
+    private async Task<bool> ConfirmLeaveAsync(CancellationToken cancellationToken)
+    {
         if (!_preview.IsDirty)
-            return Task.FromResult(true);
+            return true;
 
         _afterLeave = null; // Supersede any pending location change with the close request.
         // The user may have hidden the details pane while editing. A close
@@ -438,6 +449,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _showPreviewForClose = true;
         OnPropertyChanged(nameof(ShowSide));
         _preview.ShowContent();
+        var confirmationId = ++_leaveConfirmationId;
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         EventHandler? resolved = null;
         EventHandler? cancelled = null;
@@ -445,15 +457,27 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         {
             _preview.LeaveResolved -= resolved;
             _preview.LeaveCancelled -= cancelled;
-            _showPreviewForClose = false;
-            OnPropertyChanged(nameof(ShowSide));
+            if (confirmationId == _leaveConfirmationId && !_reconnectPending && !_disposed)
+            {
+                if (cancellationToken.IsCancellationRequested && _afterLeave is null && _preview.ShowLeaveBar)
+                    _preview.StayCommand.Execute(null);
+                _showPreviewForClose = false;
+                OnPropertyChanged(nameof(ShowSide));
+            }
         }
-        resolved = (_, _) => { Cleanup(); completion.TrySetResult(true); };
-        cancelled = (_, _) => { Cleanup(); completion.TrySetResult(false); };
+        resolved = (_, _) => completion.TrySetResult(true);
+        cancelled = (_, _) => completion.TrySetResult(false);
         _preview.LeaveResolved += resolved;
         _preview.LeaveCancelled += cancelled;
         _preview.MarkLeavePending();
-        return completion.Task;
+        try
+        {
+            return await completion.Task.WaitAsync(cancellationToken);
+        }
+        finally
+        {
+            Cleanup();
+        }
     }
     public bool ShowSide => (_state.Preferences.ShowDetailsPane || _showPreviewForClose)
         && (_detail is not null || _preview.IsOpen);
@@ -564,7 +588,9 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     {
         SetDropTarget(false);
         _disposed = true;
+        GoToPathCommand.RaiseCanExecuteChanged();
         _generation++;
+        CancelGoToPath();
         _state.ExplorerDisplayChanged -= OnExplorerDisplayChanged;
         _clipboard.Changed -= OnClipboardChanged;
         _clipboard.StorageChanged -= OnStorageChanged;
@@ -586,6 +612,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     {
         if (_disposed || _connection?.Id != change.Current.Id)
             return;
+        CancelGoToPath();
         var previous = _connection;
         var reconnect = _reconnectPending || change.RequiresReconnect
             || new Cavdeck.Application.Connections.ConnectionChange(previous, change.Current).RequiresReconnect;
@@ -650,6 +677,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
 
     public async Task OpenPlaceAsync(ExplorerPlace place)
     {
+        CancelGoToPath();
         if (_reconnectPending)
         {
             await RetryReconnectAsync();
@@ -687,6 +715,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
 
     public async Task OpenAsync(StorageConnection connection)
     {
+        CancelGoToPath();
         if (_reconnectPending)
         {
             await RetryReconnectAsync();
@@ -899,11 +928,17 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         PublishRows(appendOnlyNewPage: false);
     }
 
-    private void ApplySelection(IReadOnlyList<ExplorerRow> rows)
+    private void ApplySelection(IReadOnlyList<ExplorerRow> rows, ObjectHead? knownHead = null)
     {
         _selected.Clear();
         _selected.AddRange(rows);
-        if (rows.Count == 1)
+        if (knownHead is not null)
+        {
+            CancelHeaderLoad();
+            _headerKey = knownHead.Key;
+            _headerHead = knownHead;
+        }
+        else if (rows.Count == 1)
             BeginHeaderLoad(rows[0]);
         else
             CancelHeaderLoad();
@@ -933,7 +968,10 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         var next = _afterLeave;
         _afterLeave = null;
         if (next is not null)
+        {
+            CancelGoToPath();
             RunUiOperation(next);
+        }
     }
 
     private void ApplySavedObject(ObjectHead head)
@@ -1030,6 +1068,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
 
     private void RaiseCommands()
     {
+        GoToPathCommand.RaiseCanExecuteChanged();
         if (CopyCommand is RelayCommand copy)
             copy.RaiseCanExecuteChanged();
         if (CutCommand is RelayCommand cut)

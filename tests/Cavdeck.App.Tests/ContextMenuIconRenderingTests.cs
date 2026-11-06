@@ -4,8 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Cavdeck.App;
+using System.Windows.Markup;
+using System.Xml.Linq;
 using Xunit;
+using WpfApplication = System.Windows.Application;
 
 namespace Cavdeck.App.Tests;
 
@@ -21,16 +23,20 @@ public sealed class ContextMenuIconRenderingTests
             {
                 // Run a real WPF template and rasterization test on its required STA thread.
                 // Static XAML checks alone cannot catch invisible icons caused by broken bindings.
-                var app = new App();
-                app.InitializeComponent();
+                var app = new WpfApplication { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+                LoadAppResources(app);
                 Assert.True(app.Resources.MergedDictionaries.Count > 0);
 
                 VerifyTheme(app, "Colors.Light.xaml");
+                ExplorerConnectionReconnectTests.VerifyGoToPathHeaderLayout();
+                GoToPathDialogChecks.Verify(app, accept: true);
                 app.Resources.MergedDictionaries[0] = new ResourceDictionary
                 {
                     Source = new Uri("pack://application:,,,/Cavdeck;component/Themes/Colors.Dark.xaml")
                 };
                 VerifyTheme(app, "Colors.Dark.xaml");
+                ExplorerConnectionReconnectTests.VerifyGoToPathHeaderLayout();
+                GoToPathDialogChecks.Verify(app, accept: false);
             }
             catch (Exception exception)
             {
@@ -45,7 +51,28 @@ public sealed class ContextMenuIconRenderingTests
             ExceptionDispatchInfo.Capture(failure).Throw();
     }
 
-    private static void VerifyTheme(App app, string theme)
+    private static void LoadAppResources(WpfApplication application)
+    {
+        // Load the production resources without starting connection or transfer services.
+        XNamespace wpf = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
+        var app = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckApp.xaml"));
+        var dictionary = app.Root!.Element(wpf + "Application.Resources")!.Element(wpf + "ResourceDictionary")!;
+        var baseUri = new Uri("pack://application:,,,/Cavdeck;component/App.xaml");
+        foreach (var source in dictionary.Element(wpf + "ResourceDictionary.MergedDictionaries")!.Elements())
+        {
+            application.Resources.MergedDictionaries.Add(new ResourceDictionary
+            {
+                Source = new Uri(baseUri, source.Attribute("Source")!.Value)
+            });
+        }
+        foreach (var element in dictionary.Elements(wpf + "Style"))
+        {
+            var style = (Style)XamlReader.Parse(element.ToString(), new ParserContext { BaseUri = baseUri });
+            application.Resources.Add(style.TargetType, style);
+        }
+    }
+
+    private static void VerifyTheme(WpfApplication app, string theme)
     {
         var foreground = (SolidColorBrush)app.FindResource("PrimaryTextBrush");
         var danger = (SolidColorBrush)app.FindResource("DangerTextBrush");
@@ -60,11 +87,16 @@ public sealed class ContextMenuIconRenderingTests
         AssertIcon(app, "IconOpenNewTab", "ContextMenuIconStyle", foreground.Color, enabled: true, theme);
         AssertIcon(app, "IconDownload", "ContextMenuIconStyle", foreground.Color, enabled: false, theme);
         AssertIcon(app, "IconTrash", "ContextMenuDangerIconStyle", danger.Color, enabled: true, theme);
+        foreach (var dpi in new[] { 96, 120, 144, 192 })
+        {
+            AssertIcon(app, "IconGoToPath", "ContextMenuIconStyle", foreground.Color, enabled: true, theme, dpi);
+            AssertIcon(app, "IconGoToPath", "ContextMenuIconStyle", foreground.Color, enabled: false, theme, dpi);
+        }
     }
 
     private static void AssertIcon(
-        App app, string geometryKey, string iconStyleKey,
-        Color expectedStroke, bool enabled, string theme)
+        WpfApplication app, string geometryKey, string iconStyleKey,
+        Color expectedStroke, bool enabled, string theme, int dpi = 96)
     {
         var path = new System.Windows.Shapes.Path
         {
@@ -93,19 +125,21 @@ public sealed class ContextMenuIconRenderingTests
         Assert.True(path.Data!.Bounds.Width > 0);
         Assert.True(path.Data.Bounds.Height > 0);
 
-        var bitmap = new RenderTargetBitmap(240, 32, 96, 96, PixelFormats.Pbgra32);
+        var width = 240 * dpi / 96;
+        var height = 32 * dpi / 96;
+        var bitmap = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Pbgra32);
         bitmap.Render(item);
 
-        var pixels = new byte[240 * 32 * 4];
-        bitmap.CopyPixels(pixels, 240 * 4, 0);
+        var pixels = new byte[width * height * 4];
+        bitmap.CopyPixels(pixels, width * 4, 0);
         var visibleIconPixels = 0;
         // The glyph is in the left 40 DIPs. Header text starts in the next column.
-        for (var y = 2; y < 30; y++)
-        for (var x = 12; x < 38; x++)
-            if (pixels[(y * 240 + x) * 4 + 3] > 12)
+        for (var y = 2 * dpi / 96; y < 30 * dpi / 96; y++)
+        for (var x = 12 * dpi / 96; x < 38 * dpi / 96; x++)
+            if (pixels[(y * width + x) * 4 + 3] > 12)
                 visibleIconPixels++;
 
         Assert.True(visibleIconPixels >= 8,
-            $"{geometryKey} ({theme}, enabled={enabled}): no visible icon pixels were rendered.");
+            $"{geometryKey} ({theme}, {dpi} DPI, enabled={enabled}): no visible icon pixels were rendered.");
     }
 }

@@ -813,4 +813,25 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="Toast_CopyHelpText" xml:space="preserve"><value>Kopiert einen bereinigten Bericht ohne Dateinamen, Pfade, Kontodaten oder Zugangsdaten.</value></data>
   <data name="Toast_Copied" xml:space="preserve"><value>Diagnosebericht kopiert.</value></data>
   <data name="Toast_ViewFailedTransfers" xml:space="preserve"><value>Fehlgeschlagene Übertragungen anzeigen</value></data>
+  <data name="ExplorerPath_Title" xml:space="preserve"><value>Zu Pfad wechseln</value></data>
+  <data name="ExplorerPath_Description" xml:space="preserve"><value>Pfade mit führendem / beginnen am zugänglichen Stamm des aktuellen Buckets. Andere Pfade beginnen im aktuellen Ordner. Eine s3://-URI öffnet einen Pfad im angegebenen Bucket.</value></data>
+  <data name="ExplorerPath_Label" xml:space="preserve"><value>Pfad</value></data>
+  <data name="ExplorerPath_Placeholder" xml:space="preserve"><value>Ordner- oder Dateipfad eingeben</value></data>
+  <data name="ExplorerPath_Go" xml:space="preserve"><value>Wechseln</value></data>
+  <data name="ExplorerPath_Loading" xml:space="preserve"><value>Pfad wird gesucht…</value></data>
+  <data name="ExplorerPath_Required" xml:space="preserve"><value>Geben Sie einen Pfad ein.</value></data>
+  <data name="ExplorerPath_Unsupported" xml:space="preserve"><value>Lokale Pfade und andere URL-Formate werden hier nicht unterstützt.</value></data>
+  <data name="ExplorerPath_Invalid" xml:space="preserve"><value>Steuerzeichen, leere Pfadabschnitte sowie . und .. sind unzulässig.</value></data>
+  <data name="ExplorerPath_TooLong" xml:space="preserve"><value>Der Objektschlüssel überschreitet 1.024 UTF-8-Bytes.</value></data>
+  <data name="ExplorerPath_NotFound" xml:space="preserve"><value>Unter diesem Pfad wurde keine Datei und kein Ordner gefunden.</value></data>
+  <data name="ExplorerPath_Failed" xml:space="preserve"><value>Der Pfad konnte nicht geprüft werden.</value></data>
+  <data name="ExplorerPath_BucketMode" xml:space="preserve"><value>Bucket-Pfad</value></data>
+  <data name="ExplorerPath_BucketModeHint" xml:space="preserve"><value>Der erste Abschnitt ist der Bucket-Name, z. B. assets/images/.</value></data>
+  <data name="ExplorerPath_Recent" xml:space="preserve"><value>Zuletzt besuchte Ordner</value></data>
+  <data name="ExplorerPath_History" xml:space="preserve"><value>Eingabeverlauf</value></data>
+  <data name="ExplorerPath_ClearHistory" xml:space="preserve"><value>Eingabeverlauf löschen</value></data>
+  <data name="ExplorerPath_ClearHistoryConfirm" xml:space="preserve"><value>Den Eingabeverlauf für diese Verbindung löschen?</value></data>
+  <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>Dieser Ordner kann im Explorer nur mit einem geänderten Schlüssel geöffnet werden.</value></data>
+  <data name="ExplorerPath_Menu" xml:space="preserve"><value>Zu Pfad wechseln…</value></data>
+  <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>Zu Pfad wechseln (Ctrl+G)</value></data>
 </root>

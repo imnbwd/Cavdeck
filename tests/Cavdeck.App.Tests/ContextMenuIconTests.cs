@@ -9,7 +9,7 @@ public sealed class ContextMenuIconTests
     private static readonly XNamespace Xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
 
     [Theory]
-    [InlineData("CavdeckExplorerView.xaml", 41)]
+    [InlineData("CavdeckExplorerView.xaml", 42)]
     [InlineData("CavdeckShellWindow.xaml", 6)]
     [InlineData("CavdeckPlacesView.xaml", 3)]
     [InlineData("CavdeckDesignCatalog.xaml", 3)]
