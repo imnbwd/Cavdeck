@@ -9,6 +9,7 @@
              Focusable="True"
              PreviewKeyDown="Root_PreviewKeyDown"
              GotKeyboardFocus="Root_GotKeyboardFocus"
+             LostKeyboardFocus="Root_LostKeyboardFocus"
              ContextMenuOpening="Root_ContextMenuOpening">
   <UserControl.Resources>
     <ResourceDictionary>
@@ -720,6 +721,8 @@
 
         <Grid x:Name="EmptyObjectsArea" Background="{DynamicResource SurfaceBrush}"
               Visibility="{Binding Explorer.ShowEmptyObjects, Converter={StaticResource BoolVis}}"
+              Focusable="True" KeyboardNavigation.IsTabStop="False"
+              PreviewMouseDown="EmptyObjectsArea_PreviewMouseDown"
               ContextMenu="{StaticResource CurrentDirectoryMenu}"
               ContextMenuOpening="EmptyObjects_ContextMenuOpening">
           <StackPanel Style="{StaticResource PageEmptyHost}" TextBlock.TextAlignment="Center">
