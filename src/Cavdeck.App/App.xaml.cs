@@ -13,7 +13,6 @@ using Cavdeck.App.Features.Transfers;
 using Cavdeck.App.Features.Updates;
 using Cavdeck.App.Features.Diagnostics;
 using Cavdeck.Application.Abstractions;
-using Cavdeck.Application.Connections;
 using Cavdeck.Application.Explorer;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Application.Settings;
@@ -22,12 +21,12 @@ using Cavdeck.Application.Sharing;
 using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.Configuration;
 using Cavdeck.Infrastructure.S3;
-using Cavdeck.Infrastructure.Security;
+using Cavdeck.Infrastructure.DependencyInjection;
 using Cavdeck.Infrastructure.Settings;
 using Cavdeck.Infrastructure.Places;
-using Cavdeck.Infrastructure.Transfers;
 using Cavdeck.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Velopack;
 using System.Windows.Threading;
 
@@ -270,31 +269,19 @@ public partial class App : System.Windows.Application
     private void RegisterServices(bool demoSnapshots = false)
     {
         var registrations = new ServiceCollection();
+        registrations.AddCavdeckCore();
         registrations.AddSingleton<ApplicationState>();
         registrations.AddSingleton<JsonSettingsStore>();
         registrations.AddSingleton<ISettingsStore>(sp => sp.GetRequiredService<JsonSettingsStore>());
         registrations.AddSingleton<IPlaceStore, JsonPlaceStore>();
         registrations.AddSingleton<PlaceLibrary>();
-        registrations.AddSingleton<ICredentialVault, WindowsCredentialVault>();
-        registrations.AddSingleton<JsonConnectionCatalog>();
-        registrations.AddSingleton<IConnectionCatalog>(sp => sp.GetRequiredService<JsonConnectionCatalog>());
-        registrations.AddSingleton<IStorageProbe, S3StorageProbe>();
-        registrations.AddSingleton<S3ClientLeasePool>();
-        registrations.AddSingleton<IObjectStorageProviderFactory, S3ProviderFactory>();
         registrations.AddSingleton<IDownloadLinkSigner, S3DownloadLinkSigner>();
-        registrations.AddSingleton<ConnectionService>();
-        registrations.AddSingleton<ExplorerService>();
         registrations.AddSingleton<ExplorerClipboard>();
         registrations.AddSingleton<Cavdeck.Application.Preview.PreviewService>();
 #if DEBUG
         if (demoSnapshots)
-            registrations.AddSingleton<ITransferJournal, MemoryTransferJournal>();
-        else
+            registrations.Replace(ServiceDescriptor.Singleton<ITransferJournal, MemoryTransferJournal>());
 #endif
-            registrations.AddSingleton<ITransferJournal>(_ => new SqliteTransferJournal(SqliteTransferJournal.DefaultPath()));
-        registrations.AddSingleton<ITransferConnections, CatalogTransferConnections>();
-        registrations.AddSingleton<IRemoteObjectTransfer, S3ObjectTransfer>();
-        registrations.AddSingleton<TransferEngine>();
         registrations.AddSingleton<ITransferActivity>(sp => sp.GetRequiredService<TransferEngine>());
         registrations.AddSingleton<ConnectionsViewModel>();
         registrations.AddTransient<ExplorerViewModel>();

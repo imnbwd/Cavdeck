@@ -23,6 +23,10 @@ public interface IObjectStorageProvider
         string? continuationToken, int pageSize,
         CancellationToken cancellationToken);
 
+    Task<PrefixPage> ListExactPageAsync(StorageConnection connection, string bucket, string prefix,
+        bool recursive, string? continuationToken, int pageSize, CancellationToken cancellationToken) =>
+        throw new NotSupportedException("The provider does not support exact prefix listings.");
+
     Task<bool> ObjectExistsAsync(
         StorageConnection connection, string bucket, string key,
         CancellationToken cancellationToken);

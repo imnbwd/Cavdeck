@@ -130,18 +130,83 @@ public sealed class S3ProviderGuardTests
         Assert.Equal(0, gateway.ListCalls);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Exact_page_preserves_raw_prefix_page_size_token_and_cancellation(bool recursive)
+    {
+        const string prefix = "images/ 空//x%2F";
+        var gateway = new FakeGateway();
+        var provider = new S3CompatibleStorageProvider(StorageProviderKind.Minio,
+            new EmptyVault(("fictional-key", "fictional-secret")), gateway);
+        using var cancellation = new CancellationTokenSource();
+        var page = await provider.ListExactPageAsync(Sample("assets"), "assets", prefix,
+            recursive, "opaque=page+token", 2, cancellation.Token);
+
+        Assert.Equal((prefix, "opaque=page+token", 2, recursive, cancellation.Token), gateway.ExactRequest);
+        Assert.Equal("following-page", page.ContinuationToken);
+        if (recursive)
+            Assert.Empty(page.CommonPrefixes);
+        else
+            Assert.Equal(prefix + "/child/", Assert.Single(page.CommonPrefixes));
+        Assert.Equal(prefix + "/", Assert.Single(page.Objects).Key);
+
+        await cancellation.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => provider.ListExactPageAsync(
+            Sample("assets"), "assets", prefix, recursive, null, 1, cancellation.Token));
+    }
+
+    [Fact]
+    public async Task Exact_page_honors_scope_and_uses_configured_root_for_empty_prefix()
+    {
+        var gateway = new FakeGateway();
+        var provider = new S3CompatibleStorageProvider(StorageProviderKind.Minio,
+            new EmptyVault(("fictional-key", "fictional-secret")), gateway);
+        var connection = Sample("assets");
+        var page = await provider.ListExactPageAsync(connection, "assets", "", false, null, 25, default);
+        Assert.Equal("images/", gateway.ExactRequest.Prefix);
+        Assert.Empty(page.Objects);
+        Assert.Empty(page.CommonPrefixes);
+        Assert.Null(page.ContinuationToken);
+        var wrongBucket = await Assert.ThrowsAsync<StorageException>(() => provider.ListExactPageAsync(
+            connection, "other", "images/", true, null, 25, default));
+        Assert.Equal(StorageFailureKind.AccessDenied, wrongBucket.Failure.Kind);
+        var wrongPrefix = await Assert.ThrowsAsync<StorageException>(() => provider.ListExactPageAsync(
+            connection, "assets", "/images/", false, null, 25, default));
+        Assert.Equal(StorageFailureKind.AccessDenied, wrongPrefix.Failure.Kind);
+    }
+
+    [Fact]
+    public async Task Head_preserves_object_key_and_propagates_storage_errors()
+    {
+        const string key = "images/a//b%2F ";
+        var gateway = new FakeGateway();
+        var provider = new S3CompatibleStorageProvider(StorageProviderKind.Minio,
+            new EmptyVault(("fictional-key", "fictional-secret")), gateway);
+        var connection = Sample("assets");
+        Assert.Equal(new ObjectHead("assets", key, 0, null, null),
+            await provider.HeadObjectAsync(connection, "assets", key, default));
+        foreach (var kind in new[] { StorageFailureKind.BucketNotFound, StorageFailureKind.AccessDenied, StorageFailureKind.Network })
+        {
+            gateway.HeadFailure = new StorageFailure(kind, null, null, null, "fictional provider text");
+            var error = await Assert.ThrowsAsync<StorageException>(() =>
+                provider.HeadObjectAsync(connection, "assets", key, default));
+            Assert.Equal(kind, error.Failure.Kind);
+        }
+    }
+
     private static StorageConnection Sample(string? restricted = null) => new(
         Guid.NewGuid(), "Local", StorageProviderKind.Minio, "http://127.0.0.1:9000", "us-east-1",
         CredentialReferences.ForConnection(Guid.NewGuid()), RestrictedBucket: restricted, KeyPrefix: "images/");
 
-    private sealed class EmptyVault : Cavdeck.Application.Abstractions.ICredentialVault
+    private sealed class EmptyVault((string, string)? credential = null) : Cavdeck.Application.Abstractions.ICredentialVault
     {
         public Task SaveAsync(string reference, string accessKeyId, string secretAccessKey,
             CancellationToken cancellationToken) => Task.CompletedTask;
 
         public Task<(string AccessKeyId, string SecretAccessKey)?> ReadAsync(
             string reference, CancellationToken cancellationToken) =>
-            Task.FromResult<(string AccessKeyId, string SecretAccessKey)?>(null);
+            Task.FromResult(credential);
 
         public Task DeleteAsync(string reference, CancellationToken cancellationToken) => Task.CompletedTask;
     }
@@ -151,6 +216,8 @@ public sealed class S3ProviderGuardTests
         public int ListCalls { get; private set; }
         public int UploadCalls { get; private set; }
         public int PrefixCalls { get; private set; }
+        public (string Prefix, string? Token, int Limit, bool Recursive, CancellationToken Cancellation) ExactRequest { get; private set; }
+        public StorageFailure? HeadFailure { get; set; }
 
         public Task<IReadOnlyList<string>> ListBucketNamesAsync(S3Session session, CancellationToken cancellationToken)
         {
@@ -163,15 +230,26 @@ public sealed class S3ProviderGuardTests
 
         public Task<StoragePage<StorageObject>> ListObjectsAsync(
             S3Session session, string bucket, string prefix, string? continuationToken, int pageSize,
-            CancellationToken cancellationToken) =>
-            Task.FromResult(new StoragePage<StorageObject>([], null));
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ExactRequest = (prefix, continuationToken, pageSize, true, cancellationToken);
+            return Task.FromResult(new StoragePage<StorageObject>(
+                continuationToken is null ? [] : [new(bucket, prefix + "/", 0, DateTimeOffset.UnixEpoch, null, null)],
+                continuationToken is null ? null : "following-page"));
+        }
 
         public Task<PrefixPage> ListPrefixAsync(
             S3Session session, string bucket, string prefix, string? continuationToken, int pageSize,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             PrefixCalls++;
-            return Task.FromResult(new PrefixPage([], [], null));
+            ExactRequest = (prefix, continuationToken, pageSize, false, cancellationToken);
+            return Task.FromResult(continuationToken is null
+                ? new PrefixPage([], [], null)
+                : new PrefixPage([prefix + "/child/"],
+                    [new(bucket, prefix + "/", 0, DateTimeOffset.UnixEpoch, null, null)], "following-page"));
         }
 
         public Task<bool> ObjectExistsAsync(
@@ -199,7 +277,9 @@ public sealed class S3ProviderGuardTests
 
         public Task<ObjectHead> HeadObjectAsync(
             S3Session session, string bucket, string key, CancellationToken cancellationToken) =>
-            Task.FromResult(new ObjectHead(bucket, key, 0, null, null));
+            HeadFailure is { } error
+                ? Task.FromException<ObjectHead>(new StorageException(error))
+                : Task.FromResult(new ObjectHead(bucket, key, 0, null, null));
 
         public Task<ObjectBody> ReadObjectAsync(
             S3Session session, string bucket, string key, int maxBytes, CancellationToken cancellationToken) =>

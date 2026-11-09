@@ -84,6 +84,22 @@ public sealed class S3ObjectTransfer : IRemoteObjectTransfer, IDisposable
         IS3ConditionalWritePolicy conditions, Action release) : IRemoteTransferLease
     {
         private int _disposed;
+        public bool SupportsVerifiedConditionalMultipart =>
+            connection.Provider == StorageProviderKind.AwsS3 && session.ServiceUrl is null;
+
+        public void EnsureVerifiedConditionalPut()
+        {
+            if (SupportsVerifiedConditionalMultipart || connection.Provider == StorageProviderKind.Minio
+                && !S3ConditionalWritePolicies.IsAlibabaOssEndpoint(session.ServiceUrl)
+                || connection.Provider == StorageProviderKind.CloudflareR2
+                && Uri.TryCreate(session.ServiceUrl, UriKind.Absolute, out var endpoint)
+                && endpoint.Scheme == "https"
+                && endpoint.Host.EndsWith(".r2.cloudflarestorage.com", StringComparison.OrdinalIgnoreCase))
+                return;
+            throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+                "ConditionalWriteUnsupported", null, null, null));
+        }
+
         public void EnsureConditionalMultipartSupported() => conditions.EnsureConditionalMultipartSupported();
 
         public async Task<RemoteIdentity?> HeadAsync(string bucket, string key, CancellationToken cancellationToken)
@@ -183,7 +199,7 @@ public sealed class S3ObjectTransfer : IRemoteObjectTransfer, IDisposable
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                throw AwsS3Gateway.Map(exception, session);
+                throw MapConditionalWrite(exception);
             }
         }
 
@@ -280,8 +296,19 @@ public sealed class S3ObjectTransfer : IRemoteObjectTransfer, IDisposable
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                throw AwsS3Gateway.Map(exception, session);
+                throw MapConditionalWrite(exception);
             }
+        }
+
+        private StorageException MapConditionalWrite(Exception exception)
+        {
+            var mapped = AwsS3Gateway.Map(exception, session);
+            if (mapped.Failure.StatusCode == 409)
+                return new StorageException(mapped.Failure with { Kind = StorageFailureKind.PreconditionFailed });
+            if (mapped.Failure.StatusCode == 501 || mapped.Failure.ErrorCode is
+                "NotImplemented" or "UnsupportedHeader" or "UnsupportedOperation" or "InvalidRequest")
+                return new StorageException(mapped.Failure with { Kind = StorageFailureKind.Unsupported });
+            return mapped;
         }
 
         public async Task AbortMultipartAsync(

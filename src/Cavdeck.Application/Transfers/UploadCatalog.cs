@@ -9,11 +9,13 @@ public static class UploadCatalog
     public static IReadOnlyList<UploadSource> Expand(string keyPrefix, IEnumerable<string> paths) =>
         Enumerate(keyPrefix, paths).ToList();
 
-    public static IEnumerable<UploadSource> Enumerate(string keyPrefix, IEnumerable<string> paths)
+    public static IEnumerable<UploadSource> Enumerate(string keyPrefix, IEnumerable<string> paths,
+        bool exact = false, CancellationToken cancellationToken = default)
     {
         var prefix = keyPrefix;
         foreach (var raw in paths)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (string.IsNullOrWhiteSpace(raw))
             {
                 yield return new UploadSource("", prefix, null, false, "Missing");
@@ -23,7 +25,7 @@ public static class UploadCatalog
             string? full;
             try
             {
-                full = Path.GetFullPath(raw);
+                full = exact ? ExactLocalPaths.FullPath(raw) : Path.GetFullPath(raw);
             }
             catch (Exception)
             {
@@ -37,7 +39,7 @@ public static class UploadCatalog
 
             if (Directory.Exists(full))
             {
-                foreach (var source in Walk(prefix, DirectoryParent(full), full))
+                foreach (var source in Walk(prefix, exact ? full : DirectoryParent(full), full, exact, cancellationToken))
                     yield return source;
             }
             else if (File.Exists(full))
@@ -47,13 +49,15 @@ public static class UploadCatalog
         }
     }
 
-    private static IEnumerable<UploadSource> Walk(string prefix, string parent, string directory)
+    private static IEnumerable<UploadSource> Walk(string prefix, string parent, string directory, bool exact, CancellationToken cancellationToken)
     {
         FileInfo[] files = [];
         DirectoryInfo[] children = [];
         string? error = null;
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var pin = exact ? ExactLocalPaths.Pin(directory, includeLeaf: true) : null;
             var info = new DirectoryInfo(directory);
             if (info.Attributes.HasFlag(FileAttributes.ReparsePoint))
                 error = "Reparse";
@@ -63,7 +67,7 @@ public static class UploadCatalog
                 children = info.GetDirectories();
             }
         }
-        catch (Exception)
+        catch (Exception exception) when (exception is not OperationCanceledException)
         {
             error = "Unreadable";
         }
@@ -78,11 +82,18 @@ public static class UploadCatalog
             yield return AddFile(prefix, parent, file.FullName);
         foreach (var child in children)
         {
-            foreach (var source in Walk(prefix, parent, child.FullName))
+            foreach (var source in Walk(prefix, parent, child.FullName, exact, cancellationToken))
                 yield return source;
         }
         if (files.Length == 0 && children.Length == 0)
-            yield return Make(directory, Join(prefix, parent, directory) + "/", 0, true, null);
+        {
+            var key = exact && directory == parent
+                ? prefix.Length > 0 ? prefix : Path.GetFileName(Path.TrimEndingDirectorySeparator(directory)) + "/"
+                : Join(prefix, parent, directory) + "/";
+            if (exact && key == "/")
+                yield break;
+            yield return Make(directory, key, 0, true, exact ? KeyError(key) : null);
+        }
     }
 
     private static UploadSource AddFile(string prefix, string parent, string file)

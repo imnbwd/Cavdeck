@@ -58,6 +58,22 @@ public sealed class S3CompatibleStorageProvider : IObjectStorageProvider
             Math.Clamp(pageSize, 1, 1000), cancellationToken);
     }
 
+    public async Task<PrefixPage> ListExactPageAsync(StorageConnection connection, string bucket,
+        string prefix, bool recursive, string? continuationToken, int pageSize, CancellationToken cancellationToken)
+    {
+        EnsureKind(connection);
+        var effectivePrefix = prefix.Length == 0 ? connection.KeyPrefix ?? "" : prefix;
+        ObjectAccess.Ensure(connection, bucket, effectivePrefix, write: false);
+        var session = await OpenAsync(connection, cancellationToken);
+        if (!recursive)
+            return await _gateway.ListPrefixAsync(session, bucket, effectivePrefix, continuationToken,
+                pageSize, cancellationToken);
+
+        var page = await _gateway.ListObjectsAsync(session, bucket, effectivePrefix, continuationToken,
+            pageSize, cancellationToken);
+        return new PrefixPage([], page.Items, page.ContinuationToken);
+    }
+
     public async Task<bool> ObjectExistsAsync(
         StorageConnection connection, string bucket, string key, CancellationToken cancellationToken)
     {

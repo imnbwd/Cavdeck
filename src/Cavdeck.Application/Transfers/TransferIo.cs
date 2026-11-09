@@ -288,12 +288,12 @@ internal static class TransferFiles
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
-    public static void Commit(string partial, string finalPath, Guid jobId, LocalFileStamp? initial)
+    public static void Commit(string partial, string finalPath, Guid jobId, LocalFileStamp? initial, bool isolated = false)
     {
         var parent = Path.GetDirectoryName(finalPath);
         if (!string.IsNullOrEmpty(parent))
             Directory.CreateDirectory(parent);
-        var commit = TransferPaths.Commit(finalPath, jobId);
+        var commit = TransferPaths.Commit(finalPath, jobId, isolated);
         if (File.Exists(commit))
             File.Delete(commit);
         File.Move(partial, commit);
@@ -306,7 +306,7 @@ internal static class TransferFiles
                 if (File.Exists(finalPath))
                     throw new DestinationChangedException();
                 try { File.Move(commit, finalPath); }
-                catch (IOException) when (File.Exists(finalPath))
+                catch (IOException) when (File.Exists(finalPath) || Directory.Exists(finalPath))
                 {
                     throw new DestinationChangedException();
                 }
@@ -317,6 +317,8 @@ internal static class TransferFiles
             // Share.Delete permits File.Replace on Windows.
             try
             {
+                if (isolated)
+                    ExactLocalPaths.RejectExistingReparsePoint(finalPath);
                 using var held = new FileStream(finalPath, FileMode.Open, FileAccess.Read,
                     FileShare.Read | FileShare.Delete);
                 if (Snapshot(finalPath) != initial)

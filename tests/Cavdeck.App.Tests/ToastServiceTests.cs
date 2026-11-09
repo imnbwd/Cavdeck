@@ -221,7 +221,7 @@ public sealed class ToastServiceTests
 
             service.Show(new ToastRequest { Title = "success", Tone = ToastTone.Success });
             Assert.False(service.Items.Last().HasCopy);
-        }, () => new ToastService(new LocalizationService(),
+        }, () => new ToastService(EnglishTexts(),
             text => copied = text, () => "Cavdeck diagnostic report: safe IDs only"));
     }
 
@@ -237,7 +237,7 @@ public sealed class ToastServiceTests
             Assert.Equal("Could not copy the report.", error.CopyFeedback);
             Assert.False(error.IsClosing);
             Assert.Single(service.Items);
-        }, () => new ToastService(new LocalizationService(),
+        }, () => new ToastService(EnglishTexts(),
             _ => throw new System.Runtime.InteropServices.ExternalException("clipboard busy"),
             () => "safe"));
     }
@@ -278,8 +278,25 @@ public sealed class ToastServiceTests
             Assert.Equal(1, opened);
             Assert.True(item.IsClosing);
             texts.ChangeLanguage("en-US");
-        }, () => new ToastService(texts = new LocalizationService(),
+        }, () => new ToastService(texts = EnglishTexts(),
             _ => { }, () => "safe"));
+    }
+
+    private static LocalizationService EnglishTexts()
+    {
+        var previousCulture = System.Globalization.CultureInfo.DefaultThreadCurrentCulture;
+        var previousUiCulture = System.Globalization.CultureInfo.DefaultThreadCurrentUICulture;
+        try
+        {
+            var texts = new LocalizationService();
+            texts.ChangeLanguage("en-US");
+            return texts;
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = previousCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = previousUiCulture;
+        }
     }
 
     private static void RunOnSta(Action<ToastService> assertion,

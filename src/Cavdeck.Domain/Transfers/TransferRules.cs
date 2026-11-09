@@ -126,13 +126,16 @@ public static class TransferPaths
 
     public static string Partial(string finalPath) => finalPath + ".cavdeck-partial";
 
-    public static string Partial(string finalPath, Guid jobId) =>
-        finalPath + ".cavdeck-" + jobId.ToString("N") + ".partial";
+    public static string Partial(string finalPath, Guid jobId, bool isolated = false) =>
+        TemporaryBase(finalPath, isolated) + ".cavdeck-" + jobId.ToString("N") + ".partial";
 
     public static string Commit(string finalPath) => finalPath + ".cavdeck-commit";
 
-    public static string Commit(string finalPath, Guid jobId) =>
-        finalPath + ".cavdeck-" + jobId.ToString("N") + ".commit";
+    public static string Commit(string finalPath, Guid jobId, bool isolated = false) =>
+        TemporaryBase(finalPath, isolated) + ".cavdeck-" + jobId.ToString("N") + ".commit";
+
+    private static string TemporaryBase(string finalPath, bool isolated) =>
+        isolated ? Path.GetDirectoryName(finalPath) + Path.DirectorySeparatorChar : finalPath;
 
     public static bool TryCombine(string root, string relativeKey, ISet<string> used, out string path, out string? error)
     {
@@ -183,13 +186,14 @@ public static class TransferPaths
 
 public static class TransferFailures
 {
-    public static TransferFailure FromStorage(StorageException exception)
+    public static TransferFailure FromStorage(StorageException exception, bool includeEndpointFailures = false)
     {
         var failure = exception.Failure;
         var code = failure.ErrorCode;
         var throttled = failure.StatusCode == 429
             || code is "SlowDown" or "TooManyRequests" or "Throttling";
         var transient = failure.Kind == StorageFailureKind.Network
+            || includeEndpointFailures && failure.Kind == StorageFailureKind.Endpoint
             || failure.StatusCode is 408 or 500 or 502 or 503 or 504
             || code is "InternalError" or "ServiceUnavailable" or "RequestTimeout" or "RequestTimeTooSkewed";
 
