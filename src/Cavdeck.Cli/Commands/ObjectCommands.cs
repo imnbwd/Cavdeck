@@ -125,10 +125,4 @@ internal static partial class CliRuntime
         return path;
     }
 
-    private static string EffectivePrefix(StorageConnection connection, StorageUri uri) =>
-        uri.Key.Length == 0 ? connection.KeyPrefix ?? "" : uri.Key;
-
-    private static bool ShowProgress(ParseResult p, Option<bool> quiet) =>
-        !p.GetValue(quiet) && !IsJson(p) && !Console.IsErrorRedirected &&
-        !Console.IsInputRedirected && !Console.IsOutputRedirected;
 }

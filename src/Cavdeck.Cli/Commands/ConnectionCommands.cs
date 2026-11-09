@@ -8,6 +8,51 @@ namespace Cavdeck.Cli;
 
 internal static partial class CliRuntime
 {
+    private static void RegisterConnectionCommands(RootCommand root, CancellationToken token)
+    {
+        var connection = new Command("connection", CliText.Get("ConnectionDescription"));
+        var list = new Command("list", CliText.Get("ConnectionList"));
+        Bind(list, "connection.list", async (p, services) =>
+        {
+            var items = await services.GetRequiredService<ConnectionService>().ListAsync(token);
+            return new { items = items.Select(c => new
+            {
+                c.Id, c.Name, provider = c.Provider.ToString(), endpoint = SafeEndpoint(c.Endpoint),
+                c.Region, c.IsReadOnly, c.RestrictedBucket
+            }).ToArray() };
+        });
+        connection.Subcommands.Add(list);
+
+        foreach (var test in new[] { false, true })
+        {
+            var command = new Command(test ? "test" : "show", test ? CliText.Get("ConnectionTest") : CliText.Get("ConnectionShow"));
+            var selector = new Argument<string>("connection") { Description = CliText.Get("ConnectionSelector") };
+            command.Arguments.Add(selector);
+            Bind(command, test ? "connection.test" : "connection.show", async (p, services) =>
+            {
+                var service = services.GetRequiredService<ConnectionService>();
+                var c = await ResolveAsync(service, p.GetValue(selector)!, token);
+                if (test)
+                {
+                    var result = await service.TestStoredAsync(c.Id, token);
+                    if (!result.Succeeded)
+                        throw new CliException(result.Probe?.Failure is { } failure
+                            ? CliError.FromStorage(failure) : CliError.Arguments);
+                    return new { c.Id, c.Name, reachable = true };
+                }
+
+                return new { c.Id, c.Name, provider = c.Provider.ToString(), endpoint = SafeEndpoint(c.Endpoint),
+                    c.Region, c.IsReadOnly, c.RestrictedBucket, c.KeyPrefix, c.ForcePathStyle };
+            });
+            connection.Subcommands.Add(command);
+        }
+        connection.Subcommands.Add(ConnectionSave(update: false, token));
+        connection.Subcommands.Add(ConnectionSave(update: true, token));
+        connection.Subcommands.Add(ConnectionRemove(token));
+        root.Subcommands.Add(connection);
+
+    }
+
     private static Command ConnectionSave(bool update, CancellationToken token)
     {
         var command = new Command(update ? "update" : "add", CliText.Get(update ? "ConnectionUpdate" : "ConnectionAdd"));
@@ -182,4 +227,8 @@ internal static partial class CliRuntime
         }
         finally { Console.Error.WriteLine(); }
     }
+    private static string SafeEndpoint(string endpoint) =>
+        Uri.TryCreate(endpoint, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https"
+            ? uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.UriEscaped)
+            : "";
 }
