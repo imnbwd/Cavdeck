@@ -5,7 +5,7 @@ using Cavdeck.Domain.Transfers;
 
 namespace Cavdeck.Application.Transfers;
 
-public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposable, IAsyncDisposable
+public sealed partial class TransferEngine : ITransferActivity, ITransferSink, IDisposable, IAsyncDisposable
 {
     private readonly IRemoteObjectTransfer _remote;
     private readonly ITransferJournal _journal;
@@ -324,7 +324,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
         StorageConnection source, StorageConnection destination, string sourceBucket,
         IReadOnlyList<DownloadItem> items, string destinationBucket, string destinationPrefix,
         TransferConflictPolicy conflict, CancellationToken cancellationToken = default, bool move = false,
-        Action<Guid>? batchCreated = null)
+        Action<Guid>? batchCreated = null, bool exactTargets = false)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(destination);
@@ -333,25 +333,92 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
         ObjectAccess.Ensure(source, sourceBucket, null, write: move);
         ObjectAccess.Ensure(destination, destinationBucket, null, write: true);
         var prefix = CrossTransferPlanner.Prefix(destinationPrefix);
-        if (conflict == TransferConflictPolicy.Rename
+        if (exactTargets)
+        {
+            if (items.Count > _options.MaxCrossMoveManifestObjects)
+                throw new Cavdeck.Application.Explorer.ObjectManifestLimitException();
+            if (items.Any(item => item.Folder || string.IsNullOrEmpty(item.DestinationKey)) ||
+                items.Select(item => item.Key).Distinct(StringComparer.Ordinal).Count() != items.Count ||
+                items.Select(item => item.DestinationKey).Distinct(StringComparer.Ordinal).Count() != items.Count)
+                throw new ArgumentException("The exact copy manifest must map distinct keys.", nameof(items));
+            if (CrossTransferPlanner.SameBackend(source, destination) && sourceBucket == destinationBucket &&
+                items.Select(item => item.Key).Intersect(items.Select(item => item.DestinationKey), StringComparer.Ordinal).Any())
+                throw new ArgumentException("The copy manifest overlaps the source.", nameof(items));
+            if (conflict == TransferConflictPolicy.Rename)
+                items = await AllocateExactCrossDestinationsAsync(source, destination, sourceBucket,
+                    destinationBucket, items, cancellationToken);
+            foreach (var item in items)
+            {
+                if (!ExplorerPath.FitsKey(item.Key) || !ExplorerPath.FitsKey(item.DestinationKey!))
+                    throw new ArgumentException("The copy manifest contains an invalid object key.", nameof(items));
+                ObjectAccess.Ensure(source, sourceBucket, item.Key, write: move);
+                ObjectAccess.Ensure(destination, destinationBucket, item.DestinationKey, write: true);
+            }
+        }
+        else if (conflict == TransferConflictPolicy.Rename
             || !move && CrossTransferPlanner.SameBackend(source, destination)
                 && sourceBucket == destinationBucket)
             items = await AllocateCrossDestinationsAsync(source, destination, sourceBucket,
                 items, destinationBucket, prefix, conflict, move, cancellationToken);
         // Do not delete any source object while a folder is being paged.
         // Materialize a bounded, durable manifest before scheduling move jobs.
-        if (move)
+        if (move && !exactTargets)
             items = await SnapshotMoveItemsAsync(source, destination, sourceBucket, items,
                 destinationBucket, prefix, cancellationToken);
         var batch = Guid.NewGuid();
         var created = new List<TransferJob>();
         var scan = new CrossTransferBatch(batch, source.Id, destination.Id, sourceBucket,
             destinationBucket, prefix, items.ToArray(), conflict, 0, null, null, 0,
-            CrossBatchState.Scanning, null, _clock.UtcNow, move);
+            CrossBatchState.Scanning, null, _clock.UtcNow, move)
+        {
+            SourceConfiguration = CrossTransferPlanner.ConfigurationIdentity(source),
+            DestinationConfiguration = CrossTransferPlanner.ConfigurationIdentity(destination),
+            ExactTargets = exactTargets
+        };
         await PublishBatchAsync(scan, cancellationToken);
         batchCreated?.Invoke(batch);
         await ScanBatchSafelyAsync(scan, created, cancellationToken);
         return created;
+    }
+
+    private async Task<IReadOnlyList<DownloadItem>> AllocateExactCrossDestinationsAsync(
+        StorageConnection source, StorageConnection destination, string sourceBucket, string destinationBucket,
+        IReadOnlyList<DownloadItem> items, CancellationToken cancellationToken)
+    {
+        var reserved = items.Select(item => item.DestinationKey!).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (reserved.Count != items.Count)
+            throw new ArgumentException("The destination names differ only by case.", nameof(items));
+        if (CrossTransferPlanner.SameBackend(source, destination) && sourceBucket == destinationBucket)
+            reserved.UnionWith(items.Select(item => item.Key));
+        await using var lease = await _remote.OpenAsync(destination, write: true, cancellationToken);
+        var selected = new List<DownloadItem>(items.Count);
+        foreach (var item in items)
+        {
+            var original = item.DestinationKey!;
+            var target = original;
+            if (await lease.HeadAsync(destinationBucket, original, cancellationToken) is not null)
+            {
+                target = "";
+                var marker = original.EndsWith('/');
+                for (var index = 1; index <= _options.MaxRenameAttempts; index++)
+                {
+                    var candidate = ConflictNames.WithSuffix(marker ? original[..^1] : original, index);
+                    if (marker)
+                        candidate += "/";
+                    if (!ExplorerPath.FitsKey(candidate) || reserved.Contains(candidate) ||
+                        await lease.HeadAsync(destinationBucket, candidate, cancellationToken) is not null)
+                        continue;
+                    reserved.Add(candidate);
+                    target = candidate;
+                    break;
+                }
+            }
+            if (target.Length == 0)
+                throw new StorageException(new StorageFailure(StorageFailureKind.PreconditionFailed,
+                    "NoFreeDestinationName", null, null, null));
+            selected.Add(item with { DestinationKey = target });
+        }
+        return selected;
     }
 
     public async Task<string?> FindCrossCopyConflictAsync(
@@ -583,6 +650,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             {
                 State = CrossBatchState.Failed,
                 Error = nameof(OperationCanceledException),
+                Retryable = false,
                 UpdatedAt = _clock.UtcNow
             }, CancellationToken.None);
             throw;
@@ -596,8 +664,9 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             {
                 State = CrossBatchState.Failed,
                 Error = exception is StorageException storage
-                    ? $"{storage.Failure.Kind}:{storage.Failure.ErrorCode}"
+                    ? storage.Failure.Kind.ToString()
                     : exception.GetType().Name,
+                Retryable = exception is StorageException failure && TransferFailures.FromStorage(failure).Retryable,
                 UpdatedAt = _clock.UtcNow
             }, CancellationToken.None);
             throw;
@@ -620,6 +689,10 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             ?? throw new InvalidOperationException("The source connection is no longer available.");
         var destination = await ResolveAsync(batch.DestinationConnectionId, cancellationToken)
             ?? throw new InvalidOperationException("The destination connection is no longer available.");
+        if (!CrossTransferPlanner.MatchesConfiguration(batch.SourceConfiguration, source) ||
+            !CrossTransferPlanner.MatchesConfiguration(batch.DestinationConfiguration, destination))
+            throw new StorageException(new StorageFailure(StorageFailureKind.InvalidConfiguration,
+                "ConnectionConfigurationChanged", null, null, null));
         ObjectAccess.Ensure(source, batch.SourceBucket, null, write: batch.Move);
         ObjectAccess.Ensure(destination, batch.DestinationBucket, null, write: true);
         await using var lease = await _remote.OpenAsync(source, write: false, cancellationToken);
@@ -648,7 +721,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
                     var targetKey = CrossTransferPlanner.MapKey(listed.Key, sourcePrefix, targetPrefix);
                     if (await QueueCrossCopyAsync(source, destination, batch.SourceBucket, listed.Key,
                         batch.DestinationBucket, targetKey, listed.Size, batch.Conflict,
-                        batch.Id, created, cancellationToken, batch.Move))
+                        batch.Id, created, cancellationToken, batch.Move, listed.ETag))
                         batch = batch with { ObjectsQueued = batch.ObjectsQueued + 1 };
                 }
                 batch = batch with
@@ -663,7 +736,8 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             {
                 if (await QueueCrossCopyAsync(source, destination, batch.SourceBucket, item.Key,
                     batch.DestinationBucket, item.DestinationKey ?? batch.DestinationPrefix + name, item.Size,
-                    batch.Conflict, batch.Id, created, cancellationToken, batch.Move))
+                    batch.ExactTargets && batch.Conflict == TransferConflictPolicy.Rename ? TransferConflictPolicy.Fail : batch.Conflict,
+                    batch.Id, created, cancellationToken, batch.Move, item.SourceETag))
                     batch = batch with { ObjectsQueued = batch.ObjectsQueued + 1 };
                 batch = batch with { ScanIndex = batch.ScanIndex + 1, ContinuationToken = null,
                     LastKey = item.Key, UpdatedAt = _clock.UtcNow };
@@ -672,14 +746,16 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
         }
         await PublishBatchAsync(batch with
         {
-            State = CrossBatchState.Completed, UpdatedAt = _clock.UtcNow
+            State = CrossBatchState.Completed,
+            ObjectsQueued = (await _journal.GetBatchProgressAsync(batch.Id, cancellationToken)).Queued,
+            UpdatedAt = _clock.UtcNow
         }, cancellationToken);
     }
 
     private async Task<bool> QueueCrossCopyAsync(StorageConnection source, StorageConnection destination,
         string sourceBucket, string sourceKey, string destinationBucket, string destinationKey,
         long? size, TransferConflictPolicy conflict, Guid batch,
-        List<TransferJob>? created, CancellationToken cancellationToken, bool move)
+        List<TransferJob>? created, CancellationToken cancellationToken, bool move, string? sourceETag)
     {
         if (System.Text.Encoding.UTF8.GetByteCount(destinationKey) > ObjectLayout.MaxKeyBytes)
             throw new ArgumentException("Destination object key is too long.", nameof(destinationKey));
@@ -698,7 +774,10 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             DisplayName = ObjectLayout.DisplayName(sourceKey),
             CrossTransfer = new CrossTransferSpec(
                 new StorageObjectRef(source.Id, sourceBucket, sourceKey),
-                new StorageObjectRef(destination.Id, destinationBucket, destinationKey), jobConflict, Move: move)
+                new StorageObjectRef(destination.Id, destinationBucket, destinationKey), jobConflict,
+                SourceConfiguration: CrossTransferPlanner.ConfigurationIdentity(source),
+                DestinationConfiguration: CrossTransferPlanner.ConfigurationIdentity(destination), Move: move)
+            { SourceETag = sourceETag }
         };
         await WaitForCrossCapacityAsync(cancellationToken);
         if (!await _journal.TryCreateCrossJobAsync(job, cancellationToken))
@@ -1195,7 +1274,8 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             cancellationToken.ThrowIfCancellationRequested();
             var job = TransferJob.Create(TransferKind.Upload, connection.Id, bucket, source.Key,
                 source.LocalPath, source.Size, conflict, batch,
-                source.FolderMarker ? null : ContentTypes.FromPath(source.LocalPath), source.FolderMarker, _clock.UtcNow);
+                source.FolderMarker ? null : ContentTypes.FromPath(source.LocalPath), source.FolderMarker, _clock.UtcNow)
+                with { ConnectionConfiguration = CrossTransferPlanner.ConfigurationIdentity(connection) };
             var error = source.Error;
             if (source.Key.Length == 0 || source.Key.Any(char.IsControl) ||
                 System.Text.Encoding.UTF8.GetByteCount(source.Key) > ObjectLayout.MaxKeyBytes)
@@ -1231,7 +1311,8 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             }
 
             var job = TransferJob.Create(TransferKind.Download, connection.Id, bucket, item.Key,
-                path, item.Size, conflict, batch, null, false, _clock.UtcNow);
+                path, item.Size, conflict, batch, null, false, _clock.UtcNow)
+                with { ConnectionConfiguration = CrossTransferPlanner.ConfigurationIdentity(connection) };
             if (error is not null)
             {
                 job = job with { State = TransferState.Failed, Failure = new TransferFailure(
@@ -1252,21 +1333,26 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
     }
 
     // Stop the pump and join all workers before cleaning up or disposing their dependencies.
-    public async Task<IReadOnlyList<TransferJob>> FinishIsolatedRunAsync()
+    public async Task<IReadOnlyList<TransferJob>> FinishIsolatedRunAsync(bool preserveRetryableState = false)
     {
         if (!_options.IsolatedRun)
             throw new InvalidOperationException("The transfer engine is not isolated.");
 
         await DisposeAsync().ConfigureAwait(false);
-        foreach (var job in Jobs)
+        foreach (var initial in Jobs)
         {
+            var job = initial;
             if (job.IsOpen)
+            {
                 await TransitionAsync(job.Id, current => current with
                 {
                     State = TransferState.Cancelled, Failure = null, NextAttemptAt = null
                 }, cancel: false, CancellationToken.None).ConfigureAwait(false);
+                job = CurrentOr(job.Id, job);
+            }
 
-            if (job.State != TransferState.Completed)
+            if (job.State != TransferState.Completed &&
+                !(preserveRetryableState && job.State == TransferState.Failed && job.Failure?.Retryable == true))
                 await CleanupIsolatedJobAsync(job).ConfigureAwait(false);
         }
         return Jobs;
@@ -1276,10 +1362,15 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
     {
         try
         {
-            if (job.Kind == TransferKind.Upload && job.UploadId is { } uploadId)
+            if (job.UploadId is { } uploadId && job.Kind is TransferKind.Upload or TransferKind.Copy)
             {
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
-                var connection = await CurrentConnectionAsync(_isolatedConnection!, timeout.Token);
+                var connection = _isolatedConnection is { } snapshot
+                    ? await CurrentConnectionAsync(snapshot, timeout.Token)
+                    : await ResolveAsync(job.ConnectionId, timeout.Token);
+                if (connection is null || !CrossTransferPlanner.MatchesConfiguration(
+                        job.CrossTransfer?.DestinationConfiguration ?? job.ConnectionConfiguration, connection))
+                    throw new IOException("The connection for multipart cleanup changed.");
                 await using var lease = await _remote.OpenAsync(connection, write: true, timeout.Token);
                 try { await lease.AbortMultipartAsync(job.Bucket, job.Key, uploadId, timeout.Token); }
                 catch (StorageException exception) when (exception.Failure.ErrorCode == "NoSuchUpload") { }
@@ -1570,6 +1661,12 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             }
 
             ObjectAccess.Ensure(connection, job.Bucket, job.Key, write: job.Kind != TransferKind.Download);
+            if (_options.IsolatedRun && !CrossTransferPlanner.MatchesConfiguration(job.ConnectionConfiguration, connection))
+            {
+                await PublishAsync(Fail(job, new TransferFailure(TransferFailureKind.ConnectionMissing,
+                    false, "ConnectionConfigurationChanged", null)), CancellationToken.None);
+                return;
+            }
             TransferJob result;
             if (job.Kind == TransferKind.Copy && job.CrossTransfer is { } cross)
             {

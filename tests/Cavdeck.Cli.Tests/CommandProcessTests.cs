@@ -28,6 +28,26 @@ public sealed class CommandProcessTests
     [InlineData("bucket", "list", "--unknown", "--json")]
     [InlineData("connection", "list", "--json", "--format", "table")]
     [InlineData("object", "list", "s3://bucket/", "-c", "missing", "--limit", "1001", "--json")]
+    [InlineData("object", "search", "logo", "-c", "missing", "--json")]
+    [InlineData("search", "logo", "--in", "s3://bucket/", "-c", "missing", "--match", "unknown", "--json")]
+    [InlineData("mkdir", "s3://bucket/key", "-c", "missing", "--json")]
+    [InlineData("mkdir", "s3://bucket/", "-c", "missing", "--json")]
+    [InlineData("presign", "s3://bucket/key", "-c", "missing", "--expires-in", "59", "--json")]
+    [InlineData("presign", "s3://bucket/key", "-c", "missing", "--expires-in", "604801", "--json")]
+    [InlineData("cp", "s3://bucket/a", "s3://bucket/b", "-c", "missing", "--source-connection", "other", "--json")]
+    [InlineData("cp", "s3://bucket/a", "s3://bucket/b", "-c", "missing", "--on-conflict", "overwrite", "--json")]
+    [InlineData("cp", "s3://bucket/prefix/", "s3://bucket/b", "-c", "missing", "--recursive", "--json")]
+    [InlineData("mv", "s3://bucket/a", "s3://bucket/b", "-c", "missing", "--json")]
+    [InlineData("rm", "s3://bucket/a", "-c", "missing", "--json")]
+    [InlineData("rm", "s3://bucket/a/", "-c", "missing", "--yes", "--json")]
+    [InlineData("rm", "s3://bucket/a", "-c", "missing", "--dry-run", "--yes", "--json")]
+    [InlineData("rm", "s3://bucket/", "-c", "missing", "--yes", "--recursive", "--json")]
+    [InlineData("rm", "s3://bucket/a", "-c", "missing", "--yes", "--max-objects", "100001", "--json")]
+    [InlineData("connection", "add", "--name", "test", "--provider", "minio", "--secret", "fictional-value", "--json")]
+    [InlineData("connection", "update", "missing", "--read-only", "--writable", "--json")]
+    [InlineData("connection", "remove", "missing", "--json")]
+    [InlineData("transfer", "list", "--limit", "501", "--json")]
+    [InlineData("transfer", "show", "../invalid", "--json")]
     public async Task InvalidArgumentsAreStructured(params string[] arguments)
     {
         var result = await InvokeAsync(arguments);
@@ -76,7 +96,7 @@ public sealed class CommandProcessTests
     internal static Task<(int ExitCode, string Output, string Error)> InvokeAsync(params string[] arguments) =>
         InvokeInProfileAsync(null, arguments);
 
-    private static async Task<(int ExitCode, string Output, string Error)> InvokeInProfileAsync(
+    internal static async Task<(int ExitCode, string Output, string Error)> InvokeInProfileAsync(
         string? profile, string[] arguments)
     {
         var cliAssembly = typeof(CliRuntime).Assembly.Location;
@@ -93,6 +113,7 @@ public sealed class CommandProcessTests
         {
             start.Environment["USERPROFILE"] = profile;
             start.Environment["APPDATA"] = Path.Combine(profile, "AppData", "Roaming");
+            start.Environment["LOCALAPPDATA"] = Path.Combine(profile, "AppData", "Local");
         }
         foreach (var argument in arguments)
             start.ArgumentList.Add(argument);

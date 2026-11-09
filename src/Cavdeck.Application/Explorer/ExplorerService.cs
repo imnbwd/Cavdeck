@@ -1,4 +1,6 @@
 using Cavdeck.Application.Abstractions;
+using Cavdeck.Application.Connections;
+using Cavdeck.Application.Transfers;
 using Cavdeck.Domain.Storage;
 
 namespace Cavdeck.Application.Explorer;
@@ -17,6 +19,7 @@ public sealed record DeletePreview(Guid ConnectionId, string Bucket, IReadOnlyLi
     public IReadOnlyDictionary<string, string> SourceETags { get; init; } =
         new Dictionary<string, string>(StringComparer.Ordinal);
 }
+public sealed class ObjectManifestLimitException : Exception;
 public sealed record RenameMapping(string SourceKey, string DestinationKey, bool CreateMarker);
 public sealed record RenamePreview(Guid ConnectionId, string Bucket, IReadOnlyList<RenameMapping> Items,
     IReadOnlyList<MutationIssue> Issues, IReadOnlyList<string> ConflictKeys, string TargetKey,
@@ -26,7 +29,8 @@ public sealed record RenamePreview(Guid ConnectionId, string Bucket, IReadOnlyLi
 }
 
 // Bucket browsing and metadata operations. Byte transfers stay in the transfer engine.
-public sealed class ExplorerService(IObjectStorageProviderFactory providers, IConnectionCatalog? catalog = null)
+public sealed class ExplorerService(IObjectStorageProviderFactory providers, IConnectionCatalog? catalog = null,
+    IRemoteObjectTransfer? remote = null)
 {
     public const int PageSize = 200;
     public const int MaxSearchResults = 2000;
@@ -38,24 +42,24 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         StorageConnection connection, string bucket, string? prefix, string query,
         Action<PrefixSearchProgress>? progress, CancellationToken cancellationToken,
         Action<IReadOnlyList<ObjectEntry>>? onMatches = null, PrefixSearchCursor? cursor = null,
-        IReadOnlyCollection<string>? previousKeys = null)
+        IReadOnlyCollection<string>? previousKeys = null, bool exactScope = false)
         => SearchObjectsAsync(connection, bucket, prefix, query, matchKeyPrefix: false,
-            progress, cancellationToken, onMatches, cursor, previousKeys);
+            progress, cancellationToken, onMatches, cursor, previousKeys, exactScope);
 
     // The key-prefix listing is case-sensitive and is not a substring search.
     public Task<PrefixSearchResult> SearchKeyPrefixAsync(
         StorageConnection connection, string bucket, string? prefix, string query,
         Action<PrefixSearchProgress>? progress, CancellationToken cancellationToken,
         Action<IReadOnlyList<ObjectEntry>>? onMatches = null, PrefixSearchCursor? cursor = null,
-        IReadOnlyCollection<string>? previousKeys = null)
+        IReadOnlyCollection<string>? previousKeys = null, bool exactScope = false)
         => SearchObjectsAsync(connection, bucket, prefix, query, matchKeyPrefix: true,
-            progress, cancellationToken, onMatches, cursor, previousKeys);
+            progress, cancellationToken, onMatches, cursor, previousKeys, exactScope);
 
     private async Task<PrefixSearchResult> SearchObjectsAsync(
         StorageConnection connection, string bucket, string? prefix, string query, bool matchKeyPrefix,
         Action<PrefixSearchProgress>? progress, CancellationToken cancellationToken,
         Action<IReadOnlyList<ObjectEntry>>? onMatches, PrefixSearchCursor? cursor,
-        IReadOnlyCollection<string>? previousKeys)
+        IReadOnlyCollection<string>? previousKeys, bool exactScope)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (string.IsNullOrWhiteSpace(query))
@@ -63,9 +67,16 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         if (cursor is { Offset: < 0 })
             throw new ArgumentOutOfRangeException(nameof(cursor));
 
-        var visible = VisiblePrefix(connection, prefix);
-        var needle = query.Trim();
-        var listPrefix = matchKeyPrefix ? visible + needle : visible;
+        connection = await ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+        var visible = exactScope ? (string.IsNullOrEmpty(prefix) ? connection.KeyPrefix ?? "" : prefix)
+            : VisiblePrefix(connection, prefix);
+        ObjectAccess.Ensure(connection, bucket, visible, write: false);
+        var needle = exactScope ? query : query.Trim();
+        if (exactScope && matchKeyPrefix && !needle.StartsWith(visible, StringComparison.Ordinal) &&
+            !visible.StartsWith(needle, StringComparison.Ordinal))
+            return new PrefixSearchResult(visible, [], 0, 0, Complete: true);
+        var listPrefix = !matchKeyPrefix ? visible : !exactScope ? visible + needle :
+            needle.Length >= visible.Length ? needle : visible;
         var provider = Provider(connection);
         var matches = new List<ObjectEntry>();
         var seenTokens = new HashSet<string>(StringComparer.Ordinal);
@@ -75,6 +86,8 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         var scanned = 0;
         var requests = 0;
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        budget.CancelAfter(MaxSearchDurationPerRun);
         string? token = cursor?.ContinuationToken;
         var offset = cursor?.Offset ?? 0;
         while (true)
@@ -86,9 +99,26 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
                 return new PrefixSearchResult(visible, matches, scanned, requests, false,
                     new PrefixSearchCursor(token, offset));
 
-            var page = await provider.ListObjectsAsync(
-                connection, bucket, listPrefix, token, 1000, cancellationToken);
             requests++;
+            StoragePage<StorageObject> page;
+            try
+            {
+                if (exactScope)
+                {
+                    var exactPage = await provider.ListExactPageAsync(connection, bucket, listPrefix,
+                        true, token, 1000, budget.Token);
+                    page = new(exactPage.Objects, exactPage.ContinuationToken);
+                }
+                else
+                    page = await provider.ListObjectsAsync(connection, bucket, listPrefix, token, 1000, budget.Token);
+            }
+            catch (OperationCanceledException) when (budget.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            {
+                return new PrefixSearchResult(visible, matches, scanned, requests, false,
+                    new PrefixSearchCursor(token, offset));
+            }
+            if (exactScope && page.Items.Count > 1000)
+                throw new InvalidOperationException("The storage provider exceeded the requested page size.");
             if (offset > page.Items.Count)
                 throw new InvalidOperationException("The search continuation is no longer valid.");
 
@@ -96,11 +126,18 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
             for (var index = offset; index < page.Items.Count; index++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                if (scanned >= MaxSearchObjectsPerRun || budget.IsCancellationRequested)
+                {
+                    if (batch.Count > 0)
+                        onMatches?.Invoke(batch);
+                    progress?.Invoke(new PrefixSearchProgress(scanned, requests, matches.Count));
+                    return new PrefixSearchResult(visible, matches, scanned, requests, false, new PrefixSearchCursor(token, index));
+                }
                 var item = page.Items[index];
                 if (string.IsNullOrEmpty(item.Key) || !item.Key.StartsWith(listPrefix, StringComparison.Ordinal))
                     continue;
                 scanned++;
-                if (item.Key.Length <= visible.Length)
+                if (!exactScope && item.Key.Length <= visible.Length)
                     continue;
                 var entry = SearchEntry(item, visible, needle, matchKeyPrefix);
                 if (entry is null || !seenKeys.Add(entry.Key))
@@ -273,13 +310,26 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         if (!ObjectLayout.TryJoin(VisiblePrefix(connection, prefix), name, folder: true, out var key, out var issue))
             return MutationReport.FromIssue(name ?? "", ObjectLayout.NameFailure(issue));
 
-        var provider = Provider(connection);
-        if (await provider.ObjectExistsAsync(connection, bucket, key, cancellationToken))
-            return MutationReport.Conflict(1);
-
-        await using var empty = new MemoryStream([]);
-        await provider.UploadAsync(connection, bucket, key, empty, null, null, cancellationToken);
+        try { await CreateFolderMarkerAsync(connection, bucket, key, cancellationToken); }
+        catch (StorageException exception) when (exception.Failure.Kind == StorageFailureKind.PreconditionFailed ||
+            exception.Failure.StatusCode == 409) { return MutationReport.Conflict(1); }
         return new MutationReport(1, 0, 0, false, 0, []);
+    }
+
+    public async Task CreateFolderMarkerAsync(StorageConnection connection, string bucket, string key,
+        CancellationToken cancellationToken)
+    {
+        connection = await ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+        if (key.Length < 2 || !key.EndsWith('/') || !ExplorerPath.FitsKey(key))
+            throw new ArgumentException("A valid folder marker key is required.", nameof(key));
+        ObjectAccess.Ensure(connection, bucket, key, write: true);
+        if (remote is null)
+            throw new NotSupportedException("Conditional marker creation is unavailable.");
+        await using var lease = await remote.OpenAsync(connection, write: true, cancellationToken);
+        lease.EnsureVerifiedConditionalPut();
+        await using var empty = new MemoryStream([]);
+        await lease.PutConditionalAsync(bucket, key, empty, 0, null, "1B2M2Y8AsgTpgAmY7PhCfg==",
+            expectedETag: null, requireMissing: true, cancellationToken);
     }
 
     public async Task<MutationReport> CreateTextFileAsync(
@@ -313,15 +363,23 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
 
     public async Task<DeletePreview> PreviewDeleteAsync(
         StorageConnection connection, string bucket, IReadOnlyList<ObjectEntry> entries,
-        CancellationToken cancellationToken, Action<OperationScanProgress>? progress = null)
+        CancellationToken cancellationToken, Action<OperationScanProgress>? progress = null,
+        int? maxObjects = null)
     {
         ArgumentNullException.ThrowIfNull(entries);
+        connection = await ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
         ObjectAccess.Ensure(connection, bucket, null, write: true);
         var keys = new HashSet<string>(StringComparer.Ordinal);
         var etags = new Dictionary<string, string>(StringComparer.Ordinal);
         var requests = 0;
         var scanned = 0;
         var provider = Provider(connection);
+        void Count(int count)
+        {
+            scanned += count;
+            if (scanned > maxObjects)
+                throw new ObjectManifestLimitException();
+        }
         foreach (var entry in entries)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -331,7 +389,7 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
                 keys.Add(entry.Key);
                 if (!string.IsNullOrWhiteSpace(entry.ETag))
                     etags[entry.Key] = entry.ETag;
-                scanned++;
+                Count(1);
                 progress?.Invoke(new OperationScanProgress(scanned, requests, 0));
             }
             else
@@ -339,13 +397,13 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
                     cancellationToken, pageCount =>
                     {
                         requests++;
-                        scanned += pageCount;
                         progress?.Invoke(new OperationScanProgress(scanned, requests, 0));
                     }, item =>
                     {
+                        Count(1);
                         if (!string.IsNullOrWhiteSpace(item.ETag))
                             etags[item.Key] = item.ETag;
-                    }))
+                    }, exact: maxObjects is not null))
                     keys.Add(key);
         }
         // Some compatible providers omit ETags from listings. Resolve these
@@ -368,7 +426,7 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
 
     public async Task<MutationReport> DeletePreparedAsync(
         StorageConnection connection, DeletePreview preview, CancellationToken cancellationToken,
-        Action<CopyProgress>? progress = null)
+        Action<CopyProgress>? progress = null, bool requireVerifiedDelete = false)
     {
         ArgumentNullException.ThrowIfNull(preview);
         if (preview.ConnectionId != connection.Id)
@@ -378,6 +436,13 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
             return denied;
         foreach (var key in preview.Keys)
             ObjectAccess.Ensure(connection, preview.Bucket, key, write: true);
+        if (requireVerifiedDelete && preview.Keys.Count > 0)
+        {
+            if (remote is null)
+                throw new NotSupportedException("Verified conditional deletion is unavailable.");
+            await using var lease = await remote.OpenAsync(connection, write: true, cancellationToken);
+            lease.EnsureVerifiedConditionalDelete();
+        }
         return await DeleteKeysAsync(connection, preview.Bucket, preview.Keys, cancellationToken,
             progress, preview.SourceETags);
     }
@@ -853,14 +918,23 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
     private static async Task<IReadOnlyList<string>> ListKeysAsync(
         IObjectStorageProvider provider, StorageConnection connection, string bucket, string prefix,
         CancellationToken cancellationToken, Action<int>? pageVisited = null,
-        Action<StorageObject>? objectVisited = null)
+        Action<StorageObject>? objectVisited = null, bool exact = false)
     {
         var keys = new List<string>();
         var seenTokens = new HashSet<string>(StringComparer.Ordinal);
         string? token = null;
         while (true)
         {
-            var page = await provider.ListObjectsAsync(connection, bucket, prefix, token, 1000, cancellationToken);
+            StoragePage<StorageObject> page;
+            if (exact)
+            {
+                var listed = await provider.ListExactPageAsync(connection, bucket, prefix, true, token, 1000, cancellationToken);
+                page = new(listed.Objects, listed.ContinuationToken);
+                if (page.Items.Count > 1000 || page.Items.Any(item => !item.Key.StartsWith(prefix, StringComparison.Ordinal)))
+                    throw new InvalidOperationException("The storage provider returned an invalid page.");
+            }
+            else
+                page = await provider.ListObjectsAsync(connection, bucket, prefix, token, 1000, cancellationToken);
             var accepted = 0;
             foreach (var item in page.Items)
             {

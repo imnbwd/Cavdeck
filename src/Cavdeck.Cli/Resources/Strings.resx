@@ -72,4 +72,57 @@
   <data name="Reachable" xml:space="preserve"><value>Connection '{0}' is reachable.</value></data>
   <data name="Transferred" xml:space="preserve"><value>Transferred {0:N0} of {1:N0} bytes.</value></data>
   <data name="ErrorLine" xml:space="preserve"><value>Error [{0}]: {1}</value></data>
+  <data name="ObjectSearch" xml:space="preserve"><value>Search object names or key prefixes.</value></data>
+  <data name="SearchMatch" xml:space="preserve"><value>Match mode (name or key-prefix).</value></data>
+  <data name="SearchProgress" xml:space="preserve"><value>Scanned {0} objects. Found {1} matches.</value></data>
+  <data name="ObjectMkdir" xml:space="preserve"><value>Create an empty directory marker.</value></data>
+  <data name="ObjectPresign" xml:space="preserve"><value>Sign a private download URL.</value></data>
+  <data name="PresignLifetime" xml:space="preserve"><value>Link lifetime in seconds (60–604800, default 3600).</value></data>
+  <data name="PresignUnsupported" xml:space="preserve"><value>This connection provider cannot sign download URLs.</value></data>
+  <data name="InvalidSearchToken" xml:space="preserve"><value>Use the page token returned for the same connection, scope, query and match mode.</value></data>
+  <data name="SearchTokenTooLarge" xml:space="preserve"><value>The search checkpoint is too large. Narrow the search scope and start again.</value></data>
+  <data name="ObjectCopy" xml:space="preserve"><value>Copy objects using conditional writes.</value></data>
+  <data name="ObjectMove" xml:space="preserve"><value>Copy and verify objects before removing the sources.</value></data>
+  <data name="ObjectRemove" xml:space="preserve"><value>Preview or conditionally delete objects.</value></data>
+  <data name="ConfirmOperation" xml:space="preserve"><value>Confirm the requested write or deletion.</value></data>
+  <data name="PreviewOperation" xml:space="preserve"><value>Preview the operation without making changes.</value></data>
+  <data name="MaxDeleteObjects" xml:space="preserve"><value>Maximum objects to delete (1–100000, default 10000).</value></data>
+  <data name="DeleteLimit" xml:space="preserve"><value>The deletion exceeds the object limit. Narrow the prefix or increase --max-objects.</value></data>
+  <data name="CopyLimit" xml:space="preserve"><value>The transfer exceeds the object manifest limit. Narrow the source prefix.</value></data>
+  <data name="CopyOverlap" xml:space="preserve"><value>The destination overlaps the source.</value></data>
+  <data name="SourceETagRequired" xml:space="preserve"><value>The storage provider did not return an ETag for the source.</value></data>
+  <data name="SourceChanged" xml:space="preserve"><value>The source object changed after it was selected.</value></data>
+  <data name="RunMissing" xml:space="preserve"><value>The specified transfer run was not found.</value></data>
+  <data name="RunInProgress" xml:space="preserve"><value>The transfer run is active. Wait for it to finish before resuming.</value></data>
+  <data name="ConnectionUpdate" xml:space="preserve"><value>Update only the supplied connection settings.</value></data>
+  <data name="ConnectionAdd" xml:space="preserve"><value>Save a new storage connection.</value></data>
+  <data name="ConnectionRemove" xml:space="preserve"><value>Preview or remove a saved connection.</value></data>
+  <data name="ConnectionName" xml:space="preserve"><value>Display name for the connection.</value></data>
+  <data name="ConnectionProvider" xml:space="preserve"><value>Provider (aws-s3, cloudflare-r2, minio or s3-compatible).</value></data>
+  <data name="AccessEnv" xml:space="preserve"><value>Environment variable that contains the access key ID.</value></data>
+  <data name="SecretEnv" xml:space="preserve"><value>Environment variable that contains the secret access key.</value></data>
+  <data name="CredentialsRequired" xml:space="preserve"><value>Provide an access key ID and a secret. Use --secret-env for automation.</value></data>
+  <data name="SecretPrompt" xml:space="preserve"><value>Secret access key (hidden). Press Enter to continue or Esc to cancel. </value></data>
+  <data name="CatalogBusy" xml:space="preserve"><value>Another process is editing connections. Try again shortly.</value></data>
+  <data name="ConnectionNameExists" xml:space="preserve"><value>A connection already uses this name.</value></data>
+  <data name="RunHistory" xml:space="preserve"><value>List recent CLI transfer runs.</value></data>
+  <data name="RunShow" xml:space="preserve"><value>Show jobs in a transfer run.</value></data>
+  <data name="RunResume" xml:space="preserve"><value>Resume eligible jobs in a transfer run.</value></data>
+  <data name="RunId" xml:space="preserve"><value>Transfer run GUID.</value></data>
+  <data name="JobId" xml:space="preserve"><value>Select one transfer job by GUID.</value></data>
+  <data name="RunLimit" xml:space="preserve"><value>Number of results to return.</value></data>
+  <data name="RunState" xml:space="preserve"><value>Filter by transfer state.</value></data>
+  <data name="RunKind" xml:space="preserve"><value>Filter by upload, download, copy or move.</value></data>
+  <data name="RunOffset" xml:space="preserve"><value>Number of matching jobs to skip.</value></data>
+  <data name="JobMissing" xml:space="preserve"><value>The specified job was not found in this run.</value></data>
+  <data name="JobNotResumable" xml:space="preserve"><value>The run has no eligible jobs or batches to resume.</value></data>
+  <data name="RunCorrupted" xml:space="preserve"><value>The transfer journal or run metadata could not be read.</value></data>
+  <data name="RunSkipped" xml:space="preserve"><value>Transfer run {0} could not be read.</value></data>
+  <data name="LegacyRunNotResumable" xml:space="preserve"><value>This older run lacks the connection checkpoints required for safe recovery.</value></data>
+  <data name="ConditionalDeleteUnsupported" xml:space="preserve"><value>This provider has no verified ETag-conditional delete support.</value></data>
+  <data name="SearchComplete" xml:space="preserve"><value>Search complete. Scanned {0} objects in {1} requests.</value></data>
+  <data name="SearchPartial" xml:space="preserve"><value>Partial results. Scanned {0} objects in {1} requests. Use the next page token to continue.</value></data>
+  <data name="NextOffset" xml:space="preserve"><value>More jobs are available. Use --offset {0}.</value></data>
+  <data name="ConfirmationRequired" xml:space="preserve"><value>Use --yes to confirm a move or an overwrite.</value></data>
+  <data name="PreviewOrConfirm" xml:space="preserve"><value>Use --dry-run to preview or --yes to execute. Choose one.</value></data>
 </root>

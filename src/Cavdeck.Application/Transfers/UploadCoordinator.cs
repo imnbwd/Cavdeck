@@ -20,6 +20,9 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
             var source = job.FolderMarker ? null : new FileInfo(job.LocalPath);
             var length = source?.Length ?? 0;
             DateTimeOffset? modifiedAt = source is null ? null : new DateTimeOffset(source.LastWriteTimeUtc);
+            if (options.IsolatedRun && job.BaselineCaptured &&
+                (job.TotalBytes != length || job.SourceModifiedAt != modifiedAt))
+                return Fail(job, new TransferFailure(TransferFailureKind.Integrity, false, "LocalSourceChanged", null));
             if (!string.IsNullOrEmpty(job.UploadId)
                 && (job.TotalBytes != length || job.SourceModifiedAt != modifiedAt))
             {
@@ -46,10 +49,12 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
             if (remote is not null && job.Conflict == TransferConflictPolicy.Fail)
                 return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false,
                     "TargetExists", "The destination already exists."));
-            if (remote is not null && job.Conflict == TransferConflictPolicy.Skip && string.IsNullOrEmpty(job.UploadId))
+            if (remote is not null && job.Conflict == TransferConflictPolicy.Skip && string.IsNullOrEmpty(job.UploadId)
+                && (!options.IsolatedRun || !job.BaselineCaptured))
                 return job with { State = TransferState.Completed, Skipped = true, UpdatedAt = clock.UtcNow, Failure = null };
 
-            if (remote is not null && job.Conflict == TransferConflictPolicy.Rename && string.IsNullOrEmpty(job.UploadId))
+            if (remote is not null && job.Conflict == TransferConflictPolicy.Rename && string.IsNullOrEmpty(job.UploadId)
+                && (!options.IsolatedRun || !job.BaselineCaptured))
             {
                 var renamed = await RenameAsync(job, lease, cancellationToken);
                 if (renamed.State == TransferState.Failed)

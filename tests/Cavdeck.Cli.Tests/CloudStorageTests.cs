@@ -1,7 +1,11 @@
 using System.Text;
 using Cavdeck.Application.Abstractions;
+using Cavdeck.Application.Explorer;
+using Cavdeck.Application.Transfers;
 using Cavdeck.Domain.Storage;
+using Cavdeck.Domain.Transfers;
 using Cavdeck.Infrastructure.S3;
+using Cavdeck.Infrastructure.Transfers;
 using Xunit;
 
 namespace Cavdeck.Cli.Tests;
@@ -49,6 +53,7 @@ public sealed class CloudStorageTests
             await using var body = await lease.OpenDownloadAsync(bucket, key, null, token);
             using var reader = new StreamReader(body.Content);
             Assert.Equal("original", await reader.ReadToEndAsync(token));
+            await VerifyManagementAsync(transfer, providers, credentials, pool, connection, bucket, key, head.ETag, token);
 
             if (lease.SupportsVerifiedConditionalMultipart)
             {
@@ -85,6 +90,88 @@ public sealed class CloudStorageTests
             await lease.PutConditionalAsync(bucket, key, content, content.Length, "text/plain",
                 Digest(content), null, true, token);
         }
+    }
+
+    private static async Task VerifyManagementAsync(S3ObjectTransfer transfer, S3ProviderFactory providers,
+        Vault credentials, S3ClientLeasePool pool, StorageConnection source, string bucket, string key,
+        string? etag, CancellationToken token)
+    {
+        var marker = key + ".dir/";
+        var copy = key + ".copy";
+        var moved = key + ".moved";
+        var ownsMarker = false;
+        var ownsCopy = false;
+        var ownsMoved = false;
+        var target = source with { Id = Guid.NewGuid(), Name = "integration target" };
+        var explorer = new ExplorerService(providers, remote: transfer);
+        using var signer = new S3DownloadLinkSigner(credentials, pool);
+        await using var cleanupLease = await transfer.OpenAsync(source, write: true, token);
+        var root = Directory.CreateTempSubdirectory("cavdeck-cli-cloud-").FullName;
+        try
+        {
+            await explorer.CreateFolderMarkerAsync(source, bucket, marker, token);
+            ownsMarker = true;
+            var duplicate = await Assert.ThrowsAsync<StorageException>(() => explorer.CreateFolderMarkerAsync(source, bucket, marker, token));
+            Assert.Equal(StorageFailureKind.PreconditionFailed, duplicate.Failure.Kind);
+
+            var signed = await signer.SignDownloadAsync(source with { IsReadOnly = true }, bucket, key,
+                TimeSpan.FromMinutes(1), token);
+            Assert.False(signed.IsPublic);
+            Assert.True(Uri.TryCreate(signed.Url, UriKind.Absolute, out _));
+            using var http = new HttpClient();
+            string downloaded;
+            try { downloaded = await http.GetStringAsync(signed.Url, token); }
+            catch (HttpRequestException) { throw new InvalidOperationException("The presigned GET failed."); }
+            Assert.Equal("original", downloaded);
+
+            var copied = await RunCopyAsync(key, copy, etag, move: false);
+            ownsCopy = copied.State == TransferState.Completed;
+            Assert.Equal(TransferState.Completed, copied.State);
+            Assert.Equal("SHA256", copied.CrossTransfer?.Verification);
+            var before = await cleanupLease.HeadAsync(bucket, copy, token);
+            Assert.NotNull(before);
+            if (source.Provider == StorageProviderKind.AwsS3 && source.Endpoint.Length == 0)
+            {
+                var conflict = await Assert.ThrowsAsync<StorageException>(() => cleanupLease.DeleteIfMatchAsync(bucket, copy,
+                    "\"00000000000000000000000000000000\"", token));
+                Assert.Equal(StorageFailureKind.PreconditionFailed, conflict.Failure.Kind);
+                var movedJob = await RunCopyAsync(copy, moved, before.ETag, move: true);
+                ownsMoved = movedJob.State == TransferState.Completed;
+                Assert.Equal(TransferState.Completed, movedJob.State);
+                Assert.Null(await cleanupLease.HeadAsync(bucket, copy, token));
+                ownsCopy = false;
+            }
+        }
+        finally
+        {
+            using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            if (ownsMarker)
+                await cleanupLease.DeleteAsync(bucket, marker, cleanup.Token);
+            if (ownsCopy)
+                await cleanupLease.DeleteAsync(bucket, copy, cleanup.Token);
+            if (ownsMoved)
+                await cleanupLease.DeleteAsync(bucket, moved, cleanup.Token);
+            Directory.Delete(root, recursive: true);
+        }
+
+        async Task<TransferJob> RunCopyAsync(string from, string to, string? expected, bool move)
+        {
+            using var journal = new SqliteTransferJournal(Path.Combine(root, Guid.NewGuid().ToString("N") + ".db"));
+            await using var engine = new TransferEngine(transfer, journal, new Connections(source, target),
+                new TransferEngineOptions { IsolatedRun = true });
+            var run = await TransferRunCoordinator.RunAsync(engine, (worker, ct) =>
+                worker.EnqueueCrossCopiesAsync(source, target, bucket, [new DownloadItem(from, false, 8, to, expected)],
+                    bucket, "", TransferConflictPolicy.Fail, ct, move, exactTargets: true), progress: false, token);
+            Assert.Null(run.SubmissionError);
+            Assert.Null(run.BackgroundError);
+            return Assert.Single(run.Jobs);
+        }
+    }
+
+    private sealed class Connections(StorageConnection source, StorageConnection destination) : ITransferConnections
+    {
+        public Task<StorageConnection?> FindAsync(Guid id, CancellationToken token) =>
+            Task.FromResult<StorageConnection?>(id == source.Id ? source : id == destination.Id ? destination : null);
     }
 
     private static string Digest(MemoryStream content) =>

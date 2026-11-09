@@ -119,7 +119,7 @@ Use least-privilege credentials and read-only mode when you do not need to modif
 
 ## Windows CLI
 
-Use the standalone cavdeck.exe to list objects, inspect metadata, and transfer files with saved connections. See the [CLI guide](docs/cli.md) for installation and commands.
+Use the standalone `cavdeck.exe` to manage saved connections, search and manage objects, sign download links, and inspect or resume transfers. The CLI shares connections with the desktop app and keeps its transfer history separate. See the [CLI guide](docs/cli.md) for installation, PowerShell examples, and provider limits.
 
 ## Building from source
 

@@ -68,7 +68,8 @@ public interface ITransferJournal
 public sealed record ListedObject(string Key, long Size, string? ETag);
 public sealed record ListedPage(IReadOnlyList<ListedObject> Objects, string? ContinuationToken);
 
-public sealed record DownloadItem(string Key, bool Folder, long? Size, string? DestinationKey = null);
+public sealed record DownloadItem(string Key, bool Folder, long? Size, string? DestinationKey = null,
+    string? SourceETag = null);
 
 public sealed class DownloadBody : IAsyncDisposable
 {
@@ -86,6 +87,9 @@ public interface IRemoteTransferLease : IAsyncDisposable
     void EnsureVerifiedConditionalPut() =>
         throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
             "ConditionalWriteUnsupported", null, null, null));
+    void EnsureVerifiedConditionalDelete() =>
+        throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+            "ConditionalDeleteUnsupported", null, null, null));
 
     Task<RemoteIdentity?> HeadAsync(string bucket, string key, CancellationToken cancellationToken);
 

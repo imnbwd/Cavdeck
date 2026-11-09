@@ -224,8 +224,6 @@ internal sealed class DestinationChangedException : IOException
     public DestinationChangedException() : base("The local destination changed while downloading.") { }
 }
 
-internal readonly record struct LocalFileStamp(long Length, DateTime LastWriteUtc, DateTime CreationUtc);
-
 internal static class TransferFiles
 {
     public static LocalFileStamp? Snapshot(string path)

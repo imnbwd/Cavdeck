@@ -10,7 +10,8 @@ internal sealed record TransferRunResult(
 internal static class TransferRunCoordinator
 {
     public static async Task<TransferRunResult> RunAsync(TransferEngine engine,
-        Func<TransferEngine, CancellationToken, Task> submit, bool progress, CancellationToken cancellationToken)
+        Func<TransferEngine, CancellationToken, Task> submit, bool progress, CancellationToken cancellationToken,
+        bool resume = false)
     {
         using var stop = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var changes = Channel.CreateBounded<bool>(1);
@@ -42,7 +43,8 @@ internal static class TransferRunCoordinator
         {
             try
             {
-                await engine.StartAsync(stop.Token);
+                if (!resume)
+                    await engine.StartAsync(stop.Token);
                 await submit(engine, stop.Token);
             }
             catch (Exception exception)
@@ -57,7 +59,7 @@ internal static class TransferRunCoordinator
             }
             catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
 
-            var jobs = await engine.FinishIsolatedRunAsync();
+            var jobs = await engine.FinishIsolatedRunAsync(preserveRetryableState: true);
             return new(jobs, submissionError, backgroundError);
         }
         finally

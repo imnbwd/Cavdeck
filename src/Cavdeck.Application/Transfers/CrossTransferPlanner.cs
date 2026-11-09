@@ -5,7 +5,7 @@ using Cavdeck.Domain.Transfers;
 
 namespace Cavdeck.Application.Transfers;
 
-internal static class CrossTransferPlanner
+public static class CrossTransferPlanner
 {
     public static string Prefix(string? key) => string.IsNullOrEmpty(key) || key.EndsWith('/')
         ? key ?? "" : key + "/";
@@ -23,6 +23,8 @@ internal static class CrossTransferPlanner
 
     public static bool SameBackend(StorageConnection left, StorageConnection right)
     {
+        if (left.Id == right.Id)
+            return true;
         if (left.Provider == StorageProviderKind.AwsS3 && right.Provider == StorageProviderKind.AwsS3
             && string.IsNullOrEmpty(left.Endpoint) && string.IsNullOrEmpty(right.Endpoint))
             return true;

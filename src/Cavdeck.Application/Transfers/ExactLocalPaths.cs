@@ -38,7 +38,8 @@ public static class ExactLocalPaths
 
     // Open each component without following reparse points and deny deletion
     // for the lifetime of the operation. Check attributes on the opened handle.
-    internal static IDisposable Pin(string path, bool includeLeaf, bool createDirectories = false)
+    public static IDisposable Pin(string path, bool includeLeaf, bool createDirectories = false,
+        FileShare leafShare = FileShare.Read)
     {
         var full = FullPath(path);
         var root = Path.GetPathRoot(full)!;
@@ -55,7 +56,7 @@ public static class ExactLocalPaths
                 var directory = i < components.Length - 1 || createDirectories;
                 if (createDirectories && directory)
                     Directory.CreateDirectory(current);
-                pins.Add(current, directory);
+                pins.Add(current, directory, directory ? FileShare.Read : leafShare);
             }
             return pins;
         }
@@ -66,7 +67,7 @@ public static class ExactLocalPaths
         }
     }
 
-    internal static void RejectExistingReparsePoint(string path)
+    public static void RejectExistingReparsePoint(string path)
     {
         try
         {
@@ -81,7 +82,7 @@ public static class ExactLocalPaths
     {
         private readonly List<SafeFileHandle> _handles = [];
 
-        public void Add(string path, bool directory)
+        public void Add(string path, bool directory, FileShare share)
         {
             if (!OperatingSystem.IsWindows())
                 throw new PlatformNotSupportedException();
@@ -91,7 +92,7 @@ public static class ExactLocalPaths
             const uint backupSemantics = 0x02000000;
             var longPath = path.StartsWith(@"\\", StringComparison.Ordinal)
                 ? @"\\?\UNC\" + path[2..] : @"\\?\" + path;
-            var handle = CreateFile(longPath, readAttributes, FileShare.Read, IntPtr.Zero,
+            var handle = CreateFile(longPath, readAttributes, share, IntPtr.Zero,
                 openExisting, openReparsePoint | backupSemantics, IntPtr.Zero);
             _handles.Add(handle);
             if (handle.IsInvalid || !GetFileInformationByHandleEx(handle, 9, out var info, 8))

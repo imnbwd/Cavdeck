@@ -28,23 +28,29 @@ internal sealed class CrossTransferCoordinator(
 
         await using var source = await remote.OpenAsync(sourceConnection, write: spec.Move, cancellationToken);
         await using var destination = await remote.OpenAsync(destinationConnection, write: true, cancellationToken);
+        if (options.IsolatedRun && spec.Move)
+            source.EnsureVerifiedConditionalDelete();
         if (spec.Move && spec.Stage == CrossTransferStage.Removing)
             return await CompleteMoveAsync(job, source, destination, cancellationToken);
+        if (options.IsolatedRun)
+            destination.EnsureVerifiedConditionalPut();
 
         var identity = await source.HeadAsync(spec.Source.Bucket, spec.Source.Key, cancellationToken);
         if (identity is null)
             return Failure(job, TransferFailureKind.NotFound, "SourceMissing");
         if (string.IsNullOrWhiteSpace(identity.ETag))
             return Failure(job, TransferFailureKind.Unsupported, "SourceHasNoETag");
-        if (spec.SourceIdentity is not null && !SameIdentity(spec.SourceIdentity, identity))
+        if ((spec.SourceETag is not null && !string.Equals(RemoteIdentity.Normalize(spec.SourceETag),
+                RemoteIdentity.Normalize(identity.ETag), StringComparison.Ordinal)) ||
+            (spec.SourceIdentity is not null && !SameIdentity(spec.SourceIdentity, identity)))
             return Failure(job, TransferFailureKind.Integrity, "SourceChanged");
 
         var originalDestination = await destination.HeadAsync(spec.Destination.Bucket, spec.Destination.Key, cancellationToken);
-        if (job.UploadId is not null && spec.Stage == CrossTransferStage.Verifying
+        if ((job.UploadId is not null || spec.SinglePut) && spec.Stage == CrossTransferStage.Verifying
             && originalDestination is not null
             && !SameIdentity(spec.DestinationBaseline, originalDestination))
         {
-            var verificationPlan = CrossTransferPlanner.Plan(identity.Size, options);
+            var verificationPlan = VerificationPlan(identity.Size, spec);
             var savedParts = (await journal.GetPartsAsync(job.Id, cancellationToken))
                 .Where(part => part.Sha256 is not null).ToDictionary(part => part.Number);
             if (verificationPlan.Count == savedParts.Count)
@@ -54,11 +60,16 @@ internal sealed class CrossTransferCoordinator(
         }
         if (spec.DestinationBaseline is not null && !SameIdentity(spec.DestinationBaseline, originalDestination))
             return Failure(job, TransferFailureKind.Conflict, "DestinationChanged");
-        if (job.UploadId is not null && spec.DestinationBaseline is null && originalDestination is not null)
+        if (spec.Stage != CrossTransferStage.Preparing && spec.DestinationBaseline is null && originalDestination is not null)
             return Failure(job, TransferFailureKind.Conflict, "DestinationAppearedDuringResume");
 
-        if (job.UploadId is null && originalDestination is not null)
+        if (spec.Stage == CrossTransferStage.Preparing && originalDestination is not null)
         {
+            if (options.IsolatedRun && spec.Move && spec.Source.Bucket == spec.Destination.Bucket &&
+                spec.Source.Key == spec.Destination.Key && SameIdentity(identity, originalDestination))
+                return Failure(job, TransferFailureKind.Conflict, "SourceAndDestinationMatch");
+            if (spec.Conflict == TransferConflictPolicy.Fail)
+                return Failure(job, TransferFailureKind.Conflict, "TargetExists");
             if (spec.Conflict == TransferConflictPolicy.Skip)
                 return job with { State = TransferState.Completed, Skipped = true, UpdatedAt = clock.UtcNow };
             if (spec.Conflict == TransferConflictPolicy.Rename)
@@ -76,7 +87,7 @@ internal sealed class CrossTransferCoordinator(
                 return Failure(job, TransferFailureKind.Unsupported, "DestinationHasNoETag");
         }
 
-        if (job.UploadId is null)
+        if (spec.Stage == CrossTransferStage.Preparing)
         {
             spec = spec with
             {
@@ -85,7 +96,8 @@ internal sealed class CrossTransferCoordinator(
                 DestinationBaseline = originalDestination,
                 SourceConfiguration = sourceConfig,
                 DestinationConfiguration = destinationConfig,
-                Stage = CrossTransferStage.Transferring
+                Stage = CrossTransferStage.Transferring,
+                SinglePut = identity.Size == 0 || options.IsolatedRun && !destination.SupportsVerifiedConditionalMultipart
             };
             job = job with { CrossTransfer = spec, Key = spec.Destination.Key,
                 ContentType = identity.ContentType,
@@ -93,22 +105,11 @@ internal sealed class CrossTransferCoordinator(
             await sink.PublishAsync(job, cancellationToken);
         }
 
-        var plan = CrossTransferPlanner.Plan(identity.Size, options);
+        var plan = VerificationPlan(identity.Size, spec);
         if (plan.Any(part => part.Length > tempBudget.Limit))
             return Failure(job, TransferFailureKind.Unsupported, "PartExceedsTemporaryStorageBudget");
-        if (plan.Count == 0)
-        {
-            using var empty = new MemoryStream(Array.Empty<byte>());
-            await destination.PutConditionalAsync(spec.Destination.Bucket, spec.Destination.Key,
-                empty, 0, job.ContentType, Convert.ToBase64String(MD5.HashData(Array.Empty<byte>())),
-                originalDestination?.ETag, originalDestination is null, cancellationToken);
-            var zeroHead = await destination.HeadAsync(spec.Destination.Bucket, spec.Destination.Key, cancellationToken);
-            if (zeroHead?.Size != 0)
-                return Failure(job, TransferFailureKind.Integrity, "DestinationSizeMismatch");
-            return await FinishCopyAsync(job with { State = TransferState.Completed, BytesTransferred = 0,
-                CrossTransfer = spec with { Stage = CrossTransferStage.Verifying, Verification = "SHA256" }, UpdatedAt = clock.UtcNow },
-                source, destination, cancellationToken);
-        }
+        if (spec.SinglePut || plan.Count == 0)
+            return await PutSingleAsync(job, source, destination, identity, plan, cancellationToken);
 
         destination.EnsureConditionalMultipartSupported();
 
@@ -177,6 +178,36 @@ internal sealed class CrossTransferCoordinator(
         }
     }
 
+    private IReadOnlyList<TransferPart> VerificationPlan(long size, CrossTransferSpec spec) =>
+        spec.SinglePut && size > 0 ? [new TransferPart(1, 0, size, null)] : CrossTransferPlanner.Plan(size, options);
+
+    private async Task<TransferJob> PutSingleAsync(TransferJob job, IRemoteTransferLease source,
+        IRemoteTransferLease destination, RemoteIdentity identity, IReadOnlyList<TransferPart> plan,
+        CancellationToken cancellationToken)
+    {
+        var spec = job.CrossTransfer!;
+        if (identity.Size > 5L * 1024 * 1024 * 1024)
+            return Failure(job, TransferFailureKind.Unsupported, "ConditionalMultipartUnsupported");
+        using var empty = new MemoryStream([]);
+        await using var buffer = plan.Count == 0 ? null : await ReadPartAsync(source, spec.Source, identity.ETag!,
+            plan[0], options.CrossCopyMemoryBudgetBytes / 8, tempBudget, cancellationToken);
+        var saved = new Dictionary<int, TransferPart>();
+        if (buffer is not null)
+        {
+            saved.Add(1, plan[0] with { Sha256 = buffer.Sha256 });
+            await sink.SavePartAsync(job.Id, saved[1], cancellationToken);
+        }
+        if (!SameIdentity(identity, await source.HeadAsync(spec.Source.Bucket, spec.Source.Key, cancellationToken)))
+            return Failure(job, TransferFailureKind.Integrity, "SourceChanged");
+        job = job with { CrossTransfer = spec with { Stage = CrossTransferStage.Verifying }, UpdatedAt = clock.UtcNow };
+        await sink.PublishAsync(job, cancellationToken);
+        await destination.PutConditionalAsync(spec.Destination.Bucket, spec.Destination.Key, buffer?.Content ?? empty,
+            identity.Size, job.ContentType, buffer?.Md5 ?? "1B2M2Y8AsgTpgAmY7PhCfg==",
+            spec.DestinationBaseline?.ETag, spec.DestinationBaseline is null, cancellationToken);
+        return await FinishCopyAsync(await VerifyAsync(job, destination, plan, saved, cancellationToken),
+            source, destination, cancellationToken);
+    }
+
     private async Task<TransferJob> FinishCopyAsync(TransferJob verified,
         IRemoteTransferLease source, IRemoteTransferLease destination, CancellationToken cancellationToken)
     {
@@ -204,7 +235,7 @@ internal sealed class CrossTransferCoordinator(
 
         // Reverify on restart, including when the source was deleted immediately
         // before a crash. Never trust a size-only check for a completed move.
-        var plan = CrossTransferPlanner.Plan(original.Size, options);
+        var plan = VerificationPlan(original.Size, spec);
         var saved = (await journal.GetPartsAsync(job.Id, cancellationToken))
             .Where(part => part.Sha256 is not null).ToDictionary(part => part.Number);
         if (plan.Count != saved.Count)
@@ -322,8 +353,10 @@ internal sealed class CrossTransferCoordinator(
                 completed[part.Number].Sha256, StringComparison.OrdinalIgnoreCase))
                 return Failure(job, TransferFailureKind.Integrity, "DestinationChecksumMismatch");
         }
+        if (!SameIdentity(head, await destination.HeadAsync(spec.Destination.Bucket, spec.Destination.Key, cancellationToken)))
+            return Failure(job, TransferFailureKind.Conflict, "DestinationChanged");
         return job with { State = TransferState.Completed, BytesTransferred = head.Size,
-            CrossTransfer = spec with { Verification = "SHA256" }, UpdatedAt = clock.UtcNow };
+            UploadId = null, CrossTransfer = spec with { Verification = "SHA256" }, UpdatedAt = clock.UtcNow };
     }
 
     private static async Task<CrossPartBuffer> ReadPartAsync(IRemoteTransferLease source,

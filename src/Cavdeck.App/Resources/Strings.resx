@@ -838,4 +838,5 @@ Repair the file and retry before changing connections.</value></data>
   <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>Explorer can’t open this folder without changing its key.</value></data>
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>Go to Path…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>Go to Path (Ctrl+G)</value></data>
+  <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>A connection already uses this name.</value></data>
 </root>

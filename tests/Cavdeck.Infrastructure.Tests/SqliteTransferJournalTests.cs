@@ -8,6 +8,34 @@ namespace Cavdeck.Infrastructure.Tests;
 public sealed class SqliteTransferJournalTests
 {
     [Fact]
+    public async Task ReadOnlyHistoryDoesNotCreateOrMigrateDatabases()
+    {
+        var root = Directory.CreateTempSubdirectory("cavdeck-readonly-journal-").FullName;
+        try
+        {
+            var missing = Path.Combine(root, "missing", "transfers.db");
+            using (var absent = new SqliteTransferJournal(missing, readOnly: true))
+                await Assert.ThrowsAsync<SqliteException>(() => absent.ReadHistoryCountsAsync(CancellationToken.None));
+            Assert.False(Directory.Exists(Path.GetDirectoryName(missing)));
+
+            var path = Path.Combine(root, "legacy.db");
+            await using (var db = new SqliteConnection($"Data Source={path};Pooling=False"))
+            {
+                await db.OpenAsync();
+                await using var command = db.CreateCommand();
+                command.CommandText = "CREATE TABLE jobs (id TEXT PRIMARY KEY, state TEXT, updated TEXT, payload TEXT);";
+                await command.ExecuteNonQueryAsync();
+            }
+            var before = await File.ReadAllBytesAsync(path);
+            using (var history = new SqliteTransferJournal(path, readOnly: true))
+                Assert.Empty(await history.ReadHistoryCountsAsync(CancellationToken.None));
+            Assert.Equal(before, await File.ReadAllBytesAsync(path));
+            Assert.Single(Directory.EnumerateFiles(root));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void Default_journal_path_does_not_share_the_installer_directory()
     {
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

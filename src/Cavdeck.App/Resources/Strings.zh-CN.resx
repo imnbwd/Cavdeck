@@ -838,4 +838,5 @@
   <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>资源管理器无法在保留原始对象键的情况下打开此文件夹。</value></data>
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>前往路径…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>前往路径（Ctrl+G）</value></data>
+  <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>已有连接使用此名称。</value></data>
 </root>

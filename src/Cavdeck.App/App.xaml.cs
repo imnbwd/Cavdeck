@@ -17,7 +17,6 @@ using Cavdeck.Application.Explorer;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Application.Settings;
 using Cavdeck.Application.Places;
-using Cavdeck.Application.Sharing;
 using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.Configuration;
 using Cavdeck.Infrastructure.S3;
@@ -275,7 +274,6 @@ public partial class App : System.Windows.Application
         registrations.AddSingleton<ISettingsStore>(sp => sp.GetRequiredService<JsonSettingsStore>());
         registrations.AddSingleton<IPlaceStore, JsonPlaceStore>();
         registrations.AddSingleton<PlaceLibrary>();
-        registrations.AddSingleton<IDownloadLinkSigner, S3DownloadLinkSigner>();
         registrations.AddSingleton<ExplorerClipboard>();
         registrations.AddSingleton<Cavdeck.Application.Preview.PreviewService>();
 #if DEBUG
