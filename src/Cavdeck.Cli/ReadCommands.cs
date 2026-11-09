@@ -52,6 +52,9 @@ internal static partial class CliRuntime
             });
             connection.Subcommands.Add(command);
         }
+        connection.Subcommands.Add(ConnectionSave(update: false, token));
+        connection.Subcommands.Add(ConnectionSave(update: true, token));
+        connection.Subcommands.Add(ConnectionRemove(token));
         root.Subcommands.Add(connection);
 
         var bucket = new Command("bucket", CliText.Get("BucketDescription"));
@@ -72,6 +75,7 @@ internal static partial class CliRuntime
         root.Subcommands.Add(objects);
         root.Subcommands.Add(ObjectList("ls", token));
         root.Subcommands.Add(ObjectStat("stat", token));
+        RegisterObjectManagement(root, objects, quiet, token);
         RegisterTransfers(root, quiet, token);
     }
 
@@ -129,12 +133,14 @@ internal static partial class CliRuntime
         return command;
     }
 
-    private static void Bind(Command command, string operation, Func<ParseResult, ServiceProvider, Task<object>> run)
+    private static void Bind(Command command, string operation, Func<ParseResult, ServiceProvider, Task<object>> run,
+        bool writableCatalog = false, Option<bool>? previewOption = null)
     {
         command.SetAction(async (p, _) =>
         {
             object data;
-            await using (var services = new ServiceCollection().AddCavdeckCore(readOnlyCatalog: true).BuildServiceProvider())
+            var readOnlyCatalog = !writableCatalog || previewOption is not null && p.GetValue(previewOption);
+            await using (var services = new ServiceCollection().AddCavdeckCore(readOnlyCatalog: readOnlyCatalog).BuildServiceProvider())
                 data = await run(p, services);
             WriteSuccess(p, operation, data);
             return 0;

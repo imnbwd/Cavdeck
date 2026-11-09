@@ -899,6 +899,47 @@ public sealed class ExplorerServiceTests
 
     private static StorageConnection Connection(bool readOnly = false) => Connection(Guid.NewGuid(), readOnly);
 
+    [Fact]
+    public async Task ExactSearchIntersectsFullKeyPrefixWithItsScopeWithoutNormalizingTheKey()
+    {
+        var store = new MemoryStorage
+        {
+            Objects = [
+                new StorageObject("assets", "images//Logo.png", 1, DateTimeOffset.UnixEpoch, "one", null),
+                new StorageObject("assets", "images//logo.png", 1, DateTimeOffset.UnixEpoch, "two", null),
+                new StorageObject("assets", "images/Logo.png", 1, DateTimeOffset.UnixEpoch, "three", null)]
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+        var connection = Connection() with { KeyPrefix = "images//" };
+        var result = await service.SearchKeyPrefixAsync(connection, "assets", "images//", "images//Logo",
+            null, CancellationToken.None, exactScope: true);
+        Assert.Equal("images//Logo.png", Assert.Single(result.Matches).Key);
+        Assert.True(result.Complete);
+        var empty = await service.SearchKeyPrefixAsync(connection, "assets", "images//", "outside",
+            null, CancellationToken.None, exactScope: true);
+        Assert.Empty(empty.Matches);
+        Assert.Equal(0, empty.Requests);
+        await Assert.ThrowsAsync<StorageException>(() => service.SearchPrefixAsync(connection, "assets", "images/",
+            "logo", null, CancellationToken.None, exactScope: true));
+    }
+
+    [Fact]
+    public async Task BoundedDeleteStopsBeforeAnyMutationOrHeadAfterTheLimit()
+    {
+        var store = new MemoryStorage
+        {
+            Pages = [
+                [new StorageObject("assets", "images/a", 1, DateTimeOffset.UnixEpoch, null, null)],
+                [new StorageObject("assets", "images/b", 1, DateTimeOffset.UnixEpoch, null, null)]]
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+        var entry = new ObjectEntry(ObjectEntryKind.Folder, "images", "images/", 0, null, null);
+        await Assert.ThrowsAsync<ObjectManifestLimitException>(() => service.PreviewDeleteAsync(Connection(),
+            "assets", [entry], CancellationToken.None, maxObjects: 1));
+        Assert.Empty(store.HeadKeys);
+        Assert.Empty(store.Deleted);
+    }
+
     private static StorageConnection Connection(Guid id, bool readOnly = false) => new(
         id, "Local", StorageProviderKind.Minio, "http://127.0.0.1:9000", "us-east-1",
         "Cavdeck:test", readOnly, KeyPrefix: "images");
@@ -957,6 +998,13 @@ public sealed class ExplorerServiceTests
             }
             return Task.FromResult(new StoragePage<StorageObject>(
                 Objects.Where(item => item.Key.StartsWith(prefix, StringComparison.Ordinal)).ToList(), null));
+        }
+
+        public async Task<PrefixPage> ListExactPageAsync(StorageConnection connection, string bucket,
+            string prefix, bool recursive, string? continuationToken, int pageSize, CancellationToken cancellationToken)
+        {
+            var page = await ListObjectsAsync(connection, bucket, prefix, continuationToken, pageSize, cancellationToken);
+            return new PrefixPage([], page.Items, page.ContinuationToken);
         }
 
         public Task<PrefixPage> ListPrefixAsync(

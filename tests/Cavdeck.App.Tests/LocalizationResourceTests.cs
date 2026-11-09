@@ -2,8 +2,10 @@ using System.Globalization;
 using System.Resources;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Cavdeck.App.Features.Connections;
 using Cavdeck.App.Localization;
 using Cavdeck.Application.Settings;
+using Cavdeck.Domain.Storage;
 using Xunit;
 
 namespace Cavdeck.App.Tests;
@@ -66,6 +68,16 @@ public sealed class LocalizationResourceTests
         Assert.Equal(connectionsLabel, manager.GetString("Header_Connections", culture));
         Assert.Equal(saveLabel, manager.GetString("Connection_Save", culture));
         Assert.DoesNotContain("[", manager.GetString("Connection_Failure_Unknown", culture));
+    }
+
+    [Fact]
+    public void Duplicate_connection_name_uses_the_editor_localization()
+    {
+        var texts = new LocalizationService();
+        var message = ConnectionText.Issue(texts, new ConnectionIssue(ConnectionField.Name, ConnectionIssueCode.Duplicate));
+        Assert.Equal(texts["Connection_Issue_NameDuplicate"], message);
+        Assert.NotEqual(texts["Connection_Issue_NameInvalid"], message);
+        Assert.DoesNotContain("[", message);
     }
 
     private static string[] Placeholders(string source) =>

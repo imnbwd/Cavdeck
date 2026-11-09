@@ -102,6 +102,13 @@ public sealed class S3ObjectTransfer : IRemoteObjectTransfer, IDisposable
 
         public void EnsureConditionalMultipartSupported() => conditions.EnsureConditionalMultipartSupported();
 
+        public void EnsureVerifiedConditionalDelete()
+        {
+            if (!SupportsVerifiedConditionalMultipart)
+                throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+                    "ConditionalDeleteUnsupported", null, null, null));
+        }
+
         public async Task<RemoteIdentity?> HeadAsync(string bucket, string key, CancellationToken cancellationToken)
         {
             Guard(bucket, key, write: false);

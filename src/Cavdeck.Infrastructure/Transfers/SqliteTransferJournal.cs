@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Cavdeck.Infrastructure.Transfers;
 
-public sealed class SqliteTransferJournal : ITransferJournal, IDisposable
+public sealed partial class SqliteTransferJournal : ITransferJournal, IDisposable
 {
     private static readonly JsonSerializerOptions Json = new()
     {
@@ -15,13 +15,15 @@ public sealed class SqliteTransferJournal : ITransferJournal, IDisposable
     };
 
     private readonly string _path;
+    private readonly SqliteOpenMode _mode;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private SqliteConnection? _connection;
 
-    public SqliteTransferJournal(string path)
+    public SqliteTransferJournal(string path, bool readOnly = false, bool existing = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         _path = path;
+        _mode = readOnly ? SqliteOpenMode.ReadOnly : existing ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadWriteCreate;
     }
 
     public static string DefaultPath()
@@ -446,17 +448,34 @@ public sealed class SqliteTransferJournal : ITransferJournal, IDisposable
             return _connection;
 
         var directory = Path.GetDirectoryName(_path);
-        if (!string.IsNullOrEmpty(directory))
+        if (_mode == SqliteOpenMode.ReadWriteCreate && !string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
         var settings = new SqliteConnectionStringBuilder
         {
             DataSource = _path,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            Cache = SqliteCacheMode.Shared,
-            Pooling = false
+            Mode = _mode,
+            Cache = _mode == SqliteOpenMode.ReadOnly ? SqliteCacheMode.Private : SqliteCacheMode.Shared,
+            Pooling = false,
+            DefaultTimeout = 5
         };
         var connection = new SqliteConnection(settings.ToString());
-        await connection.OpenAsync(cancellationToken);
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+            if (_mode != SqliteOpenMode.ReadOnly)
+                await InitializeAsync(connection, cancellationToken);
+            _connection = connection;
+            return connection;
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private static async Task InitializeAsync(SqliteConnection connection, CancellationToken cancellationToken)
+    {
         await using (var pragma = connection.CreateCommand())
         {
             pragma.CommandText = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA synchronous=NORMAL;";
@@ -512,7 +531,5 @@ public sealed class SqliteTransferJournal : ITransferJournal, IDisposable
             migration.CommandText = "ALTER TABLE parts ADD COLUMN sha256 TEXT NULL;";
             await migration.ExecuteNonQueryAsync(cancellationToken);
         }
-        _connection = connection;
-        return connection;
     }
 }

@@ -24,6 +24,11 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
                 return Fail(job, new TransferFailure(TransferFailureKind.NotFound, false, "NoSuchKey", "The object does not exist."));
 
             var destinationAtStart = TransferFiles.Snapshot(job.LocalPath);
+            if (options.IsolatedRun && job.Remote is { } checkpoint && !checkpoint.SameContent(remote))
+                return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false, "SourceChanged", null));
+            if (options.IsolatedRun && job.LocalDestinationBaselineCaptured &&
+                (job.LocalDestinationBaseline != destinationAtStart || Directory.Exists(job.LocalPath)))
+                return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false, "LocalDestinationChanged", null));
             if (job.Conflict == TransferConflictPolicy.Fail &&
                 (destinationAtStart is not null || Directory.Exists(job.LocalPath)))
                 return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false,
@@ -31,7 +36,8 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
             if (destinationAtStart is not null && job.Conflict == TransferConflictPolicy.Skip)
                 return job with { State = TransferState.Completed, Skipped = true, Failure = null, TotalBytes = remote.Size, UpdatedAt = clock.UtcNow };
 
-            if (destinationAtStart is not null && job.Conflict == TransferConflictPolicy.Rename)
+            if (destinationAtStart is not null && job.Conflict == TransferConflictPolicy.Rename &&
+                (!options.IsolatedRun || !job.LocalDestinationBaselineCaptured))
             {
                 var renamed = Rename(job.LocalPath);
                 if (renamed is null)
@@ -40,6 +46,8 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
                 partial = TransferPaths.Partial(renamed, job.Id, options.IsolatedRun);
                 destinationAtStart = null;
             }
+            if (options.IsolatedRun)
+                job = job with { LocalDestinationBaseline = destinationAtStart, LocalDestinationBaselineCaptured = true };
 
             var recorded = job.Remote;
             if (recorded is not null && !recorded.SameContent(remote)

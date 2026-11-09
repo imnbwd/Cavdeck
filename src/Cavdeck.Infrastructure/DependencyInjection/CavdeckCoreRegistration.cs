@@ -1,6 +1,7 @@
 using Cavdeck.Application.Abstractions;
 using Cavdeck.Application.Connections;
 using Cavdeck.Application.Explorer;
+using Cavdeck.Application.Sharing;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.S3;
@@ -16,10 +17,12 @@ public static class CavdeckCoreRegistration
         string? transferJournalPath = null, bool readOnlyCatalog = false)
     {
         services.AddSingleton<ICredentialVault, WindowsCredentialVault>();
-        services.AddSingleton(_ => new JsonConnectionCatalog(readOnlyCatalog));
+        services.AddSingleton<IConnectionMutationLock>(_ => new FileConnectionMutationLock());
+        services.AddSingleton(sp => new JsonConnectionCatalog(readOnlyCatalog, sp.GetRequiredService<IConnectionMutationLock>()));
         services.AddSingleton<IConnectionCatalog>(sp => sp.GetRequiredService<JsonConnectionCatalog>());
         services.AddSingleton<IStorageProbe, S3StorageProbe>();
         services.AddSingleton<S3ClientLeasePool>();
+        services.AddSingleton<IDownloadLinkSigner, S3DownloadLinkSigner>();
         services.AddSingleton<IObjectStorageProviderFactory, S3ProviderFactory>();
         services.AddSingleton<ConnectionService>();
         services.AddSingleton<ExplorerService>();

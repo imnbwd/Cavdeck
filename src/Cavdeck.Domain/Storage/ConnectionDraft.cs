@@ -18,6 +18,7 @@ public static class ConnectionIssueCode
     public const string Invalid = "invalid";
     public const string UserInfo = "userinfo";
     public const string SecretRequired = "secret-required";
+    public const string Duplicate = "duplicate";
 }
 
 public sealed record ConnectionIssue(ConnectionField Field, string Code);

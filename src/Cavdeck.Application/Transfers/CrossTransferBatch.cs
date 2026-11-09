@@ -27,4 +27,10 @@ public sealed record CrossTransferBatch(
     CrossBatchState State,
     string? Error,
     DateTimeOffset UpdatedAt,
-    bool Move = false);
+    bool Move = false)
+{
+    public string? SourceConfiguration { get; init; }
+    public string? DestinationConfiguration { get; init; }
+    public bool ExactTargets { get; init; }
+    public bool Retryable { get; init; }
+}

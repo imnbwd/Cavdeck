@@ -394,7 +394,7 @@ public sealed class ConnectionEditorViewModel : ViewModelBase
                         return;
                 }
                 token.ThrowIfCancellationRequested();
-                var saved = await _connections.SaveAsync(draft, token);
+                var saved = await _connections.SaveAsync(draft, token, _originalConnection);
                 SavedChange = new ConnectionChange(_originalConnection, saved, credentialsChanged);
                 // A successful commit must reach every workspace even if the editor was closed.
                 Saved?.Invoke(this, saved);

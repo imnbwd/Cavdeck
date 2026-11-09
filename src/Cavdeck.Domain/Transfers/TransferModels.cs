@@ -71,6 +71,8 @@ public sealed record TransferPart(int Number, long Offset, long Length, string? 
     public string? Sha256 { get; init; }
 }
 
+public readonly record struct LocalFileStamp(long Length, DateTime LastWriteUtc, DateTime CreationUtc);
+
 public sealed record StorageObjectRef(Guid ConnectionId, string Bucket, string Key, string? VersionId = null);
 
 public enum CrossTransferStage { Preparing, Transferring, Verifying, Removing }
@@ -86,7 +88,11 @@ public sealed record CrossTransferSpec(
     CrossTransferStage Stage = CrossTransferStage.Preparing,
     string? Verification = null,
     bool CleanupPending = false,
-    bool Move = false);
+    bool Move = false)
+{
+    public string? SourceETag { get; init; }
+    public bool SinglePut { get; init; }
+}
 
 public sealed record TransferJob(
     Guid Id,
@@ -117,6 +123,9 @@ public sealed record TransferJob(
     public DateTimeOffset? SourceModifiedAt { get; init; }
     // Keep first-observed destination identity even after a transient failure.
     public bool BaselineCaptured { get; init; }
+    public string? ConnectionConfiguration { get; init; }
+    public LocalFileStamp? LocalDestinationBaseline { get; init; }
+    public bool LocalDestinationBaselineCaptured { get; init; }
     public CrossTransferSpec? CrossTransfer { get; init; }
 
     public bool IsOpen => State is TransferState.Queued or TransferState.Running

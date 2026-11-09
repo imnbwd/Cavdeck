@@ -9,12 +9,15 @@ public sealed class ConnectionService
     private readonly ICredentialVault _vault;
     private readonly IStorageProbe _probe;
     private readonly SemaphoreSlim _mutationGate = new(1, 1);
+    private readonly IConnectionMutationLock? _mutationLock;
 
-    public ConnectionService(IConnectionCatalog catalog, ICredentialVault vault, IStorageProbe probe)
+    public ConnectionService(IConnectionCatalog catalog, ICredentialVault vault, IStorageProbe probe,
+        IConnectionMutationLock? mutationLock = null)
     {
         _catalog = catalog;
         _vault = vault;
         _probe = probe;
+        _mutationLock = mutationLock;
     }
 
     public Task<IReadOnlyList<StorageConnection>> ListAsync(CancellationToken cancellationToken = default) =>
@@ -79,40 +82,69 @@ public sealed class ConnectionService
     }
 
     public async Task<StorageConnection> SaveAsync(
-        ConnectionDraft draft, CancellationToken cancellationToken = default)
+        ConnectionDraft draft, CancellationToken cancellationToken = default, StorageConnection? expected = null)
     {
         await _mutationGate.WaitAsync(cancellationToken);
-        try { return await SaveCoreAsync(draft, cancellationToken); }
+        try
+        {
+            using var lease = _mutationLock is null ? null : await _mutationLock.AcquireAsync(cancellationToken);
+            var all = await _catalog.ListForMutationAsync(cancellationToken);
+            if (expected is not null && (draft.Id != expected.Id || !all.Contains(expected)))
+                throw new StorageException(new StorageFailure(StorageFailureKind.PreconditionFailed,
+                    "ConnectionConfigurationChanged", null, null, null));
+            return await SaveCoreAsync(draft, all, cancellationToken);
+        }
         finally { _mutationGate.Release(); }
     }
 
-    private async Task<StorageConnection> SaveCoreAsync(ConnectionDraft draft, CancellationToken cancellationToken)
+    public async Task<StorageConnection> UpdateAsync(Guid id,
+        Func<StorageConnection, string?, ConnectionDraft> buildDraft, CancellationToken cancellationToken = default)
+    {
+        await _mutationGate.WaitAsync(cancellationToken);
+        try
+        {
+            using var lease = _mutationLock is null ? null : await _mutationLock.AcquireAsync(cancellationToken);
+            var all = await _catalog.ListForMutationAsync(cancellationToken);
+            var current = all.FirstOrDefault(item => item.Id == id) ?? throw ConnectionMissing();
+            var stored = await _vault.ReadAsync(current.CredentialReference, cancellationToken);
+            var draft = buildDraft(current, stored?.AccessKeyId);
+            if (draft.Id != id)
+                throw new ArgumentException("The update must keep the original connection ID.", nameof(buildDraft));
+            return await SaveCoreAsync(draft, all, cancellationToken);
+        }
+        finally { _mutationGate.Release(); }
+    }
+
+    private async Task<StorageConnection> SaveCoreAsync(ConnectionDraft draft,
+        IReadOnlyList<StorageConnection> all, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(draft);
-        var (target, accessKey, secret, issues) = await ResolveSecretsAsync(draft, cancellationToken);
+        var previousConnection = draft.Id is null ? null : all.FirstOrDefault(item => item.Id == draft.Id);
+        var (target, accessKey, secret, issues) = await ResolveSecretsAsync(draft, cancellationToken,
+            previousConnection?.CredentialReference);
         if (issues.Count > 0 || target is null)
             throw new ConnectionValidationException(issues);
         if (secret is null || accessKey is null)
             throw new StorageException(new StorageFailure(
                 StorageFailureKind.CredentialMissing, null, null, null, null));
+        if (draft.Id is not null && previousConnection is null)
+            throw ConnectionMissing();
 
         var id = draft.Id ?? Guid.NewGuid();
-        var reference = CredentialReferences.ForConnection(id);
+        var reference = previousConnection?.CredentialReference ?? CredentialReferences.ForConnection(id);
+        var name = draft.Name.Trim();
+        if (!string.Equals(previousConnection?.Name, name, StringComparison.OrdinalIgnoreCase) &&
+            all.Any(item => item.Id != id && string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase)))
+            throw new ConnectionValidationException([new(ConnectionField.Name, ConnectionIssueCode.Duplicate)]);
         var creating = draft.Id is null;
         var typedNewSecret = !draft.KeepExistingSecret || !string.IsNullOrWhiteSpace(draft.SecretAccessKey);
         var previousCredential = typedNewSecret && !creating
             ? await _vault.ReadAsync(reference, cancellationToken)
             : null;
-        var previousConnection = creating ? null : (await _catalog.ListAsync(cancellationToken))
-            .FirstOrDefault(item => item.Id == id);
-
-        if (!creating && previousConnection is null)
-            throw new StorageException(new StorageFailure(
-                StorageFailureKind.CredentialMissing, null, null, null, null));
 
         var connection = new StorageConnection(
             id,
-            draft.Name.Trim(),
+            name,
             draft.Provider,
             target!.Endpoint,
             target.Region,
@@ -167,7 +199,7 @@ public sealed class ConnectionService
     }
 
     private async Task<(StorageTarget? Target, string? AccessKey, string? Secret, IReadOnlyList<ConnectionIssue> Issues)>
-        ResolveSecretsAsync(ConnectionDraft draft, CancellationToken cancellationToken)
+        ResolveSecretsAsync(ConnectionDraft draft, CancellationToken cancellationToken, string? credentialReference = null)
     {
         var resolved = ConnectionPlanner.TryResolve(draft, out var target, out var issues);
         var accessKey = draft.AccessKeyId?.Trim() ?? "";
@@ -187,7 +219,7 @@ public sealed class ConnectionService
             return (null, null, null, local);
         }
 
-        var stored = await _vault.ReadAsync(CredentialReferences.ForConnection(draft.Id.Value), cancellationToken);
+        var stored = await _vault.ReadAsync(credentialReference ?? CredentialReferences.ForConnection(draft.Id.Value), cancellationToken);
         if (stored is null)
             return (target, accessKey, null, local);
 
@@ -203,13 +235,17 @@ public sealed class ConnectionService
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await _mutationGate.WaitAsync(cancellationToken);
-        try { await DeleteCoreAsync(id, cancellationToken); }
+        try
+        {
+            using var lease = _mutationLock is null ? null : await _mutationLock.AcquireAsync(cancellationToken);
+            await DeleteCoreAsync(id, cancellationToken);
+        }
         finally { _mutationGate.Release(); }
     }
 
     private async Task DeleteCoreAsync(Guid id, CancellationToken cancellationToken)
     {
-        var connection = await FindAsync(id, cancellationToken);
+        var connection = (await _catalog.ListForMutationAsync(cancellationToken)).FirstOrDefault(item => item.Id == id);
         if (connection is null)
             return;
 
@@ -246,4 +282,7 @@ public sealed class ConnectionService
         var all = await _catalog.ListAsync(cancellationToken);
         return all.FirstOrDefault(connection => connection.Id == id);
     }
+
+    private static StorageException ConnectionMissing() => new(new StorageFailure(
+        StorageFailureKind.CredentialMissing, "ConnectionMissing", null, null, null));
 }

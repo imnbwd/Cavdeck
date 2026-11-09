@@ -834,4 +834,5 @@
   <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>元のキーを保持したまま、このフォルダーをエクスプローラーで開くことはできません。</value></data>
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>パスへ移動…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>パスへ移動（Ctrl+G）</value></data>
+  <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>この名前は別の接続で使われています。</value></data>
 </root>

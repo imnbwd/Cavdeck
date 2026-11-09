@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Cavdeck.Application.Abstractions;
+using Cavdeck.Application.Connections;
 using Cavdeck.Domain.Storage;
 using Cavdeck.Infrastructure.Configuration;
 
@@ -18,21 +19,23 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
 
     private readonly string _filePath;
     private readonly bool _readOnly;
+    private readonly IConnectionMutationLock? _mutationLock;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     public JsonConnectionCatalog() : this(false) { }
 
-    public JsonConnectionCatalog(bool readOnly)
+    public JsonConnectionCatalog(bool readOnly, IConnectionMutationLock? mutationLock = null)
         : this(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Cavdeck", "connections.json"), readOnly)
+            "Cavdeck", "connections.json"), readOnly, mutationLock)
     {
     }
 
-    public JsonConnectionCatalog(string filePath, bool readOnly = false)
+    public JsonConnectionCatalog(string filePath, bool readOnly = false, IConnectionMutationLock? mutationLock = null)
     {
         _filePath = filePath;
         _readOnly = readOnly;
+        _mutationLock = mutationLock;
     }
 
     public string FilePath => _filePath;
@@ -40,6 +43,28 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
 
     public async Task<IReadOnlyList<StorageConnection>> ListAsync(
         CancellationToken cancellationToken = default)
+    {
+        if (_readOnly || _mutationLock is null)
+            return await ListForMutationAsync(cancellationToken);
+
+        // Normal reads can share the atomically replaced file. Recovery writes
+        // use the same transaction lock as connection mutations.
+        try
+        {
+            var current = await ReadValidatedAsync(_filePath, cancellationToken, allowReplacement: true);
+            return current.Connections!;
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException
+            or JsonException or InvalidDataException)
+        {
+            if ((exception is FileNotFoundException or DirectoryNotFoundException) && !File.Exists(_filePath + ".bak"))
+                return [];
+            using var lease = await _mutationLock.AcquireAsync(cancellationToken);
+            return await ListForMutationAsync(cancellationToken);
+        }
+    }
+
+    public async Task<IReadOnlyList<StorageConnection>> ListForMutationAsync(CancellationToken cancellationToken)
     {
         await _gate.WaitAsync(cancellationToken);
         try

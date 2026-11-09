@@ -2289,6 +2289,7 @@ internal sealed class FakeRemote : IRemoteObjectTransfer
     public bool WrapPartCancellation;
     public bool BlockInitiate;
     public bool RejectConditionalMultipart;
+    public bool RejectVerifiedPut;
     public int AbortCalls;
     public bool FailAbortOnce;
     public int PendingUploads
@@ -2354,8 +2355,17 @@ internal sealed class FakeRemote : IRemoteObjectTransfer
         return Task.FromResult<IRemoteTransferLease>(new Lease(this));
     }
 
-        private sealed class Lease(FakeRemote owner) : IRemoteTransferLease
+    private sealed class Lease(FakeRemote owner) : IRemoteTransferLease
     {
+        public bool SupportsVerifiedConditionalMultipart => !owner.RejectConditionalMultipart;
+        public void EnsureVerifiedConditionalDelete() { }
+        public void EnsureVerifiedConditionalPut()
+        {
+            if (owner.RejectVerifiedPut)
+                throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+                    "ConditionalWriteUnsupported", null, null, null));
+        }
+
         public void EnsureConditionalMultipartSupported()
         {
             if (owner.RejectConditionalMultipart)

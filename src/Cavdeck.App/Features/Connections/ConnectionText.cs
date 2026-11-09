@@ -17,6 +17,7 @@ internal static class ConnectionText
     public static string Issue(LocalizationService texts, ConnectionIssue issue) => (issue.Field, issue.Code) switch
     {
         (ConnectionField.Name, ConnectionIssueCode.Required) => texts["Connection_Issue_NameRequired"],
+        (ConnectionField.Name, ConnectionIssueCode.Duplicate) => texts["Connection_Issue_NameDuplicate"],
         (ConnectionField.Name, _) => texts["Connection_Issue_NameInvalid"],
         (ConnectionField.AccountId, ConnectionIssueCode.Required) => texts["Connection_Issue_AccountRequired"],
         (ConnectionField.AccountId, _) => texts["Connection_Issue_AccountInvalid"],

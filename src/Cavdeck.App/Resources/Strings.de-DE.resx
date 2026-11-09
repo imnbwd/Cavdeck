@@ -834,4 +834,5 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="ExplorerPath_Unbrowsable" xml:space="preserve"><value>Dieser Ordner kann im Explorer nur mit einem geänderten Schlüssel geöffnet werden.</value></data>
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>Zu Pfad wechseln…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>Zu Pfad wechseln (Ctrl+G)</value></data>
+  <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>Eine Verbindung verwendet bereits diesen Namen.</value></data>
 </root>
