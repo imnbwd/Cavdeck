@@ -35,6 +35,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
     private int _activeBatchScans;
     private int _terminalSincePrune;
     private volatile bool _stopping;
+    private StorageConnection? _isolatedConnection;
 
     public TransferEngine(
         IRemoteObjectTransfer remote,
@@ -114,6 +115,15 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
     {
         if (Interlocked.Exchange(ref _started, 1) == 1)
             return;
+
+        if (_options.IsolatedRun)
+        {
+            if ((await _journal.LoadRecentAsync(1, cancellationToken)).Count > 0)
+                throw new InvalidOperationException("An isolated run requires a fresh transfer journal.");
+            _pump = Task.Run(() => PumpAsync(_stop.Token));
+            TrackBackground(_pump);
+            return;
+        }
 
         var recent = await _journal.LoadRecentAsync(500, cancellationToken);
         var unfinished = await _journal.LoadUnfinishedAsync(cancellationToken);
@@ -735,9 +745,9 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
         _running.TryAdd(task, 0);
         _ = task.ContinueWith(completed =>
             {
-                _running.TryRemove(completed, out _);
                 if (completed.IsFaulted && completed.Exception is { } exception)
                     RaiseBackgroundFault(exception.Flatten());
+                _running.TryRemove(completed, out _);
             },
             CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
     }
@@ -1146,12 +1156,156 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
             {
                 // Dispose() is called synchronously by the WPF service container on exit.
                 // Never resume this await on the blocked UI synchronization context.
-                await _pump.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
-                await Task.WhenAll(_running.Keys).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                if (_options.IsolatedRun)
+                {
+                    try { await _pump.ConfigureAwait(false); }
+                    catch (Exception exception) { RaiseBackgroundFault(exception); }
+                    await Task.WhenAll(_running.Keys).ConfigureAwait(false);
+                }
+                else
+                {
+                    await _pump.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
+                    await Task.WhenAll(_running.Keys).WaitAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                if (_options.IsolatedRun)
+                    RaiseBackgroundFault(exception);
             }
+        }
+    }
+
+    public Task EnqueueExactUploadsAsync(StorageConnection connection, string bucket, string key,
+        string localPath, bool directory, TransferConflictPolicy conflict, CancellationToken cancellationToken)
+    {
+        var sources = directory
+            ? UploadCatalog.Enumerate(key, [localPath], exact: true, cancellationToken)
+            : [new UploadSource(localPath, key, null, false, null)];
+        return EnqueueExactUploadsCoreAsync(connection, bucket, sources, conflict, cancellationToken);
+    }
+
+    private async Task EnqueueExactUploadsCoreAsync(StorageConnection connection, string bucket,
+        IEnumerable<UploadSource> sources, TransferConflictPolicy conflict, CancellationToken cancellationToken)
+    {
+        await SetIsolatedConnectionAsync(connection, bucket, write: true, cancellationToken);
+        var batch = Guid.NewGuid();
+        foreach (var source in sources)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var job = TransferJob.Create(TransferKind.Upload, connection.Id, bucket, source.Key,
+                source.LocalPath, source.Size, conflict, batch,
+                source.FolderMarker ? null : ContentTypes.FromPath(source.LocalPath), source.FolderMarker, _clock.UtcNow);
+            var error = source.Error;
+            if (source.Key.Length == 0 || source.Key.Any(char.IsControl) ||
+                System.Text.Encoding.UTF8.GetByteCount(source.Key) > ObjectLayout.MaxKeyBytes)
+                error ??= "InvalidKey";
+            if (error is not null)
+            {
+                job = job with { State = TransferState.Failed, Failure = new TransferFailure(
+                    TransferFailureKind.InvalidPath, false, error, "The upload source could not be queued.") };
+            }
+            await AcceptAsync(connection, job, cancellationToken);
+        }
+    }
+
+    public async Task EnqueueExactDownloadsAsync(StorageConnection connection, string bucket,
+        IAsyncEnumerable<DownloadItem> items, string localDirectory, TransferConflictPolicy conflict,
+        CancellationToken cancellationToken)
+    {
+        await SetIsolatedConnectionAsync(connection, bucket, write: false, cancellationToken);
+        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var batch = Guid.NewGuid();
+        await foreach (var item in items.WithCancellation(cancellationToken))
+        {
+            var relative = item.DestinationKey ?? "";
+            var path = localDirectory;
+            string? error = null;
+            if (!ExactLocalPaths.IsValidRelative(relative))
+                error = "Invalid";
+            else
+            {
+                path = Path.Combine(localDirectory, relative.Replace('/', Path.DirectorySeparatorChar));
+                if (!used.Add(path))
+                    error = "Collision";
+            }
+
+            var job = TransferJob.Create(TransferKind.Download, connection.Id, bucket, item.Key,
+                path, item.Size, conflict, batch, null, false, _clock.UtcNow);
+            if (error is not null)
+            {
+                job = job with { State = TransferState.Failed, Failure = new TransferFailure(
+                    TransferFailureKind.InvalidPath, false, error, "The download path could not be queued.") };
+            }
+            await AcceptAsync(connection, job, cancellationToken);
+        }
+    }
+
+    private async Task SetIsolatedConnectionAsync(StorageConnection connection, string bucket, bool write,
+        CancellationToken cancellationToken)
+    {
+        if (!_options.IsolatedRun || _isolatedConnection is not null)
+            throw new InvalidOperationException("An isolated engine accepts one transfer batch.");
+        var current = await CurrentConnectionAsync(connection, cancellationToken);
+        ObjectAccess.Ensure(current, bucket, null, write);
+        _isolatedConnection = current;
+    }
+
+    // Stop the pump and join all workers before cleaning up or disposing their dependencies.
+    public async Task<IReadOnlyList<TransferJob>> FinishIsolatedRunAsync()
+    {
+        if (!_options.IsolatedRun)
+            throw new InvalidOperationException("The transfer engine is not isolated.");
+
+        await DisposeAsync().ConfigureAwait(false);
+        foreach (var job in Jobs)
+        {
+            if (job.IsOpen)
+                await TransitionAsync(job.Id, current => current with
+                {
+                    State = TransferState.Cancelled, Failure = null, NextAttemptAt = null
+                }, cancel: false, CancellationToken.None).ConfigureAwait(false);
+
+            if (job.State != TransferState.Completed)
+                await CleanupIsolatedJobAsync(job).ConfigureAwait(false);
+        }
+        return Jobs;
+    }
+
+    private async Task CleanupIsolatedJobAsync(TransferJob job)
+    {
+        try
+        {
+            if (job.Kind == TransferKind.Upload && job.UploadId is { } uploadId)
+            {
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+                var connection = await CurrentConnectionAsync(_isolatedConnection!, timeout.Token);
+                await using var lease = await _remote.OpenAsync(connection, write: true, timeout.Token);
+                try { await lease.AbortMultipartAsync(job.Bucket, job.Key, uploadId, timeout.Token); }
+                catch (StorageException exception) when (exception.Failure.ErrorCode == "NoSuchUpload") { }
+                await TransitionAsync(job.Id, current => current with { UploadId = null },
+                    cancel: false, CancellationToken.None);
+            }
+            if (job.Kind == TransferKind.Download && job.Remote is not null)
+            {
+                var partial = TransferPaths.Partial(job.LocalPath, job.Id, isolated: true);
+                var commit = TransferPaths.Commit(job.LocalPath, job.Id, isolated: true);
+                using var pin = ExactLocalPaths.Pin(job.LocalPath, includeLeaf: false);
+                TransferFiles.DeleteIfExists(partial);
+                TransferFiles.DeleteIfExists(commit);
+            }
+            await _journal.ClearPartsAsync(job.Id, CancellationToken.None);
+        }
+        catch (Exception exception)
+        {
+            await TransitionAsync(job.Id, current => current with
+            {
+                Failure = current.Failure is { } failure
+                    ? failure with { CleanupPending = true }
+                    : new TransferFailure(TransferFailureKind.Unknown, false, "CleanupPending",
+                        null) { CleanupPending = true }
+            }, cancel: false, CancellationToken.None);
+            RaiseBackgroundFault(new IOException("Transfer cleanup could not be confirmed.", exception));
         }
     }
 
@@ -1281,7 +1435,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
 
     private Task<long> GetCommittedDownloadBytesAsync(
         TransferJob job, CancellationToken cancellationToken) =>
-        !File.Exists(TransferPaths.Partial(job.LocalPath, job.Id))
+        !File.Exists(TransferPaths.Partial(job.LocalPath, job.Id, _options.IsolatedRun))
             ? Task.FromResult(0L)
             : GetCommittedPartBytesAsync(job, cancellationToken);
 
@@ -1405,7 +1559,9 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
 
             control.Token.ThrowIfCancellationRequested();
 
-            var connection = await ResolveAsync(job.ConnectionId, control.Token);
+            var connection = _isolatedConnection is { } snapshot
+                ? await CurrentConnectionAsync(snapshot, control.Token)
+                : await ResolveAsync(job.ConnectionId, control.Token);
             if (connection is null)
             {
                 await PublishAsync(Fail(job, new TransferFailure(
@@ -1455,7 +1611,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
         }
         catch (StorageException exception)
         {
-            await SettleAsync(Fail(CurrentOr(id, job), TransferFailures.FromStorage(exception)));
+            await SettleAsync(Fail(CurrentOr(id, job), TransferFailures.FromStorage(exception, _options.IsolatedRun)));
         }
         catch (Exception exception)
         {
@@ -1489,6 +1645,9 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
 
     private async Task SettleAsync(TransferJob result)
     {
+        if (_options.IsolatedRun && result.Failure is { } raw)
+            result = result with { Failure = raw with { Detail = null } };
+
         if (result.State == TransferState.Failed
             && result.Failure is { Retryable: true } failure
             && RetrySchedule.ShouldRetry(failure, result.Attempt, _options.MaxAttempts))
@@ -1514,6 +1673,8 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
 
     private void PruneTerminalHistory()
     {
+        if (_options.IsolatedRun)
+            return;
         if (Interlocked.Increment(ref _terminalSincePrune) < 100)
             return;
         Interlocked.Exchange(ref _terminalSincePrune, 0);
@@ -1595,7 +1756,7 @@ public sealed class TransferEngine : ITransferActivity, ITransferSink, IDisposab
 
             var queued = current with
             {
-                State = TransferState.Queued,
+                State = _options.IsolatedRun ? TransferState.Cancelled : TransferState.Queued,
                 BytesTransferred = committedBytes ?? current.BytesTransferred,
                 UpdatedAt = _clock.UtcNow
             };

@@ -17,16 +17,23 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
     };
 
     private readonly string _filePath;
+    private readonly bool _readOnly;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public JsonConnectionCatalog()
+    public JsonConnectionCatalog() : this(false) { }
+
+    public JsonConnectionCatalog(bool readOnly)
         : this(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "Cavdeck", "connections.json"))
+            "Cavdeck", "connections.json"), readOnly)
     {
     }
 
-    public JsonConnectionCatalog(string filePath) => _filePath = filePath;
+    public JsonConnectionCatalog(string filePath, bool readOnly = false)
+    {
+        _filePath = filePath;
+        _readOnly = readOnly;
+    }
 
     public string FilePath => _filePath;
     public ConfigurationRecovery? LastRecovery { get; private set; }
@@ -47,6 +54,8 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
 
     public async Task UpsertAsync(StorageConnection connection, CancellationToken cancellationToken = default)
     {
+        if (_readOnly)
+            throw new InvalidOperationException("The connection catalog is read-only.");
         ArgumentNullException.ThrowIfNull(connection);
         await _gate.WaitAsync(cancellationToken);
         try
@@ -67,6 +76,8 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        if (_readOnly)
+            throw new InvalidOperationException("The connection catalog is read-only.");
         await _gate.WaitAsync(cancellationToken);
         try
         {
@@ -83,6 +94,20 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
 
     private async Task<IReadOnlyList<StorageConnection>> ReadAsync(CancellationToken cancellationToken)
     {
+        if (_readOnly)
+        {
+            try
+            {
+                return (await ReadValidatedAsync(_filePath, cancellationToken, allowReplacement: true)).Connections!;
+            }
+            catch (IOException exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+            {
+                if (File.Exists(_filePath + ".bak"))
+                    throw new InvalidDataException("The connection catalog needs recovery.", exception);
+                return [];
+            }
+        }
+
         var result = await RecoverableJsonFile.LoadAsync(
             _filePath, ReadValidatedAsync, allowDefaults: false, cancellationToken);
         LastRecovery = result.Recovery;
@@ -94,11 +119,13 @@ public sealed class JsonConnectionCatalog : IConnectionCatalog
             _filePath, new ConnectionFile { Schema = 1, Connections = connections },
             SerializerOptions, ReadValidatedAsync, cancellationToken);
 
-    private static async Task<ConnectionFile> ReadValidatedAsync(
-        string path, CancellationToken cancellationToken)
+    private static Task<ConnectionFile> ReadValidatedAsync(
+        string path, CancellationToken cancellationToken) => ReadValidatedAsync(path, cancellationToken, false);
+
+    private static async Task<ConnectionFile> ReadValidatedAsync(string path, CancellationToken cancellationToken, bool allowReplacement)
     {
         await using var stream = new FileStream(path, FileMode.Open,
-            FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
+            FileAccess.Read, allowReplacement ? FileShare.Read | FileShare.Delete : FileShare.Read, 4096, FileOptions.Asynchronous);
         using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
         if (document.RootElement.ValueKind != JsonValueKind.Object)
             throw new InvalidDataException("The connection catalog must be an object.");

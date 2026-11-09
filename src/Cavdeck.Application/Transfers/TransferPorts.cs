@@ -82,6 +82,10 @@ public sealed class DownloadBody : IAsyncDisposable
 public interface IRemoteTransferLease : IAsyncDisposable
 {
     void EnsureConditionalMultipartSupported();
+    bool SupportsVerifiedConditionalMultipart => false;
+    void EnsureVerifiedConditionalPut() =>
+        throw new StorageException(new StorageFailure(StorageFailureKind.Unsupported,
+            "ConditionalWriteUnsupported", null, null, null));
 
     Task<RemoteIdentity?> HeadAsync(string bucket, string key, CancellationToken cancellationToken);
 
@@ -153,6 +157,7 @@ public interface IRemoteObjectTransfer
 
 public sealed class TransferEngineOptions
 {
+    public bool IsolatedRun { get; init; }
     public int MaxConcurrentTransfers { get; init; } = 3;
     public int MaxConcurrentParts { get; init; } = 4;
     public long MultipartThresholdBytes { get; init; } = 8 * 1024 * 1024;
@@ -169,6 +174,7 @@ public sealed class TransferEngineOptions
 
     public TransferEngineOptions Clamp() => new()
     {
+        IsolatedRun = IsolatedRun,
         MaxConcurrentTransfers = Math.Clamp(MaxConcurrentTransfers, 1, 8),
         MaxConcurrentParts = Math.Clamp(MaxConcurrentParts, 1, 8),
         MultipartThresholdBytes = Math.Max(0, MultipartThresholdBytes),

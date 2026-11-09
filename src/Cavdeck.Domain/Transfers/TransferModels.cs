@@ -13,7 +13,7 @@ public enum TransferState
     Cancelled
 }
 
-public enum TransferConflictPolicy { Skip, Overwrite, Rename }
+public enum TransferConflictPolicy { Skip = 0, Overwrite = 1, Rename = 2, Fail = 3 }
 
 public enum TransferFailureKind
 {
@@ -44,7 +44,10 @@ public sealed record TransferFailure(
     TransferFailureKind Kind,
     bool Retryable,
     string? Code,
-    string? Detail);
+    string? Detail)
+{
+    public bool CleanupPending { get; init; }
+}
 
 public sealed record RemoteIdentity(string? ETag, long Size, DateTimeOffset? LastModified, bool ETagIsMd5 = false)
 {

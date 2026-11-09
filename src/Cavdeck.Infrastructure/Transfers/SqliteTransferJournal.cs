@@ -448,7 +448,14 @@ public sealed class SqliteTransferJournal : ITransferJournal, IDisposable
         var directory = Path.GetDirectoryName(_path);
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
-        var connection = new SqliteConnection($"Data Source={_path};Mode=ReadWriteCreate;Cache=Shared;Pooling=False");
+        var settings = new SqliteConnectionStringBuilder
+        {
+            DataSource = _path,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Cache = SqliteCacheMode.Shared,
+            Pooling = false
+        };
+        var connection = new SqliteConnection(settings.ToString());
         await connection.OpenAsync(cancellationToken);
         await using (var pragma = connection.CreateCommand())
         {

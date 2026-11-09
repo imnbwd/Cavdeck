@@ -38,6 +38,27 @@ jobs:
         run: dotnet build Cavdeck.sln --no-restore -c Release
       - name: Unit tests
         run: dotnet test Cavdeck.sln --no-build -c Release
+      - name: Publish standalone Windows CLI
+        run: dotnet publish src/Cavdeck.Cli/Cavdeck.Cli.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -o artifacts/cli/win-x64
+      - name: Smoke test published CLI
+        shell: pwsh
+        run: |
+          $cli = Join-Path $PWD 'artifacts/cli/win-x64/cavdeck.exe'
+          & $cli --help
+          if ($LASTEXITCODE -ne 0) { throw 'CLI help failed' }
+          & $cli --version
+          if ($LASTEXITCODE -ne 0) { throw 'CLI version failed' }
+          $output = & $cli connection list --json
+          if ($LASTEXITCODE -ne 0) { throw 'CLI connection list failed' }
+          $result = $output | ConvertFrom-Json
+          if ($result.schemaVersion -ne 1 -or $result.operation -ne 'connection.list' -or $null -eq $result.data.items) {
+            throw 'Unexpected CLI JSON'
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cavdeck-cli-win-x64
+          path: artifacts/cli/win-x64/
+          if-no-files-found: error
       - name: Install pinned Velopack CLI
         if: github.event_name == 'workflow_dispatch'
         shell: pwsh

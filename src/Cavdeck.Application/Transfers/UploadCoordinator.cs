@@ -10,6 +10,10 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
     {
         try
         {
+            using var sourcePin = options.IsolatedRun
+                ? ExactLocalPaths.Pin(job.LocalPath, includeLeaf: true) : null;
+            if (options.IsolatedRun)
+                lease.EnsureVerifiedConditionalPut();
             if (!job.FolderMarker && !File.Exists(job.LocalPath))
                 return Fail(job, new TransferFailure(TransferFailureKind.LocalMissing, false, "NotFound", "The local file is missing."));
 
@@ -39,6 +43,9 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
             if (string.IsNullOrEmpty(job.UploadId))
                 sink.ResetProgress(job);
             var remote = await lease.HeadAsync(job.Bucket, job.Key, cancellationToken);
+            if (remote is not null && job.Conflict == TransferConflictPolicy.Fail)
+                return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false,
+                    "TargetExists", "The destination already exists."));
             if (remote is not null && job.Conflict == TransferConflictPolicy.Skip && string.IsNullOrEmpty(job.UploadId))
                 return job with { State = TransferState.Completed, Skipped = true, UpdatedAt = clock.UtcNow, Failure = null };
 
@@ -70,19 +77,30 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
                 return await PutAsync(job, lease, empty, 0, null, cancellationToken);
             }
 
-            if (!string.IsNullOrEmpty(job.UploadId) || TransferPlanner.UseMultipart(length, options.MultipartThresholdBytes))
+            var multipart = TransferPlanner.UseMultipart(length, options.MultipartThresholdBytes);
+            if (options.IsolatedRun && !lease.SupportsVerifiedConditionalMultipart)
+            {
+                // Providers without a verified conditional multipart completion can
+                // still use a conditional PutObject within its single-request limit.
+                if (length > 5L * 1024 * 1024 * 1024)
+                    return Fail(job, new TransferFailure(TransferFailureKind.Unsupported, false,
+                        "ConditionalMultipartUnsupported", null));
+                multipart = false;
+            }
+            if (!string.IsNullOrEmpty(job.UploadId) || multipart)
                 return await MultipartAsync(job, lease, length, cancellationToken);
             await using var file = new FileStream(job.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 81_920, FileOptions.SequentialScan);
             return await PutAsync(job, lease, file, length, job.ContentType, cancellationToken);
         }
         catch (Exception exception) when (IsCancellation(exception))
         {
-            await AbortIfCancelledAsync(job, lease);
+            if (!options.IsolatedRun)
+                await AbortIfCancelledAsync(job, lease);
             throw;
         }
         catch (StorageException exception)
         {
-            return Fail(sink.Current(job.Id), TransferFailures.FromStorage(exception));
+            return Fail(sink.Current(job.Id), TransferFailures.FromStorage(exception, options.IsolatedRun));
         }
         catch (Exception exception)
         {
@@ -126,8 +144,8 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
         }
         catch (StorageException exception)
         {
-            var failure = TransferFailures.FromStorage(exception);
-            if (!failure.Retryable || hash is null)
+            var failure = TransferFailures.FromStorage(exception, options.IsolatedRun);
+            if (options.IsolatedRun || !failure.Retryable || hash is null)
                 return Fail(job, failure);
 
             var after = await lease.HeadAsync(job.Bucket, job.Key, cancellationToken);
@@ -156,7 +174,7 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
 
         if (check == IntegrityCheck.Mismatch)
         {
-            if (job.Baseline is null)
+            if (!options.IsolatedRun && job.Baseline is null)
                 await TryDeleteAsync(lease, job, cancellationToken);
             return Fail(job, new TransferFailure(TransferFailureKind.Integrity, false, "Checksum", "The uploaded object did not match the local file."));
         }
@@ -299,7 +317,7 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
             var failedJob = job with { BytesTransferred = transferred };
             sink.ResetProgress(failedJob);
             return failure is StorageException storage
-                ? Fail(failedJob, TransferFailures.FromStorage(storage))
+                ? Fail(failedJob, TransferFailures.FromStorage(storage, options.IsolatedRun))
                 : Fail(failedJob, TransferFailures.FromLocal(failure));
         }
 
@@ -316,7 +334,7 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
         var head = await lease.HeadAsync(job.Bucket, job.Key, cancellationToken);
         if (head is null || head.Size != length)
         {
-            if (job.Baseline is null)
+            if (!options.IsolatedRun && job.Baseline is null)
                 await TryDeleteAsync(lease, job, cancellationToken);
             return Fail(job, new TransferFailure(TransferFailureKind.Integrity, false, "Size", "The completed upload size does not match the local file."));
         }
@@ -328,13 +346,14 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
     {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            await sink.PublishAsync(job, cancellationToken);
+            if (!options.IsolatedRun)
+                cancellationToken.ThrowIfCancellationRequested();
+            await sink.PublishAsync(job, options.IsolatedRun ? CancellationToken.None : cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (sink.Current(job.Id).State != TransferState.Running)
                 throw new OperationCanceledException(cancellationToken);
         }
-        catch (OperationCanceledException)
+        catch (Exception exception) when (options.IsolatedRun || exception is OperationCanceledException)
         {
             // The server may have created the upload before pause, cancellation,
             // or shutdown, while the journal still has no ID for resuming or cleanup.
@@ -413,6 +432,7 @@ internal sealed class UploadCoordinator(ITransferSink sink, TransferEngineOption
             BytesTransferred = length,
             TotalBytes = length,
             Remote = identity,
+            UploadId = options.IsolatedRun ? null : job.UploadId,
             UpdatedAt = clock.UtcNow
         };
 

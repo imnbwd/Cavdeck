@@ -117,6 +117,10 @@ Use least-privilege credentials and read-only mode when you do not need to modif
 - **Link security:** **Treat presigned links as temporary access credentials** and share them only with intended recipients.
 - **Scope:** Cavdeck is a file manager, not a directory synchronization tool.
 
+## Windows CLI
+
+Use the standalone cavdeck.exe to list objects, inspect metadata, and transfer files with saved connections. See the [CLI guide](docs/cli.md) for installation and commands.
+
 ## Building from source
 
 Cavdeck is built with WPF and .NET 10. You need Windows and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0); Visual Studio with the .NET desktop development workload is optional.

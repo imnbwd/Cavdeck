@@ -9,14 +9,25 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
 
     public async Task<TransferJob> RunAsync(TransferJob job, IRemoteTransferLease lease, CancellationToken cancellationToken)
     {
-        var partial = TransferPaths.Partial(job.LocalPath, job.Id);
+        var partial = TransferPaths.Partial(job.LocalPath, job.Id, options.IsolatedRun);
+        IDisposable? destinationPin = null;
         try
         {
+            if (options.IsolatedRun)
+            {
+                destinationPin = ExactLocalPaths.Pin(job.LocalPath, includeLeaf: false, createDirectories: true);
+                ExactLocalPaths.RejectExistingReparsePoint(job.LocalPath);
+                ExactLocalPaths.RejectExistingReparsePoint(partial);
+            }
             var remote = await lease.HeadAsync(job.Bucket, job.Key, cancellationToken);
             if (remote is null)
                 return Fail(job, new TransferFailure(TransferFailureKind.NotFound, false, "NoSuchKey", "The object does not exist."));
 
             var destinationAtStart = TransferFiles.Snapshot(job.LocalPath);
+            if (job.Conflict == TransferConflictPolicy.Fail &&
+                (destinationAtStart is not null || Directory.Exists(job.LocalPath)))
+                return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false,
+                    "TargetExists", "The destination already exists."));
             if (destinationAtStart is not null && job.Conflict == TransferConflictPolicy.Skip)
                 return job with { State = TransferState.Completed, Skipped = true, Failure = null, TotalBytes = remote.Size, UpdatedAt = clock.UtcNow };
 
@@ -26,7 +37,7 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
                 if (renamed is null)
                     return Fail(job, new TransferFailure(TransferFailureKind.Conflict, false, "Name", "No free local name was available."));
                 job = job with { LocalPath = renamed, DisplayName = Path.GetFileName(renamed) };
-                partial = TransferPaths.Partial(renamed, job.Id);
+                partial = TransferPaths.Partial(renamed, job.Id, options.IsolatedRun);
                 destinationAtStart = null;
             }
 
@@ -168,7 +179,7 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
             if (sink.Current(job.Id).State == TransferState.Cancelled)
             {
                 TransferFiles.DeleteIfExists(partial);
-                TransferFiles.DeleteIfExists(TransferPaths.Commit(job.LocalPath, job.Id));
+                TransferFiles.DeleteIfExists(TransferPaths.Commit(job.LocalPath, job.Id, options.IsolatedRun));
                 await sink.ClearPartsAsync(job.Id, CancellationToken.None);
             }
 
@@ -198,16 +209,17 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
             TransferFiles.DeleteIfExists(partial);
             await sink.ClearPartsAsync(job.Id, CancellationToken.None);
             return Fail(sink.Current(job.Id) with { BytesTransferred = 0 },
-                TransferFailures.FromStorage(exception));
+                TransferFailures.FromStorage(exception, options.IsolatedRun));
         }
         catch (StorageException exception)
         {
-            return Fail(sink.Current(job.Id), TransferFailures.FromStorage(exception));
+            return Fail(sink.Current(job.Id), TransferFailures.FromStorage(exception, options.IsolatedRun));
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             return Fail(sink.Current(job.Id), TransferFailures.FromLocal(exception));
         }
+        finally { destinationPin?.Dispose(); }
     }
 
     private async Task<TransferJob> FinishAsync(
@@ -235,7 +247,7 @@ internal sealed class DownloadCoordinator(ITransferSink sink, ITransferClock clo
             }
         }
 
-        TransferFiles.Commit(partial, job.LocalPath, job.Id, destinationAtStart);
+        TransferFiles.Commit(partial, job.LocalPath, job.Id, destinationAtStart, options.IsolatedRun);
         return job with
         {
             State = TransferState.Completed,

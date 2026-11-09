@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="RootDescription" xml:space="preserve"><value>Access S3-compatible storage using saved Cavdeck connections.</value></data>
+  <data name="FormatDescription" xml:space="preserve"><value>Output format (table or json).</value></data>
+  <data name="JsonDescription" xml:space="preserve"><value>Output JSON.</value></data>
+  <data name="QuietDescription" xml:space="preserve"><value>Suppress progress.</value></data>
+  <data name="VerboseDescription" xml:space="preserve"><value>Include sanitized diagnostics.</value></data>
+  <data name="NoColorDescription" xml:space="preserve"><value>Use plain text.</value></data>
+  <data name="NoInputDescription" xml:space="preserve"><value>Run without prompts.</value></data>
+  <data name="ConnectionSelector" xml:space="preserve"><value>Saved connection name or ID.</value></data>
+  <data name="ConnectionDescription" xml:space="preserve"><value>Inspect saved connections.</value></data>
+  <data name="ConnectionList" xml:space="preserve"><value>List saved connections.</value></data>
+  <data name="ConnectionTest" xml:space="preserve"><value>Test a saved connection.</value></data>
+  <data name="ConnectionShow" xml:space="preserve"><value>Show connection settings.</value></data>
+  <data name="BucketDescription" xml:space="preserve"><value>Inspect buckets.</value></data>
+  <data name="BucketList" xml:space="preserve"><value>List accessible buckets.</value></data>
+  <data name="ObjectDescription" xml:space="preserve"><value>Inspect objects and prefixes.</value></data>
+  <data name="ObjectList" xml:space="preserve"><value>List one page of objects under a prefix.</value></data>
+  <data name="PrefixArgument" xml:space="preserve"><value>An s3://bucket/prefix address.</value></data>
+  <data name="RecursiveList" xml:space="preserve"><value>Include objects at all depths.</value></data>
+  <data name="Limit" xml:space="preserve"><value>Page size (1–1000).</value></data>
+  <data name="Cursor" xml:space="preserve"><value>Continuation token from the preceding page.</value></data>
+  <data name="ObjectStat" xml:space="preserve"><value>Read object metadata.</value></data>
+  <data name="UriArgument" xml:space="preserve"><value>An s3://bucket/key address.</value></data>
+  <data name="TransferDescription" xml:space="preserve"><value>Upload and download files.</value></data>
+  <data name="UploadDescription" xml:space="preserve"><value>Upload a file or directory.</value></data>
+  <data name="DownloadDescription" xml:space="preserve"><value>Download an object or prefix.</value></data>
+  <data name="SourceArgument" xml:space="preserve"><value>Local file or directory.</value></data>
+  <data name="ToFile" xml:space="preserve"><value>Exact local destination file.</value></data>
+  <data name="ToDirectory" xml:space="preserve"><value>Local destination directory.</value></data>
+  <data name="RecursiveTransfer" xml:space="preserve"><value>Transfer a directory tree.</value></data>
+  <data name="ConflictPolicy" xml:space="preserve"><value>Conflict policy (fail, skip, overwrite, or rename).</value></data>
+  <data name="InvalidArguments" xml:space="preserve"><value>Invalid arguments. Use --help for command syntax.</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>The command was cancelled.</value></data>
+  <data name="Timeout" xml:space="preserve"><value>The storage request timed out.</value></data>
+  <data name="NewerCatalog" xml:space="preserve"><value>The connection catalog requires a newer Cavdeck version.</value></data>
+  <data name="InvalidCatalog" xml:space="preserve"><value>The connection catalog could not be read. Open Cavdeck to check it.</value></data>
+  <data name="LocalAccess" xml:space="preserve"><value>A local file could not be accessed.</value></data>
+  <data name="Unsupported" xml:space="preserve"><value>This operation is unsupported.</value></data>
+  <data name="UnknownError" xml:space="preserve"><value>The operation could not be completed.</value></data>
+  <data name="ConnectionRemoved" xml:space="preserve"><value>The saved connection was removed.</value></data>
+  <data name="ObjectMissing" xml:space="preserve"><value>The requested object was not found.</value></data>
+  <data name="TransferAccessDenied" xml:space="preserve"><value>Access denied for this transfer.</value></data>
+  <data name="TargetConflict" xml:space="preserve"><value>The destination already exists or changed.</value></data>
+  <data name="TransferNetwork" xml:space="preserve"><value>The transfer failed because the storage service was unavailable.</value></data>
+  <data name="InvalidLocalPath" xml:space="preserve"><value>A local path is invalid or could not be accessed.</value></data>
+  <data name="ConditionalUnsupported" xml:space="preserve"><value>The provider cannot enforce the required write condition.</value></data>
+  <data name="IntegrityFailure" xml:space="preserve"><value>The transferred data could not be verified.</value></data>
+  <data name="TransferFailed" xml:space="preserve"><value>The transfer could not be completed.</value></data>
+  <data name="AuthFailed" xml:space="preserve"><value>Storage credentials are missing or invalid.</value></data>
+  <data name="StorageAccessDenied" xml:space="preserve"><value>Access denied for this storage operation.</value></data>
+  <data name="StorageMissing" xml:space="preserve"><value>The requested storage resource was not found.</value></data>
+  <data name="StorageNetwork" xml:space="preserve"><value>The storage service could not complete the request.</value></data>
+  <data name="StorageUnsupported" xml:space="preserve"><value>The storage provider does not support this operation.</value></data>
+  <data name="InvalidConnection" xml:space="preserve"><value>The connection configuration is invalid.</value></data>
+  <data name="DestinationChanged" xml:space="preserve"><value>The destination changed.</value></data>
+  <data name="StorageError" xml:space="preserve"><value>The storage operation failed.</value></data>
+  <data name="InvalidKey" xml:space="preserve"><value>This key cannot be sent without changing its meaning.</value></data>
+  <data name="ConnectionMissing" xml:space="preserve"><value>No saved connection matches the name or ID.</value></data>
+  <data name="AmbiguousConnection" xml:space="preserve"><value>Multiple connections match. Use a connection ID.</value></data>
+  <data name="PageSizeExceeded" xml:space="preserve"><value>The provider exceeded the requested page size.</value></data>
+  <data name="PageOutsidePrefix" xml:space="preserve"><value>The provider returned an object outside the requested prefix.</value></data>
+  <data name="PageTokenRepeated" xml:space="preserve"><value>The provider repeated a continuation token.</value></data>
+  <data name="PartialFailure" xml:space="preserve"><value>Some transfers succeeded and some operations failed.</value></data>
+  <data name="WorkerFailure" xml:space="preserve"><value>A transfer worker, journal, or cleanup operation failed.</value></data>
+  <data name="NoResults" xml:space="preserve"><value>No results.</value></data>
+  <data name="NextPage" xml:space="preserve"><value>Next page token: {0}</value></data>
+  <data name="Reachable" xml:space="preserve"><value>Connection '{0}' is reachable.</value></data>
+  <data name="Transferred" xml:space="preserve"><value>Transferred {0:N0} of {1:N0} bytes.</value></data>
+  <data name="ErrorLine" xml:space="preserve"><value>Error [{0}]: {1}</value></data>
+</root>

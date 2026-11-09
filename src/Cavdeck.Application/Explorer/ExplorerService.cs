@@ -165,6 +165,21 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
         return Provider(connection).ListBucketsAsync(connection, cancellationToken);
     }
 
+    public async Task<PrefixPage> ListExactPageAsync(StorageConnection connection, string bucket, string prefix,
+        bool recursive, string? continuationToken, int pageSize, CancellationToken cancellationToken)
+    {
+        connection = await Connections.ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+        return await Provider(connection).ListExactPageAsync(connection, bucket, prefix, recursive,
+            continuationToken, Math.Clamp(pageSize, 1, 1000), cancellationToken);
+    }
+
+    public async Task<ObjectHead> HeadAsync(StorageConnection connection, string bucket, string key,
+        CancellationToken cancellationToken)
+    {
+        connection = await Connections.ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+        return await Provider(connection).HeadObjectAsync(connection, bucket, key, cancellationToken);
+    }
+
     public async Task<BrowseResult> BrowseAsync(
         StorageConnection connection, string bucket, string? prefix,
         string? continuationToken, CancellationToken cancellationToken)
