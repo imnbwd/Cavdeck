@@ -30,7 +30,7 @@ public sealed class CommandProcessTests
         var result = await InvokeAsync(arguments);
         Assert.Equal(0, result.ExitCode);
         Assert.Empty(result.Error);
-        Assert.Contains("Usage:", result.Output);
+        Assert.Contains("Usage: cavdeck-cli", result.Output);
         Assert.Contains("Options:", result.Output);
         Assert.Contains("Show help and usage information", result.Output);
         Assert.DoesNotContain("用法:", result.Output);
@@ -185,7 +185,7 @@ public sealed class CommandProcessTests
         string? profile, string[] arguments)
     {
         var cliAssembly = typeof(CliRuntime).Assembly.Location;
-        var start = new ProcessStartInfo(Path.Combine(Path.GetDirectoryName(cliAssembly)!, "cavdeck.exe"))
+        var start = new ProcessStartInfo(Path.Combine(Path.GetDirectoryName(cliAssembly)!, "cavdeck-cli.exe"))
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,

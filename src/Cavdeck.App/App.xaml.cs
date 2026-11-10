@@ -56,7 +56,15 @@ public partial class App : System.Windows.Application
         };
         // Must run before WPF initialization. Never restart automatically:
         // active transfer tasks must be coordinated with the update UX.
-        VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
+        VelopackApp.Build()
+            .OnAfterInstallFastCallback(_ => CavdeckPathRegistration.TryEnsureForCurrentUser())
+            .OnAfterUpdateFastCallback(_ => CavdeckPathRegistration.TryEnsureForCurrentUser())
+            .OnBeforeUninstallFastCallback(_ => CavdeckPathRegistration.TryRemoveForCurrentUser())
+            .SetAutoApplyOnStartup(false)
+            .Run();
+
+        // Also register PATH on each user's first normal launch.
+        CavdeckPathRegistration.TryEnsureForCurrentUser();
 
         var app = new App();
         app.InitializeComponent();

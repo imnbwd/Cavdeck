@@ -7,6 +7,7 @@ using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.S3;
 using Cavdeck.Infrastructure.Security;
 using Cavdeck.Infrastructure.Transfers;
+using Cavdeck.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cavdeck.Infrastructure.DependencyInjection;
@@ -17,6 +18,7 @@ public static class CavdeckCoreRegistration
         string? transferJournalPath = null, bool readOnlyCatalog = false)
     {
         services.AddSingleton<ICredentialVault, WindowsCredentialVault>();
+        services.AddSingleton<IApplicationActivityGate, FileApplicationActivityGate>();
         services.AddSingleton<IConnectionMutationLock>(_ => new FileConnectionMutationLock());
         services.AddSingleton(sp => new JsonConnectionCatalog(readOnlyCatalog, sp.GetRequiredService<IConnectionMutationLock>()));
         services.AddSingleton<IConnectionCatalog>(sp => sp.GetRequiredService<JsonConnectionCatalog>());

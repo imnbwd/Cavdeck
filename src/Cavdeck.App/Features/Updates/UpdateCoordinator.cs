@@ -1,4 +1,5 @@
 using Cavdeck.App.Controls;
+using Cavdeck.App.Features.Diagnostics;
 using Cavdeck.App.Localization;
 using Cavdeck.App.Services;
 using Cavdeck.Application.Abstractions;
@@ -32,18 +33,20 @@ public sealed class UpdateCoordinator : IUpdateCoordinator
     private readonly ApplicationState _state;
     private readonly ApplicationLifetimeCoordinator _lifetime;
     private readonly TransferEngine _transfers;
+    private readonly IApplicationActivityGate _activityGate;
     private readonly DialogService _dialogs;
     private readonly LocalizationService _texts;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     public UpdateCoordinator(IUpdateService updater, ApplicationState state,
         ApplicationLifetimeCoordinator lifetime, TransferEngine transfers,
-        DialogService dialogs, LocalizationService texts)
+        IApplicationActivityGate activityGate, DialogService dialogs, LocalizationService texts)
     {
         _updater = updater;
         _state = state;
         _lifetime = lifetime;
         _transfers = transfers;
+        _activityGate = activityGate;
         _dialogs = dialogs;
         _texts = texts;
     }
@@ -155,7 +158,38 @@ public sealed class UpdateCoordinator : IUpdateCoordinator
         }) != DialogChoice.Primary)
             return;
 
-        _lifetime.RequestUpdateRestart(_updater);
+        IDisposable? updateLease;
+        try
+        {
+            // An exclusive lease proves that no CLI process is still using current/.
+            updateLease = _activityGate.TryAcquireUpdateLease();
+        }
+        catch (Exception ex)
+        {
+            DiagnosticLog.Current.Queue("update-coordination", ex);
+            updateLease = null;
+        }
+
+        if (updateLease is null)
+        {
+            _dialogs.ShowChoice(window, new DialogRequest
+            {
+                Title = _texts["Update_TransfersTitle"],
+                Message = _texts["Update_TransfersMessage"],
+                PrimaryText = _texts["Dialog_Ok"]
+            });
+            return;
+        }
+
+        if (!_lifetime.RequestUpdateRestart(_updater, updateLease))
+        {
+            _dialogs.ShowChoice(window, new DialogRequest
+            {
+                Title = _texts["Update_TransfersTitle"],
+                Message = _texts["Update_TransfersMessage"],
+                PrimaryText = _texts["Dialog_Ok"]
+            });
+        }
     }
 
     private void Update(UpdateCheckResult result)
