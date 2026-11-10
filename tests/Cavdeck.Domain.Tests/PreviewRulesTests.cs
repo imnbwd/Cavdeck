@@ -25,6 +25,26 @@ public sealed class PreviewRulesTests
     public void Decide_matches_what_can_be_opened_here(string name, bool folder, long size, PreviewKind expected) =>
         Assert.Equal(expected, PreviewRules.Decide(name, folder, size).Kind);
 
+    [Theory]
+    [InlineData("clip.mp4", null, PreviewFileType.Video)]
+    [InlineData("track.mp3", null, PreviewFileType.Audio)]
+    [InlineData("unknown.bin", "video/mp4", PreviewFileType.Video)]
+    [InlineData("unknown.bin", "image/png; charset=binary", PreviewFileType.Image)]
+    [InlineData("unknown.bin", "application/pdf", PreviewFileType.Pdf)]
+    [InlineData("unknown.bin", "text/plain", PreviewFileType.Unknown)]
+    [InlineData("notes.txt", "image/png", PreviewFileType.Text)]
+    [InlineData("icon.svg", "image/svg+xml", PreviewFileType.Text)]
+    public void Classify_recognizes_known_types_without_changing_existing_preview_support(
+        string name, string? contentType, PreviewFileType expected) =>
+        Assert.Equal(expected, PreviewRules.Classify(name, contentType));
+
+    [Fact]
+    public void Audio_and_video_are_recognized_but_remain_external_until_a_viewer_exists()
+    {
+        Assert.Equal(PreviewKind.External, PreviewRules.Decide("track.mp3", false, 100).Kind);
+        Assert.Equal(PreviewKind.External, PreviewRules.Decide("clip.mp4", false, 100).Kind);
+    }
+
     [Fact]
     public void Text_over_the_cap_is_not_opened_for_editing()
     {

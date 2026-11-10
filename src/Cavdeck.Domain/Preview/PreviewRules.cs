@@ -10,6 +10,16 @@ public enum PreviewKind
     External
 }
 
+public enum PreviewFileType
+{
+    Unknown,
+    Image,
+    Pdf,
+    Text,
+    Audio,
+    Video
+}
+
 public readonly record struct PreviewDecision(PreviewKind Kind);
 
 public static class PreviewRules
@@ -32,19 +42,62 @@ public static class PreviewRules
         ".gitignore", ".gitattributes", ".editorconfig", ".npmrc", ".nvmrc", ".env"
     };
 
-    public static PreviewDecision Decide(string? name, bool folder, long sizeBytes)
+    public static PreviewFileType Classify(string? name, string? contentType = null)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            var trimmed = name.Trim();
+            if (TextNames.Contains(trimmed))
+                return PreviewFileType.Text;
+
+            var lower = trimmed.ToLowerInvariant();
+            var dot = lower.LastIndexOf('.');
+            if (dot > 0 && dot < lower.Length - 1)
+            {
+                var extension = lower[(dot + 1)..];
+                if (ImageExtensions.Contains(extension))
+                    return PreviewFileType.Image;
+                if (extension == "pdf")
+                    return PreviewFileType.Pdf;
+                if (TextExtensions.Contains(extension))
+                    return PreviewFileType.Text;
+            }
+        }
+
+        // MIME is a fallback only. Known extensions remain authoritative, and active
+        // formats such as SVG/HTML are not promoted to image previews by MIME.
+        var mediaType = contentType?.Split(';', 2)[0].Trim();
+        if (string.IsNullOrWhiteSpace(mediaType))
+            return PreviewFileType.Unknown;
+
+        if (mediaType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+            return PreviewFileType.Pdf;
+        if (mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)
+            && !mediaType.Equals("image/svg+xml", StringComparison.OrdinalIgnoreCase))
+            return PreviewFileType.Image;
+        if (mediaType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
+            return PreviewFileType.Audio;
+        if (mediaType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+            return PreviewFileType.Video;
+
+        return PreviewFileType.Unknown;
+    }
+
+    public static PreviewDecision Decide(
+        string? name, bool folder, long sizeBytes, string? contentType = null)
     {
         if (folder)
             return new PreviewDecision(PreviewKind.Folder);
 
-        var slot = Classify(name);
-        if (slot == Slot.Image)
-            return Sized(sizeBytes, MaxImageBytes, PreviewKind.Image);
-        if (slot == Slot.Pdf)
-            return Sized(sizeBytes, MaxPdfBytes, PreviewKind.Pdf);
-        if (slot == Slot.Text)
-            return Sized(sizeBytes, MaxTextBytes, PreviewKind.Text);
-        return new PreviewDecision(PreviewKind.External);
+        return Classify(name, contentType) switch
+        {
+            PreviewFileType.Image => Sized(sizeBytes, MaxImageBytes, PreviewKind.Image),
+            PreviewFileType.Pdf => Sized(sizeBytes, MaxPdfBytes, PreviewKind.Pdf),
+            PreviewFileType.Text => Sized(sizeBytes, MaxTextBytes, PreviewKind.Text),
+            // Audio and video are recognized for future viewers but remain external
+            // in this foundation change, preserving current UI behavior.
+            _ => new PreviewDecision(PreviewKind.External)
+        };
     }
 
     public static bool CanOpenInShell(long sizeBytes) =>
@@ -54,28 +107,6 @@ public static class PreviewRules
         sizeBytes < 0 || sizeBytes > maxBytes
             ? new PreviewDecision(PreviewKind.TooLarge)
             : new PreviewDecision(kind);
-
-    private static Slot Classify(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return Slot.Other;
-
-        var trimmed = name.Trim();
-        if (TextNames.Contains(trimmed))
-            return Slot.Text;
-
-        var lower = trimmed.ToLowerInvariant();
-        var dot = lower.LastIndexOf('.');
-        if (dot <= 0 || dot == lower.Length - 1)
-            return Slot.Other;
-
-        var extension = lower[(dot + 1)..];
-        if (ImageExtensions.Contains(extension))
-            return Slot.Image;
-        if (extension == "pdf")
-            return Slot.Pdf;
-        return TextExtensions.Contains(extension) ? Slot.Text : Slot.Other;
-    }
 
     private static HashSet<string> BuildTextExtensions()
     {
@@ -94,6 +125,4 @@ public static class PreviewRules
             set.Add(extension);
         return set;
     }
-
-    private enum Slot { Other, Image, Pdf, Text }
 }

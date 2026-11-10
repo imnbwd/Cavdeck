@@ -1,6 +1,7 @@
 using Cavdeck.Application.Abstractions;
 using Cavdeck.Application.Connections;
 using Cavdeck.Application.Explorer;
+using Cavdeck.Application.Preview;
 using Cavdeck.Application.Sharing;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Infrastructure.Connections;
@@ -26,6 +27,7 @@ public static class CavdeckCoreRegistration
         services.AddSingleton<S3ClientLeasePool>();
         services.AddSingleton<IDownloadLinkSigner, S3DownloadLinkSigner>();
         services.AddSingleton<IObjectStorageProviderFactory, S3ProviderFactory>();
+        services.AddSingleton<IPreviewContentReader, ProviderPreviewContentReader>();
         services.AddSingleton<ConnectionService>();
         services.AddSingleton<ExplorerService>();
         services.AddSingleton<ITransferJournal>(_ =>

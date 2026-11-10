@@ -81,6 +81,75 @@ public sealed class PreviewServiceTests
     }
 
     [Fact]
+    public async Task Provider_reader_returns_an_idempotent_lease_for_a_prepared_file()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(store), root);
+            var lease = await reader.PrepareFileAsync(
+                Connection(), "assets", "report.pdf", "report.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+            var path = lease.FilePath;
+
+            Assert.True(File.Exists(path));
+            Assert.Equal(store.Body.Length, lease.Length);
+            Assert.Equal(store.Body, await File.ReadAllBytesAsync(path));
+
+            await lease.DisposeAsync();
+            await lease.DisposeAsync();
+            Assert.False(File.Exists(path));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Active_file_lease_is_not_removed_by_stale_copy_pruning()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(store), root);
+            var active = await reader.PrepareFileAsync(
+                Connection(), "assets", "active.pdf", "active.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+            File.SetLastWriteTimeUtc(active.FilePath, DateTime.UtcNow.AddDays(-3));
+
+            var next = await reader.PrepareFileAsync(
+                Connection(), "assets", "next.pdf", "next.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+
+            Assert.True(File.Exists(active.FilePath));
+            await active.DisposeAsync();
+            await next.DisposeAsync();
+            Assert.False(File.Exists(active.FilePath));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Detaching_a_file_lease_preserves_the_external_copy_for_retention_cleanup()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(store), root);
+            var lease = await reader.PrepareFileAsync(
+                Connection(), "assets", "external.pdf", "external.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+            var path = lease.Detach();
+
+            await lease.DisposeAsync();
+            Assert.True(File.Exists(path));
+            File.Delete(path);
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
     public async Task Bounded_preparation_blocks_large_objects_before_network_io()
     {
         var store = new PreviewStore { Body = new byte[4] };
