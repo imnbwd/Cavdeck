@@ -154,6 +154,13 @@ public sealed class ConnectionService
             target.KeyPrefix,
             target.ForcePathStyle,
             target.AccountId);
+        var clientConfigurationChanged = previousConnection is null
+            || new ConnectionChange(previousConnection, connection, typedNewSecret).RequiresReconnect;
+        connection = connection with
+        {
+            ClientRevision = (previousConnection?.ClientRevision ?? 0)
+                + (clientConfigurationChanged ? 1 : 0)
+        };
 
         var credentialWriteAttempted = false;
         try

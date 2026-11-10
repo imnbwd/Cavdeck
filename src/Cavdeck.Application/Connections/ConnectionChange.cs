@@ -7,6 +7,7 @@ public sealed record ConnectionChange(
     StorageConnection? Previous, StorageConnection Current, bool CredentialsChanged = false)
 {
     public bool RequiresReconnect => Previous is not null && (CredentialsChanged
+        || Previous.ClientRevision != Current.ClientRevision
         || Previous.Provider != Current.Provider
         || Previous.Endpoint != Current.Endpoint
         || Previous.Region != Current.Region

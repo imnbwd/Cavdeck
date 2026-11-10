@@ -44,10 +44,17 @@ public sealed class ConnectionsViewModelReconcileTests
         var change = Assert.Single(updates);
         Assert.Equal(second, change.Previous);
         Assert.Equal(renamed, change.Current);
+        Assert.False(change.RequiresReconnect);
 
-        viewModel.ReconcileExternal([renamed, third]);
+        // A credential rotation changes only ClientRevision in the catalog.
+        var rotated = renamed with { ClientRevision = renamed.ClientRevision + 1 };
+        viewModel.ReconcileExternal([rotated, third]);
+        Assert.Equal(2, updates.Count);
+        Assert.True(updates[1].RequiresReconnect);
 
-        Assert.Single(updates);
+        viewModel.ReconcileExternal([rotated, third]);
+
+        Assert.Equal(2, updates.Count);
         Assert.Single(deletions);
         Assert.Equal(2, viewModel.Count);
     }

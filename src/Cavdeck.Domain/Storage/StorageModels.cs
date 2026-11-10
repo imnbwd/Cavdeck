@@ -15,7 +15,11 @@ public sealed record StorageConnection(
     string? RestrictedBucket = null,
     string? KeyPrefix = null,
     bool ForcePathStyle = false,
-    string? AccountId = null);
+    string? AccountId = null)
+{
+    // Changes when credentials or settings used to create an S3 client change.
+    public long ClientRevision { get; init; }
+}
 
 public sealed record StorageBucket(string Name, string? Region);
 
