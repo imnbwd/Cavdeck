@@ -175,6 +175,13 @@
         </Trigger>
       </Style.Triggers>
     </Style>
+    <Style x:Key="ThumbnailFallbackGlyph" TargetType="Path" BasedOn="{StaticResource FileGlyph}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding HasThumbnail}" Value="True">
+          <Setter Property="Visibility" Value="Collapsed"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
     <Style x:Key="ExplorerDropIconTile" TargetType="ListBoxItem" BasedOn="{StaticResource IconTile}">
       <Style.Triggers>
         <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
@@ -972,7 +979,15 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*" MinWidth="0"/>
                       </Grid.ColumnDefinitions>
-                      <Path Grid.Column="0" Style="{StaticResource FileGlyph}" Margin="0,0,8,0"/>
+                      <Grid Grid.Column="0" Width="20" Height="20" Margin="0,0,8,0">
+                        <Path Style="{StaticResource ThumbnailFallbackGlyph}"/>
+                        <Image Source="{Binding Thumbnail}" Stretch="Uniform" Width="20" Height="20"
+                               IsHitTestVisible="False"
+                               Loaded="Thumbnail_Loaded"
+                               Unloaded="Thumbnail_Unloaded"
+                               IsVisibleChanged="Thumbnail_VisibilityChanged"
+                               DataContextChanged="Thumbnail_ContextChanged"/>
+                      </Grid>
                       <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center"
                                  TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
                                  ToolTip="{Binding DisplayName}"/>
@@ -1081,10 +1096,18 @@
             <ListBox.ItemTemplate>
               <DataTemplate>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                  <Path Style="{StaticResource FileGlyph}" Margin="0,0,0,10"
+                  <Grid Margin="0,0,0,10"
                         Width="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                        Height="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                        StrokeThickness="{Binding DataContext.Explorer.TileIconStrokeThickness, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        Height="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                    <Path Style="{StaticResource ThumbnailFallbackGlyph}"
+                          StrokeThickness="{Binding DataContext.Explorer.TileIconStrokeThickness, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                    <Image Source="{Binding Thumbnail}" Stretch="Uniform"
+                           IsHitTestVisible="False"
+                           Loaded="Thumbnail_Loaded"
+                           Unloaded="Thumbnail_Unloaded"
+                           IsVisibleChanged="Thumbnail_VisibilityChanged"
+                           DataContextChanged="Thumbnail_ContextChanged"/>
+                  </Grid>
                   <TextBlock TextAlignment="Center" TextWrapping="Wrap"
                              ToolTip="{Binding DisplayName}"
                              TextTrimming="CharacterEllipsis"

@@ -1,5 +1,6 @@
 using Cavdeck.App.Localization;
 using Cavdeck.App.ViewModels;
+using System.Windows.Media.Imaging;
 using Cavdeck.Domain.Storage;
 
 namespace Cavdeck.App.Features.Explorer;
@@ -36,6 +37,20 @@ public sealed class ExplorerRow : ViewModelBase
     }
 
     private bool _isDropTarget;
+    private BitmapSource? _thumbnail;
+    public BitmapSource? Thumbnail => _thumbnail;
+    public bool HasThumbnail => _thumbnail is not null;
+    public bool ThumbnailCandidate => ThumbnailPipeline.IsEligible(Entry);
+
+    public void SetThumbnail(BitmapSource? image)
+    {
+        if (ReferenceEquals(_thumbnail, image))
+            return;
+        _thumbnail = image;
+        OnPropertyChanged(nameof(Thumbnail));
+        OnPropertyChanged(nameof(HasThumbnail));
+    }
+
     public bool IsDropTarget => _isDropTarget;
     public void SetDropTarget(bool active) =>
         SetProperty(ref _isDropTarget, active, nameof(IsDropTarget));
@@ -44,7 +59,10 @@ public sealed class ExplorerRow : ViewModelBase
 
     public void Replace(ObjectEntry entry)
     {
+        if (!Equals(Entry, entry))
+            SetThumbnail(null);
         Entry = entry;
+        OnPropertyChanged(nameof(ThumbnailCandidate));
         OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(DisplayName));
         OnPropertyChanged(nameof(SizeBytes));
