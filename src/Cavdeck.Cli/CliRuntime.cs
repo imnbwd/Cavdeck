@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Cavdeck.Cli;
 
@@ -37,9 +38,12 @@ internal static partial class CliRuntime
             var requestedFormat = parsed.GetResult(format)?.Tokens.FirstOrDefault()?.Value;
             var asJson = parsed.GetValue(json) || requestedFormat == "json";
 
-            if (requestedFormat is not (null or "table" or "json") ||
-                (parsed.GetValue(json) && requestedFormat == "table") || parsed.Errors.Count > 0)
-                return WriteError(CliError.Arguments, asJson);
+            if (requestedFormat is not (null or "table" or "json"))
+                return WriteError(CliError.Arguments with { Message = CliText.Get("InvalidOutputFormat") }, asJson);
+            if (parsed.GetValue(json) && requestedFormat == "table")
+                return WriteError(CliError.Arguments with { Message = CliText.Get("ConflictingOutputFormat") }, asJson);
+            if (parsed.Errors.Count > 0)
+                return WriteError(CliError.Arguments with { Message = SafeParseError(parsed.Errors[0].Message) }, asJson);
 
             try
             {
@@ -62,6 +66,27 @@ internal static partial class CliRuntime
         {
             Console.CancelKeyPress -= cancel;
         }
+    }
+
+    // Parse messages may include arbitrary user-supplied arguments (including secrets).
+    // Report only option tokens and static text, never raw parser error messages.
+    private static string SafeParseError(string message)
+    {
+        var match = Regex.Match(message, @"--[a-zA-Z][a-zA-Z0-9-]*", RegexOptions.CultureInvariant);
+        if (match.Success)
+        {
+            if (message.Contains("required", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("missing", StringComparison.OrdinalIgnoreCase))
+                return CliText.Format("MissingOption", match.Value);
+            if (message.Contains("unrecognized", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("unknown", StringComparison.OrdinalIgnoreCase))
+                return CliText.Format("UnknownOption", match.Value);
+            return CliText.Format("InvalidOption", match.Value);
+        }
+        if (message.Contains("required", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("missing", StringComparison.OrdinalIgnoreCase))
+            return CliText.Get("MissingArgument");
+        return CliText.Get("InvalidSyntax");
     }
 
     static partial void RegisterCommands(RootCommand root, Option<bool> quiet, CancellationToken token);
