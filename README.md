@@ -119,7 +119,7 @@ Use least-privilege credentials and read-only mode when you do not need to modif
 
 ## Windows CLI
 
-Use the standalone `cavdeck.exe` to manage saved connections, search and manage objects, sign download links, and inspect or resume transfers. The CLI shares connections with the desktop app and keeps its transfer history separate. See the [CLI guide](docs/cli.md) for installation, PowerShell examples, and provider limits.
+Use the standalone `cavdeck.exe` to manage saved connections, search and manage objects, sign download links, and inspect or resume transfers. The CLI shares connections with the desktop app and keeps its transfer history separate. Download the versioned `Cavdeck-Cli-<version>-win-x64.zip` from [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases); the Windows CI also tests the standalone ZIP. See the [CLI guide](docs/cli.md) for installation, PowerShell examples, and provider limits.
 
 ## Building from source
 
