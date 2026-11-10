@@ -104,11 +104,28 @@ public sealed class ThumbnailPipeline : IDisposable
         try
         {
             using var stream = new MemoryStream(bytes, writable: false);
+            // Decode the longest side, not merely the width. Extremely tall images
+            // can otherwise turn a tiny compressed source into a huge bitmap.
+            var decoder = BitmapDecoder.Create(
+                stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+            if (decoder.Frames.Count == 0)
+                return null;
+            var frame = decoder.Frames[0];
+            if (frame.PixelWidth <= 0 || frame.PixelHeight <= 0)
+                return null;
+            stream.Position = 0;
+
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            bitmap.DecodePixelWidth = DecodeWidth;
+            if (Math.Max(frame.PixelWidth, frame.PixelHeight) > DecodeWidth)
+            {
+                if (frame.PixelWidth >= frame.PixelHeight)
+                    bitmap.DecodePixelWidth = DecodeWidth;
+                else
+                    bitmap.DecodePixelHeight = DecodeWidth;
+            }
             bitmap.StreamSource = stream;
             bitmap.EndInit();
             bitmap.Freeze();
