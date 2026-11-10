@@ -28,6 +28,10 @@ Add or update matching keys in `src/Cavdeck.App/Resources/Strings.resx` and all 
 
 When changing UI copy, keep all four shipped languages consistent (English, Simplified Chinese, Japanese, German), including runtime language switching and layouts with longer German strings. Preserve .NET composite-format placeholders such as {0} exactly across translations; the localization tests enforce this. Avoid translating S3 protocol identifiers, file extensions, shortcuts, request IDs, or provider names. Error messages in normal UI should come from localized error kinds/hints; provider-supplied prose and exception messages belong only in explicit technical diagnostics, not standard toasts, titles or alerts. Preserve structured S3 error codes and request IDs for troubleshooting. Reuse the same culture-aware byte formatter across Explorer, Preview and Transfers. Internal identifiers, logs, and protocol values that are not presented to users are not UI strings.
 
+## CLI language policy
+
+`Cavdeck.Cli` uses English for help text, status messages, and errors, including strings provided by `System.CommandLine`, regardless of the Windows display language. Set the CLI's `CurrentUICulture` to English before constructing its command tree; do not change `CurrentCulture` or the desktop application's localization settings. Keep CLI resource strings and `docs/cli.md` in English, while preserving Unicode support for connection names, file paths, and S3 keys. Add regression tests when changing CLI help or culture initialization.
+
 ## Light and dark mode
 
 Every surface, label, icon stroke, and state (hover, selected, disabled, focus) must read in both themes. `ThemeService` swaps `src/Cavdeck.App/Themes/Colors.Light.xaml` and `src/Cavdeck.App/Themes/Colors.Dark.xaml`. Bind colors with `DynamicResource` to those brushes. A hardcoded color, `Transparent` on a content surface, or a system brush such as `SystemColors.ControlTextBrush` does not follow the swap.
