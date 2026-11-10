@@ -183,6 +183,7 @@ public sealed class ShellViewModel : ViewModelBase
         connections.BeforeDeleteAsync = PrepareDeleteConnectionAsync;
         connections.DeleteImpact = ConnectionDeleteImpact;
         connections.ConnectionDeleted += (_, id) => OnConnectionDeleted(id);
+        connections.ConnectionDeletedExternally += (_, id) => OnConnectionDeletedExternally(id);
         _state.Preferences.Normalize();
         _sidebarWidth = Layout.SidebarWidth;
         _sidebarCollapsed = Layout.SidebarCollapsed;
@@ -394,6 +395,56 @@ public sealed class ShellViewModel : ViewModelBase
             _unavailableRestores.Remove(key);
         ScheduleSave();
         Launch(PruneDeletedConnectionsAsync);
+    }
+
+    private void OnConnectionDeletedExternally(Guid id)
+    {
+        _closedTabs.RemoveAll(tab => tab.Place?.Connection.Id == id);
+        OnPropertyChanged(nameof(CanRestoreClosedTab));
+
+        var hasUnsavedWork = false;
+        foreach (var tab in Tabs.Where(tab => BelongsToConnection(tab, id)).Reverse().ToArray())
+        {
+            if (tab.Workspace is ExplorerWorkspace explorer && explorer.Explorer.HasUnsavedChanges)
+            {
+                // Keep the workspace and its draft, but detach it from the deleted connection.
+                explorer.Explorer.MarkConnectionUnavailable();
+                hasUnsavedWork = true;
+                continue;
+            }
+
+            RemoveTab(tab, remember: false);
+        }
+
+        foreach (var workspace in Tabs.Select(tab => tab.Workspace).OfType<ConnectionWorkspace>())
+        {
+            if (workspace.Editor.ConnectionId != id)
+                continue;
+
+            if (workspace.Editor.HasUnsavedChanges)
+                hasUnsavedWork = true;
+            else
+                workspace.Editor.Close();
+        }
+
+        foreach (var key in _unavailableRestores
+                     .Where(pair => pair.Value.ConnectionId == id)
+                     .Select(pair => pair.Key).ToArray())
+            _unavailableRestores.Remove(key);
+
+        if (hasUnsavedWork)
+            _toasts.Show(new ToastRequest
+            {
+                Title = Texts["Connection_DeletedExternally"],
+                Tone = ToastTone.Warning
+            });
+
+        ScheduleSave();
+        Launch(async () =>
+        {
+            await Transfers.CancelConnectionAsync(id);
+            await PruneDeletedConnectionsAsync();
+        });
     }
 
     private async Task PruneDeletedConnectionsAsync()

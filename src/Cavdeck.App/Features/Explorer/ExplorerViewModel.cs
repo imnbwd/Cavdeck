@@ -51,7 +51,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private bool _disposed;
     private bool _reconnectPending;
     private Guid? _openingConnectionId;
-    public Guid? ConnectionId => _openingConnectionId ?? _connection?.Id;
+    private Guid? _deletedConnectionId;
+    public Guid? ConnectionId => _openingConnectionId ?? _connection?.Id ?? _deletedConnectionId;
     private string? _bucket;
     private string _prefix = "";
     private string? _continuation;
@@ -608,6 +609,45 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _preview.Dispose();
     }
 
+    public void MarkConnectionUnavailable()
+    {
+        if (_disposed || _connection is not { } connection)
+            return;
+
+        _deletedConnectionId = connection.Id;
+        _connection = null;
+        _reconnectPending = true;
+        CancelGoToPath();
+        _generation++;
+        _operation?.Cancel();
+        _mutation?.Cancel();
+        _browse.Cancel();
+        CancelSearch();
+        CancelHeaderLoad();
+        _selected.Clear();
+        _loaded.Clear();
+        _buckets.Clear();
+        Rows.Clear();
+        BucketRows.Clear();
+        Crumbs.Clear();
+        SetBusy(false, more: false);
+        _preview.InvalidateContext();
+        _afterLeave = null;
+
+        if (_preview.IsDirty)
+        {
+            _showPreviewForClose = true;
+            OnPropertyChanged(nameof(ShowSide));
+            _preview.ShowContent();
+            _preview.MarkLeavePending();
+        }
+
+        SetError(_texts["Connection_DeletedExternally"]);
+        OnPropertyChanged(nameof(ConnectionId));
+        NotifyChrome();
+        RaiseCommands();
+    }
+
     public async Task ApplyConnectionChangeAsync(Cavdeck.Application.Connections.ConnectionChange change)
     {
         if (_disposed || _connection?.Id != change.Current.Id)
@@ -617,6 +657,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         var reconnect = _reconnectPending || change.RequiresReconnect
             || new Cavdeck.Application.Connections.ConnectionChange(previous, change.Current).RequiresReconnect;
         _connection = change.Current;
+        _deletedConnectionId = null;
         if ((reconnect || change.Current.IsReadOnly) && _clipboard.Current is { Cut: true } cut
             && cut.ConnectionId == change.Current.Id)
             _clipboard.ClearIfCurrent(cut);
@@ -708,6 +749,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
             return;
         }
         _connection = place.Connection;
+        _deletedConnectionId = null;
         _openingConnectionId = null;
         ClearFilter();
         await GoToAsync(place.Bucket, place.Prefix, place.ListingBuckets);
@@ -730,6 +772,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
             return;
         }
         _connection = connection;
+        _deletedConnectionId = null;
         ClearFilter();
         await GoToAsync(
             string.IsNullOrEmpty(connection.RestrictedBucket) ? null : connection.RestrictedBucket,

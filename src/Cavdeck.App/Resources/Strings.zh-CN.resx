@@ -769,6 +769,7 @@
   <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>此连接现为只读。未保存的草稿已保留在此处，请在放弃修改或关闭前复制草稿。</value></data>
   <data name="Preview_CopyDraft" xml:space="preserve"><value>复制草稿</value></data>
   <data name="Connection_ReconnectPending" xml:space="preserve"><value>连接已更新。请先处理未保存的草稿，再刷新以重新连接。重连前无法操作文件。</value></data>
+  <data name="Connection_DeletedExternally" xml:space="preserve"><value>连接已被其他进程删除。未保存的预览内容会保留，但暂时无法执行存储操作。</value></data>
   <data name="Transfer_DropDestination" xml:space="preserve"><value>上传位置：{0}</value></data>
   <data name="Transfer_ClearFailed" xml:space="preserve"><value>清除失败</value></data>
   <data name="Transfer_ClearHistory" xml:space="preserve"><value>清空历史</value></data>

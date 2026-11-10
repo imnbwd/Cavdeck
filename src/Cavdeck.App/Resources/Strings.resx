@@ -769,6 +769,7 @@ Logs: {1}</value></data>
   <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>This connection is now read-only. Your unsaved draft is preserved here. Copy it before discarding or closing it.</value></data>
   <data name="Preview_CopyDraft" xml:space="preserve"><value>Copy draft</value></data>
   <data name="Connection_ReconnectPending" xml:space="preserve"><value>Connection updated. Resolve the unsaved draft, then refresh to reconnect. File actions are unavailable until reconnection.</value></data>
+  <data name="Connection_DeletedExternally" xml:space="preserve"><value>This connection was removed by another process. Unsaved preview content is preserved, but storage actions are unavailable.</value></data>
   <data name="Transfer_DropDestination" xml:space="preserve"><value>Destination: {0}</value></data>
   <data name="Transfer_ClearFailed" xml:space="preserve"><value>Clear failed</value></data>
   <data name="Transfer_ClearHistory" xml:space="preserve"><value>Clear history</value></data>

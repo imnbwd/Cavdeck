@@ -765,6 +765,7 @@
   <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>この接続は読み取り専用になりました。未保存の下書きは保持されています。破棄または閉じる前にコピーしてください。</value></data>
   <data name="Preview_CopyDraft" xml:space="preserve"><value>下書きをコピー</value></data>
   <data name="Connection_ReconnectPending" xml:space="preserve"><value>接続が更新されました。未保存の下書きを処理し、再読み込みして再接続してください。再接続までファイル操作は利用できません。</value></data>
+  <data name="Connection_DeletedExternally" xml:space="preserve"><value>この接続は別のプロセスによって削除されました。未保存のプレビュー内容は保持されますが、ストレージ操作は利用できません。</value></data>
   <data name="Transfer_DropDestination" xml:space="preserve"><value>アップロード先: {0}</value></data>
   <data name="Transfer_ClearFailed" xml:space="preserve"><value>失敗を消去</value></data>
   <data name="Transfer_ClearHistory" xml:space="preserve"><value>履歴を消去</value></data>

@@ -765,6 +765,7 @@
   <data name="Preview_ReadOnlyDraft" xml:space="preserve"><value>Diese Verbindung ist jetzt schreibgeschützt. Ihr ungespeicherter Entwurf bleibt erhalten. Kopieren Sie ihn vor dem Verwerfen oder Schließen.</value></data>
   <data name="Preview_CopyDraft" xml:space="preserve"><value>Entwurf kopieren</value></data>
   <data name="Connection_ReconnectPending" xml:space="preserve"><value>Die Verbindung wurde aktualisiert. Bearbeiten Sie zuerst den ungespeicherten Entwurf und laden Sie dann neu. Dateiaktionen sind bis zur erneuten Verbindung nicht verfügbar.</value></data>
+  <data name="Connection_DeletedExternally" xml:space="preserve"><value>Diese Verbindung wurde von einem anderen Prozess entfernt. Nicht gespeicherte Vorschauinhalte bleiben erhalten, Speicheraktionen sind jedoch nicht verfügbar.</value></data>
   <data name="Transfer_DropDestination" xml:space="preserve"><value>Zielordner: {0}</value></data>
   <data name="Transfer_ClearFailed" xml:space="preserve"><value>Fehler löschen</value></data>
   <data name="Transfer_ClearHistory" xml:space="preserve"><value>Verlauf löschen</value></data>

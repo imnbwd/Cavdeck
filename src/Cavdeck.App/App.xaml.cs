@@ -142,6 +142,7 @@ public partial class App : System.Windows.Application
             var connectionCatalog = _services.GetRequiredService<JsonConnectionCatalog>();
             var clients = _services.GetRequiredService<S3ClientLeasePool>();
             connections.ConnectionDeleted += (_, id) => clients.Invalidate(id);
+            connections.ConnectionDeletedExternally += (_, id) => clients.Invalidate(id);
             connections.ConnectionUpdated += (_, change) =>
             {
                 if (change.RequiresReconnect)
@@ -208,6 +209,7 @@ public partial class App : System.Windows.Application
             MainWindow = window;
             window.RestoreLayout();
             window.Show();
+            _services.GetRequiredService<ConnectionCatalogSyncService>().Start();
             var lifetime = _services.GetRequiredService<ApplicationLifetimeCoordinator>();
             _tray = _services.GetRequiredService<TrayIconService>();
             lifetime.Attach(window, _tray);
@@ -319,6 +321,7 @@ public partial class App : System.Windows.Application
 #endif
         registrations.AddSingleton<ITransferActivity>(sp => sp.GetRequiredService<TransferEngine>());
         registrations.AddSingleton<ConnectionsViewModel>();
+        registrations.AddSingleton<ConnectionCatalogSyncService>();
         registrations.AddTransient<ExplorerViewModel>();
         registrations.AddTransient<ConnectionEditorViewModel>();
         registrations.AddSingleton<Func<ExplorerViewModel>>(sp => () => sp.GetRequiredService<ExplorerViewModel>());
