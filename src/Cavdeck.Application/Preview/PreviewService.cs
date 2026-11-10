@@ -100,7 +100,7 @@ public sealed class PreviewService
         ArgumentNullException.ThrowIfNull(connection);
         try
         {
-            connection = await Cavdeck.Application.Connections.ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+            connection = await Cavdeck.Application.Connections.ConnectionAccess.ResolveAsync(_catalog, connection, cancellationToken);
             ObjectAccess.Ensure(connection, bucket, key, write: true);
             var bytes = TextCodec.Encode(text, charset, bom);
             var provider = _providers.Create(connection.Provider);
