@@ -7,6 +7,18 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+function Test-PathContains([string]$PathValue, [string]$Directory) {
+    $trimChars = [char[]]@([char]92, [char]47)
+    $target = $Directory.Trim().Trim('"').TrimEnd($trimChars)
+    foreach ($entry in ($PathValue -split ';')) {
+        $candidate = $entry.Trim().Trim('"').TrimEnd($trimChars)
+        if ($candidate -and [string]::Equals($candidate, $target, [StringComparison]::OrdinalIgnoreCase)) {
+            return $true
+        }
+    }
+    return $false
+}
 if (!$DisposableMachine) {
     throw 'Run this installer smoke test only on a disposable Windows runner or VM, with -DisposableMachine.'
 }
@@ -57,12 +69,23 @@ if ($setup.ExitCode -ne 0) {
 
 $updater = Join-Path $install 'Update.exe'
 $app = Join-Path $install 'current/Cavdeck.exe'
-if (!(Test-Path $updater -PathType Leaf) -or !(Test-Path $app -PathType Leaf)) {
-    throw "Installation did not create the updater and app in $install."
+$cli = Join-Path $install 'current/cli/cavdeck.exe'
+if (!(Test-Path $updater -PathType Leaf) -or !(Test-Path $app -PathType Leaf) -or !(Test-Path $cli -PathType Leaf)) {
+    throw "Installation did not create the updater, desktop app and CLI in $install."
+}
+$cliHelp = (& $cli --help | Out-String)
+if ($LASTEXITCODE -ne 0 -or $cliHelp -notmatch 'Usage:') { throw 'Installed CLI help failed.' }
+$cliVersion = (& $cli --version | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or ($cliVersion -split '\+', 2)[0] -ne $Version) {
+    throw "Installed CLI version mismatch: $cliVersion"
+}
+$userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+if (!(Test-PathContains $userPath (Join-Path $install 'current/cli'))) {
+    throw 'The installer did not register the CLI directory in the current user PATH.'
 }
 try {
     if ($RequireSignature) {
-        foreach ($file in @($updater, $app)) {
+        foreach ($file in @($updater, $app, $cli)) {
             $signature = Get-AuthenticodeSignature -FilePath $file
             if ($signature.Status -ne 'Valid') { throw "Installed binary is not trusted: $file ($($signature.Status))." }
         }
@@ -75,7 +98,11 @@ try {
         throw "Silent uninstall failed with exit code $($uninstall.ExitCode). See $uninstallLog"
     }
     if (Test-Path $install) { throw "Uninstall left the install directory in place: $install" }
-    Write-Host 'Setup.exe silent install and uninstall passed.'
+    $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    if (Test-PathContains $userPath (Join-Path $install 'current/cli')) {
+        throw 'Setup.exe uninstall left the Cavdeck CLI directory in the user PATH.'
+    }
+    Write-Host 'Setup.exe silent install, CLI registration and uninstall passed.'
 }
 catch {
     Write-Warning "Smoke installation remains at $install. Inspect it before cleaning up."
@@ -99,12 +126,30 @@ if ($msiResult.ExitCode -ne 0) {
 }
 try {
     $msiApp = Join-Path $msiInstall 'current/Cavdeck.exe'
-    if (!(Test-Path $msiApp -PathType Leaf)) { throw "MSI did not install Cavdeck.exe in $msiInstall." }
-    if ($RequireSignature) {
-        $signature = Get-AuthenticodeSignature -FilePath $msiApp
-        if ($signature.Status -ne 'Valid') { throw "MSI-installed app is not trusted: $($signature.Status)." }
+    $msiCli = Join-Path $msiInstall 'current/cli/cavdeck.exe'
+    if (!(Test-Path $msiApp -PathType Leaf)) {
+        throw "MSI did not install the Desktop executable: $msiApp"
     }
-    Write-Host 'MSI silent installation passed.'
+    if (!(Test-Path $msiCli -PathType Leaf)) {
+        throw "MSI did not install the CLI executable: $msiCli"
+    }
+    $msiCliHelp = (& $msiCli --help | Out-String)
+    if ($LASTEXITCODE -ne 0 -or $msiCliHelp -notmatch 'Usage:') { throw 'MSI-installed CLI help failed.' }
+    $msiCliVersion = (& $msiCli --version | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or ($msiCliVersion -split '\+', 2)[0] -ne $Version) {
+        throw "MSI-installed CLI version mismatch: $msiCliVersion"
+    }
+    $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    if (!(Test-PathContains $userPath (Join-Path $msiInstall 'current/cli'))) {
+        throw 'MSI did not register the CLI directory in the current user PATH.'
+    }
+    if ($RequireSignature) {
+        foreach ($file in @($msiApp, $msiCli)) {
+            $signature = Get-AuthenticodeSignature -FilePath $file
+            if ($signature.Status -ne 'Valid') { throw "MSI-installed binary is not trusted: $file ($($signature.Status))." }
+        }
+    }
+    Write-Host 'MSI silent installation, CLI and PATH registration passed.'
 }
 finally {
     $msiUninstallLog = Join-Path $logs 'msi-uninstall.log'
@@ -113,5 +158,10 @@ finally {
         throw "MSI silent uninstall failed with exit code $($remove.ExitCode). See $msiUninstallLog"
     }
     if (Test-Path $msiInstall) { throw "MSI uninstall left the installation directory: $msiInstall" }
-    Write-Host 'MSI silent uninstall passed.'
+    $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    if (Test-PathContains $userPath (Join-Path $msiInstall 'current/cli')) {
+        throw 'MSI uninstall left the Cavdeck CLI directory in the user PATH.'
+    }
 }
+
+Write-Host 'MSI silent install, CLI registration and uninstall passed.'

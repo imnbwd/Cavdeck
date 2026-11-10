@@ -752,8 +752,8 @@
   <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Sucht nach dem Start nach Updates, ohne Ihre Arbeit zu unterbrechen.</value></data>
   <data name="Update_BackgroundDownload" xml:space="preserve"><value>Updates im Hintergrund herunterladen</value></data>
   <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>Lädt Updates automatisch herunter. Für die Installation ist Ihre Bestätigung erforderlich.</value></data>
-  <data name="Update_TransfersTitle" xml:space="preserve"><value>Übertragungen noch nicht abgeschlossen</value></data>
-  <data name="Update_TransfersMessage" xml:space="preserve"><value>Schließen Sie alle wartenden, laufenden, erneut versuchten oder pausierten Übertragungen ab oder brechen Sie sie ab, bevor Sie aktualisieren.</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>Übertragungen oder CLI-Befehle sind noch aktiv</value></data>
+  <data name="Update_TransfersMessage" xml:space="preserve"><value>Schließen Sie vor dem Update alle wartenden, laufenden, erneut versuchten oder pausierten Übertragungen ab oder brechen Sie sie ab und beenden Sie alle laufenden CLI-Befehle.</value></data>
   <data name="Update_RestartTitle" xml:space="preserve"><value>Cavdeck-Update installieren</value></data>
   <data name="Update_RestartMessage" xml:space="preserve"><value>Cavdeck speichert den Arbeitsbereich, wird beendet, installiert das Update und startet neu. Fortfahren?</value></data>
   <data name="Update_SaveFailed" xml:space="preserve"><value>Arbeitsbereich konnte nicht gespeichert werden. Das Update wurde abgebrochen. Cavdeck bleibt geöffnet.</value></data>

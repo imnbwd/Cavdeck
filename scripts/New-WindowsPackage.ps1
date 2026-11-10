@@ -27,9 +27,13 @@ if (!$output.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar,
     throw 'OutputDirectory must be beneath the repository artifacts directory.'
 }
 $publish = Join-Path $output 'publish'
+$staging = Join-Path $output 'staging'
+$desktopPublish = Join-Path $staging 'desktop'
+$cliPublish = Join-Path $staging 'cli'
 $releases = Join-Path $output 'Releases'
 $artwork = Join-Path $output 'installer-artwork'
 if (Test-Path $publish) { throw "Publish directory already exists: $publish" }
+if (Test-Path $staging) { throw "Staging directory already exists: $staging" }
 
 Push-Location $root
 try {
@@ -51,23 +55,53 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Release tests failed.' }
     }
     New-Item -ItemType Directory -Force -Path $releases | Out-Null
-    $publishArgs = @('publish', 'src/Cavdeck.App/Cavdeck.App.csproj', '-c', 'Release',
-        '-r', 'win-x64', '--self-contained', 'true', "-p:Version=$Version", '-o', $publish, '-m:1')
-    if ($NoRestore) { $publishArgs += '--no-restore' }
-    & dotnet @publishArgs
-    if ($LASTEXITCODE -ne 0) { throw 'Windows publish failed.' }
-    if (!(Test-Path (Join-Path $publish 'Cavdeck.exe') -PathType Leaf)) {
-        throw 'The publish directory has no Cavdeck.exe.'
+    New-Item -ItemType Directory -Force -Path $staging | Out-Null
+
+    # Publish independently so each app retains its own deps/runtime config and apphost.
+    # Merge only byte-identical shared files; conflicting dependency versions fail the build.
+    $desktopPublishArgs = @('publish', 'src/Cavdeck.App/Cavdeck.App.csproj', '-c', 'Release',
+        '-r', 'win-x64', '--self-contained', 'true', "-p:Version=$Version", '-o', $desktopPublish, '-m:1')
+    if ($NoRestore) { $desktopPublishArgs += '--no-restore' }
+    & dotnet @desktopPublishArgs
+    if ($LASTEXITCODE -ne 0) { throw 'Desktop Windows publish failed.' }
+
+    $cliPublishArgs = @('publish', 'src/Cavdeck.Cli/Cavdeck.Cli.csproj', '-c', 'Release',
+        '-r', 'win-x64', '--self-contained', 'true', '-p:PublishTrimmed=false',
+        "-p:Version=$Version", '-o', $cliPublish, '-m:1')
+    if ($NoRestore) { $cliPublishArgs += '--no-restore' }
+    & dotnet @cliPublishArgs
+    if ($LASTEXITCODE -ne 0) { throw 'CLI Windows publish failed.' }
+
+    if (!(Test-Path (Join-Path $desktopPublish 'Cavdeck.exe') -PathType Leaf)) {
+        throw 'Desktop publish is missing Cavdeck.exe.'
     }
-    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') `
-        -AppDirectory $publish -Version $Version
+    if (!(Test-Path (Join-Path $cliPublish 'cavdeck.exe') -PathType Leaf)) {
+        throw 'CLI publish is missing cavdeck.exe.'
+    }
+
+    & (Join-Path $PSScriptRoot 'Assemble-WindowsPublish.ps1') -DesktopDirectory $desktopPublish -CliDirectory $cliPublish -OutputDirectory $publish
+    if ($LASTEXITCODE -ne 0) { throw 'Desktop and CLI publish merge failed.' }
+    Remove-Item -LiteralPath $staging -Recurse -Force
+
+    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $publish -Version $Version -ApplicationKind Desktop
+    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory (Join-Path $publish 'cli') -Version $Version -ApplicationKind Cli
+
+    $cli = Join-Path $publish 'cli/cavdeck.exe'
+    $cliVersion = (& $cli --version | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or ($cliVersion -split '\+', 2)[0] -ne $Version) {
+        throw "Published CLI version mismatch: expected $Version, received $cliVersion."
+    }
+    $cliHelp = (& $cli --help | Out-String)
+    if ($LASTEXITCODE -ne 0 -or $cliHelp -notmatch 'Usage:' -or $cliHelp -notmatch 'Options:') {
+        throw 'The published CLI could not display help.'
+    }
 
     & (Join-Path $PSScriptRoot 'New-InstallerArtwork.ps1') `
         -IconPath 'src/Cavdeck.App/Assets/Cavdeck.ico' -OutputDirectory $artwork
 
     & vpk pack --packId Cavdeck --packTitle Cavdeck --packVersion $Version `
         --packDir $publish --mainExe Cavdeck.exe --runtime win-x64 --channel stable `
-        --noPortable --msi --instLocation Either `
+        --noPortable --msi --instLocation PerUser `
         --exclude '.*(\.pdb|Microsoft\.Web\.WebView2\.[^\\/]*\.xml)$' `
         --icon src/Cavdeck.App/Assets/Cavdeck.ico `
         --splashImage (Join-Path $artwork 'CavdeckSetupSplash.png') `

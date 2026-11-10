@@ -130,6 +130,15 @@ try {
     & (Join-Path $PSScriptRoot 'New-WindowsPackage.ps1') -Version $Version -SkipTests
     if ($LASTEXITCODE -ne 0) { throw 'Windows packaging or verification failed.' }
 
+    # Preserve the standalone CLI ZIP as a separate GitHub Release asset. It is
+    # deliberately not added to the Velopack desktop update feed.
+    & (Join-Path $PSScriptRoot 'New-WindowsCliPackage.ps1') -Version $Version
+    if ($LASTEXITCODE -ne 0) { throw 'Standalone CLI packaging or verification failed.' }
+    $cliArchiveName = "Cavdeck-Cli-$Version-win-x64.zip"
+    $cliArchive = Join-Path $root "artifacts/cli/$cliArchiveName"
+    if (!(Test-Path $cliArchive -PathType Leaf)) { throw "Standalone CLI archive is missing: $cliArchiveName" }
+    $cliHash = (Get-FileHash $cliArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+
     if ($DisposableMachine) {
         & (Join-Path $PSScriptRoot 'Test-WindowsInstall.ps1') -ReleasesDirectory $releaseDir -Version $Version -DisposableMachine
         if ($LASTEXITCODE -ne 0) { throw 'Installer smoke test failed.' }
@@ -137,13 +146,6 @@ try {
     else {
         Write-Warning 'Installer smoke test skipped. Verify installation, uninstallation and upgrades in a clean disposable VM BEFORE publishing.'
     }
-
-    # Keep the Windows CLI separate from Velopack's desktop update packages.
-    & (Join-Path $PSScriptRoot 'New-WindowsCliPackage.ps1') -Version $Version -OutputDirectory $output
-    $cliArchiveName = "Cavdeck-Cli-$Version-win-x64.zip"
-    $cliArchive = Join-Path $output $cliArchiveName
-    if (!(Test-Path $cliArchive -PathType Leaf)) { throw 'Verified CLI ZIP is missing.' }
-    $cliChecksum = (Get-FileHash $cliArchive -Algorithm SHA256).Hash.ToLowerInvariant()
 
     # Generate user-facing changes from merged pull requests since the previous release.
     # The repository-level .github/release.yml controls category names and label mapping.
@@ -179,16 +181,23 @@ try {
 
     $checksums = Join-Path $releaseDir 'SHA256SUMS.txt'
     if (!(Test-Path $checksums -PathType Leaf)) { throw 'SHA256SUMS.txt is missing.' }
-    # Velopack generates the installer/feed hashes; append the standalone CLI artifact.
-    Add-Content -Path $checksums -Value "$cliChecksum  $cliArchiveName" -Encoding utf8
-    $lines += "| $cliArchiveName | $cliChecksum |"
+    $checksumEntries = @(Get-Content $checksums | Where-Object { ![string]::IsNullOrWhiteSpace($_) })
+    $checksumEntries += "$cliHash  $cliArchiveName"
+    $checksumEntries |
+        Sort-Object { ($_ -split '\s{2}', 2)[1] } |
+        Set-Content -Path $checksums -Encoding utf8
+    $lines += "| $cliArchiveName | $cliHash |"
     $lines += @(
+        '',
+        '## Command-line interface',
+        '',
+        'The Windows installer also installs the Cavdeck CLI. Open a new terminal after installation and run cavdeck --help.',
         '',
         '## Security and Verification',
         '',
         '**These GitHub installers are currently unsigned (not code-signed).** Windows may display an Unknown Publisher or Microsoft Defender SmartScreen warning.',
         '',
-        'Download installers and the standalone CLI ZIP only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify their SHA-256 checksums before use.',
+        'Download installers only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify their SHA-256 checksums before use.',
         '',
         '**Verify the Setup installer (PowerShell):**',
         '',
@@ -204,7 +213,6 @@ try {
         '',
         'Compare the result with the corresponding value above or the matching entry in `SHA256SUMS.txt`.',
         '',
-        '**CLI package:** Extract `' + $cliArchiveName + '` to a directory and run `cavdeck.exe --help`. The self-contained package includes .NET 10.',
         '',
         '## Automatic Updates',
         '',
@@ -228,8 +236,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or !$draft.isDraft) {
         throw 'The uploaded release is not a draft. Inspect GitHub Releases immediately.'
     }
-    & gh release upload "v$Version" $cliArchive $checksums --repo $repository --clobber
-    if ($LASTEXITCODE -ne 0) { throw 'CLI ZIP or checksum upload failed. Inspect the draft.' }
+    & gh release upload "v$Version" $checksums $cliArchive --repo $repository --clobber
+    if ($LASTEXITCODE -ne 0) { throw 'Checksum and standalone CLI upload failed. Inspect the draft.' }
     & gh release edit "v$Version" --repo $repository --notes-file $notesPath
     if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed. Inspect the draft.' }
 

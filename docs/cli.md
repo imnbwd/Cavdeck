@@ -6,22 +6,27 @@ CLI help, status messages, and errors are displayed in English regardless of the
 
 ## Install and run
 
-Download `Cavdeck-Cli-<version>-win-x64.zip` from the [official GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page, verify its SHA-256 checksum against `SHA256SUMS.txt`, and extract the entire archive. Keep its DLLs and runtime files beside `cavdeck.exe`. Run it from that directory or add the directory to PATH. The self-contained artifact includes .NET 10.
+Cavdeck CLI is included in the same Windows x64 installer as the desktop app. Install Cavdeck using the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) Setup.exe or MSI. Both installers use a per-user installation and add the installed CLI directory (`current\cli`) to the current user's PATH.
 
-On a development branch, Windows CI also provides an independently tested CLI ZIP artifact; production versions are published with the corresponding desktop release.
+Open a new terminal after installation and run:
 
 ```powershell
-.\cavdeck.exe --help
-.\cavdeck.exe --version
-.\cavdeck.exe connection list --json
+cavdeck --help
+cavdeck --version
+cavdeck connection list --json
 ```
 
-Build from source with the .NET 10 SDK.
+The installed CLI keeps its dependencies in a `cli` subdirectory of the Velopack-managed application directory. Desktop and CLI are updated and uninstalled together. The CLI shares the desktop app's connections in `%APPDATA%\Cavdeck\connections.json` and credentials in Windows Credential Manager under the same Windows user.
+
+Each production release also provides an optional standalone, self-contained `Cavdeck-Cli-<version>-win-x64.zip` for users who want the CLI without installing the desktop app. Download the archive from the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page, extract the entire archive, then run `cavdeck.exe` from that directory or add the directory to PATH. Keep all extracted runtime and dependency files together. The archive includes .NET 10 and does not participate in the desktop app's automatic update or uninstall process.
+
+The desktop updater will not apply an update while a CLI process is running. Close active CLI commands and retry the update. New CLI commands are rejected while an update is being applied. When manually updating or uninstalling with Setup.exe or MSI, close all CLI processes first; Velopack's installer hooks cannot cancel a manual install or uninstall.
+
+Build from source with the .NET 10 SDK:
 
 ```powershell
 dotnet publish src/Cavdeck.Cli/Cavdeck.Cli.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -o artifacts/cli/win-x64
 ```
-
 ## Commands
 
 | Command | Arguments and command-specific options |
@@ -202,4 +207,4 @@ Logs are retained until manually removed. Delete a run directory only after the 
 
 ## Real provider tests
 
-Set `CAVDECK_CLI_TEST_<PROVIDER>_ENABLED=1` with `BUCKET`, `PREFIX`, `ACCESS_KEY`, and `SECRET_KEY` under the same variable prefix. Provider names are `AWS`, `R2`, and `MINIO`. Set `ENDPOINT` for R2 or MinIO and `REGION` as needed. Use a dedicated test bucket and least-privilege credentials for a test prefix beginning with `cavdeck-cli-test/`. Each test uses a unique key and attempts to clean up its test objects. Tests without the required configuration are skipped.
+Set `CAVDECK_CLI_TEST_<PROVIDER>_ENABLED=1` with `BUCKET`, `PREFIX`, `ACCESS_KEY`, and `SECRET_KEY` under the same variable prefix. Provider names are `AWS`, `R2`, and `MINIO`. Set `ENDPOINT` for R2 or MinIO and `REGION` as needed. Use a dedicated test bucket and least-privilege credentials for a test prefix beginning with `cavdeck-test/`. Each test uses a unique key and attempts to clean up its test objects. Tests without the required configuration are skipped.

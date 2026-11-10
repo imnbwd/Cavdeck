@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Cavdeck.Infrastructure.Updates;
 
 namespace Cavdeck.Cli;
 
@@ -54,12 +55,17 @@ internal static partial class CliRuntime
             try
             {
                 if (parsed.Action is not null)
+                {
+                    // Hold a shared installation lease for the entire CLI invocation.
+                    // Desktop updates acquire the same file exclusively before replacing current/.
+                    using var activity = new FileApplicationActivityGate().AcquireCliLease();
                     return await parsed.InvokeAsync(new InvocationConfiguration
                     {
                         EnableDefaultExceptionHandler = false,
                         // The console handler waits for durable shutdown and cleanup.
                         ProcessTerminationTimeout = null
                     }, cancellation.Token);
+                }
                 return WriteError(CliError.Arguments, asJson);
             }
             catch (Exception exception)

@@ -279,7 +279,13 @@ public partial class ShellWindow : AppWindow
 
     public async void BeginApplicationExit() => await ExitCoreAsync(null);
 
-    public async void BeginUpdateRestart(IUpdateService updater) => await ExitCoreAsync(updater);
+    public bool BeginUpdateRestart(IUpdateService updater)
+    {
+        if (_closing || _checkingExit)
+            return false;
+        _ = ExitCoreAsync(updater);
+        return true;
+    }
 
     private async Task ExitCoreAsync(IUpdateService? updater)
     {

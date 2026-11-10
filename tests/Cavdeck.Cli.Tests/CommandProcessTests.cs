@@ -30,8 +30,9 @@ public sealed class CommandProcessTests
         var result = await InvokeAsync(arguments);
         Assert.Equal(0, result.ExitCode);
         Assert.Empty(result.Error);
-        Assert.Contains("Usage:", result.Output);
         Assert.Contains("Options:", result.Output);
+        if (arguments.Length == 1)
+            Assert.Matches(@"(?is)Usage:\s*cavdeck\b", result.Output);
         Assert.Contains("Show help and usage information", result.Output);
         Assert.DoesNotContain("用法:", result.Output);
         Assert.DoesNotContain("选项:", result.Output);

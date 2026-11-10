@@ -148,5 +148,6 @@
   <data name="ClearEndpointDescription" xml:space="preserve"><value>Clear the custom endpoint.</value></data>
   <data name="ClearBucketDescription" xml:space="preserve"><value>Clear the bucket restriction.</value></data>
   <data name="ClearPrefixDescription" xml:space="preserve"><value>Clear the key prefix restriction.</value></data>
+  <data name="ApplicationUpdating" xml:space="preserve"><value>Cavdeck is being updated. Wait for the update to finish, then retry the command.</value></data>
   <data name="WideDescription" xml:space="preserve"><value>Show full-width values and additional table columns.</value></data>
 </root>

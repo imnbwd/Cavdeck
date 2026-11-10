@@ -18,6 +18,7 @@ public sealed class ApplicationLifetimeCoordinator
     private ShellWindow? _window;
     private TrayIconService? _tray;
     private bool _exiting;
+    private IDisposable? _updateLease;
 
     public ApplicationLifetimeCoordinator(ApplicationState state, TransferEngine engine,
         DialogService dialogs, LocalizationService texts)
@@ -89,14 +90,32 @@ public sealed class ApplicationLifetimeCoordinator
 
     public bool HasUnfinishedTransfers => _engine.UnfinishedCount > 0;
 
-    public void RequestUpdateRestart(IUpdateService updater)
+    public bool RequestUpdateRestart(IUpdateService updater, IDisposable updateLease)
     {
-        if (_exiting || _window is null || HasUnfinishedTransfers) return;
+        ArgumentNullException.ThrowIfNull(updateLease);
+        if (_exiting || _window is null || HasUnfinishedTransfers)
+        {
+            updateLease.Dispose();
+            return false;
+        }
+
+        // Keep the exclusive lease until process termination. Velopack replaces current/
+        // only after the desktop process has exited.
+        _updateLease = updateLease;
         _exiting = true;
-        _window.BeginUpdateRestart(updater);
+        if (!_window.BeginUpdateRestart(updater))
+        {
+            CancelExit();
+            return false;
+        }
+        return true;
     }
 
-    public void CancelExit() => _exiting = false;
+    public void CancelExit()
+    {
+        _exiting = false;
+        Interlocked.Exchange(ref _updateLease, null)?.Dispose();
+    }
 
     private bool TryHide()
     {

@@ -3,6 +3,7 @@ using Cavdeck.Application.Explorer;
 using Cavdeck.Domain.Storage;
 using Cavdeck.Domain.Transfers;
 using Cavdeck.Infrastructure.Configuration;
+using Cavdeck.Infrastructure.Updates;
 
 namespace Cavdeck.Cli;
 
@@ -17,6 +18,7 @@ internal sealed record CliError(int ExitCode, string Code, string Message, bool 
         OperationCanceledException => new(6, "NETWORK_FAILURE", CliText.Get("Timeout"), true),
         CliException error => error.Error,
         ConnectionCatalogBusyException => new(5, "CONNECTION_CATALOG_BUSY", CliText.Get("CatalogBusy"), true),
+        ApplicationUpdateInProgressException => new(5, "APPLICATION_UPDATING", CliText.Get("ApplicationUpdating"), true),
         ConnectionValidationException validation when validation.Issues.Any(issue => issue.Code == ConnectionIssueCode.Duplicate) =>
             new(5, "CONNECTION_NAME_EXISTS", CliText.Get("ConnectionNameExists")),
         ConnectionValidationException validation => new(2, "INVALID_CONFIGURATION", CliText.Get("InvalidConnection"),
