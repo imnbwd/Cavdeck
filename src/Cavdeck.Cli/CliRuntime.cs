@@ -26,6 +26,7 @@ internal static partial class CliRuntime
         root.Options.Add(quiet);
         root.Options.Add(verbose);
         root.Options.Add(new Option<bool>("--no-color") { Recursive = true, Description = CliText.Get("NoColorDescription") });
+        root.Options.Add(new Option<bool>("--wide") { Recursive = true, Description = CliText.Get("WideDescription") });
         root.Options.Add(new Option<bool>("--no-input") { Recursive = true, Description = CliText.Get("NoInputDescription") });
 
         using var cancellation = new CancellationTokenSource();
