@@ -10,11 +10,13 @@ Set-StrictMode -Version Latest
 $desktop = (Resolve-Path $DesktopDirectory).Path
 $cli = (Resolve-Path $CliDirectory).Path
 $output = [IO.Path]::GetFullPath($OutputDirectory)
-if (Test-Path $output) { throw "Merged publish directory already exists: $output" }
+if (Test-Path $output) { throw "Assembled publish directory already exists: $output" }
 
 New-Item -ItemType Directory -Force -Path $output | Out-Null
+$cliTarget = Join-Path $output 'cli'
+New-Item -ItemType Directory -Force -Path $cliTarget | Out-Null
 
-function Copy-PublishFiles([string]$Source, [string]$Destination) {
+function Copy-PublishTree([string]$Source, [string]$Destination) {
     foreach ($file in Get-ChildItem -LiteralPath $Source -File -Recurse -Force | Sort-Object FullName) {
         if (($file.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
             throw "Publish output contains a reparse point: $($file.FullName)"
@@ -27,36 +29,38 @@ function Copy-PublishFiles([string]$Source, [string]$Destination) {
             New-Item -ItemType Directory -Force -Path $targetDirectory | Out-Null
         }
 
-        if (Test-Path $target -PathType Leaf) {
-            $existingHash = (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash
-            $incomingHash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
-            if ($existingHash -ne $incomingHash) {
-                throw "Desktop and CLI publish outputs contain conflicting files: $relative"
-            }
-            continue
-        }
-
         Copy-Item -LiteralPath $file.FullName -Destination $target
     }
 }
 
-Copy-PublishFiles -Source $desktop -Destination $output
-Copy-PublishFiles -Source $cli -Destination $output
+# Desktop and CLI intentionally keep isolated dependency graphs. Their self-contained
+# Windows publishes can contain different versions of identically named assemblies
+# (for example WindowsBase.dll), so they must not share an application base directory.
+Copy-PublishTree -Source $desktop -Destination $output
+Copy-PublishTree -Source $cli -Destination $cliTarget
 
 $requiredFiles = @(
     'Cavdeck.exe',
     'Cavdeck.dll',
     'Cavdeck.deps.json',
-    'Cavdeck.runtimeconfig.json',
+    'Cavdeck.runtimeconfig.json'
+)
+foreach ($name in $requiredFiles) {
+    if (!(Test-Path (Join-Path $output $name) -PathType Leaf)) {
+        throw "Desktop publish output is missing $name."
+    }
+}
+
+$requiredCliFiles = @(
     'cavdeck-cli.exe',
     'cavdeck-cli.dll',
     'cavdeck-cli.deps.json',
     'cavdeck-cli.runtimeconfig.json'
 )
-foreach ($name in $requiredFiles) {
-    if (!(Test-Path (Join-Path $output $name) -PathType Leaf)) {
-        throw "Merged publish output is missing $name."
+foreach ($name in $requiredCliFiles) {
+    if (!(Test-Path (Join-Path $cliTarget $name) -PathType Leaf)) {
+        throw "CLI publish output is missing cli/$name."
     }
 }
 
-Write-Host "Merged Desktop and CLI publish outputs into $output."
+Write-Host "Assembled isolated Desktop and CLI outputs under $output."

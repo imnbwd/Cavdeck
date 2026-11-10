@@ -8,9 +8,16 @@ Set-StrictMode -Version Latest
 
 $app = (Resolve-Path $AppDirectory).Path
 $expectedFileVersion = "$Version.0"
-$expectedAssemblies = @('Cavdeck.dll', 'cavdeck-cli.dll', 'Cavdeck.Application.dll',
-    'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')
-foreach ($name in @('Cavdeck.exe', 'cavdeck-cli.exe') + $expectedAssemblies) {
+$sharedAssemblies = @('Cavdeck.Application.dll', 'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')
+if ($ApplicationKind -eq 'Desktop') {
+    $expectedExecutables = @('Cavdeck.exe')
+    $expectedAssemblies = @('Cavdeck.dll') + $sharedAssemblies
+}
+else {
+    $expectedExecutables = @('cavdeck-cli.exe')
+    $expectedAssemblies = @('cavdeck-cli.dll') + $sharedAssemblies
+}
+foreach ($name in $expectedExecutables + $expectedAssemblies) {
     $path = Join-Path $app $name
     if (!(Test-Path $path -PathType Leaf)) { throw "Published app is missing $name." }
     $info = [Diagnostics.FileVersionInfo]::GetVersionInfo($path)

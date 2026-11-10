@@ -69,7 +69,7 @@ if ($setup.ExitCode -ne 0) {
 
 $updater = Join-Path $install 'Update.exe'
 $app = Join-Path $install 'current/Cavdeck.exe'
-$cli = Join-Path $install 'current/cavdeck-cli.exe'
+$cli = Join-Path $install 'current/cli/cavdeck-cli.exe'
 if (!(Test-Path $updater -PathType Leaf) -or !(Test-Path $app -PathType Leaf) -or !(Test-Path $cli -PathType Leaf)) {
     throw "Installation did not create the updater, desktop app and CLI in $install."
 }
@@ -80,7 +80,7 @@ if ($LASTEXITCODE -ne 0 -or ($cliVersion -split '\+', 2)[0] -ne $Version) {
     throw "Installed CLI version mismatch: $cliVersion"
 }
 $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
-if (!(Test-PathContains $userPath (Join-Path $install 'current'))) {
+if (!(Test-PathContains $userPath (Join-Path $install 'current/cli'))) {
     throw 'The installer did not register the CLI directory in the current user PATH.'
 }
 try {
@@ -137,7 +137,7 @@ try {
         throw "MSI-installed CLI version mismatch: $msiCliVersion"
     }
     $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
-    if (!(Test-PathContains $userPath (Join-Path $msiInstall 'current'))) {
+    if (!(Test-PathContains $userPath (Join-Path $msiInstall 'current/cli'))) {
         throw 'MSI did not register the CLI directory in the current user PATH.'
     }
     if ($RequireSignature) {

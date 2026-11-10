@@ -79,13 +79,14 @@ try {
         throw 'CLI publish is missing cavdeck-cli.exe.'
     }
 
-    & (Join-Path $PSScriptRoot 'Merge-WindowsPublish.ps1') -DesktopDirectory $desktopPublish -CliDirectory $cliPublish -OutputDirectory $publish
+    & (Join-Path $PSScriptRoot 'Assemble-WindowsPublish.ps1') -DesktopDirectory $desktopPublish -CliDirectory $cliPublish -OutputDirectory $publish
     if ($LASTEXITCODE -ne 0) { throw 'Desktop and CLI publish merge failed.' }
     Remove-Item -LiteralPath $staging -Recurse -Force
 
-    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $publish -Version $Version
+    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $publish -Version $Version -ApplicationKind Desktop
+    & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory (Join-Path $publish 'cli') -Version $Version -ApplicationKind Cli
 
-    $cli = Join-Path $publish 'cavdeck-cli.exe'
+    $cli = Join-Path $publish 'cli/cavdeck-cli.exe'
     $cliVersion = (& $cli --version | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or ($cliVersion -split '\+', 2)[0] -ne $Version) {
         throw "Published CLI version mismatch: expected $Version, received $cliVersion."

@@ -6,7 +6,7 @@ CLI help, status messages, and errors are displayed in English regardless of the
 
 ## Install and run
 
-Cavdeck CLI is included in the same Windows x64 installer as the desktop app. Install Cavdeck using the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) Setup.exe or MSI. Both installers use a per-user installation and add the installed current directory to the current user's PATH.
+Cavdeck CLI is included in the same Windows x64 installer as the desktop app. Install Cavdeck using the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) Setup.exe or MSI. Both installers use a per-user installation and add the installed CLI directory (`current\\cli`) to the current user's PATH.
 
 Open a new terminal after installation and run:
 
@@ -16,7 +16,7 @@ cavdeck-cli --version
 cavdeck-cli connection list --json
 ```
 
-There is no separate CLI installer or CLI ZIP to download, and no separate .NET 10 installation is required. Desktop and CLI are updated and uninstalled together. The CLI shares the desktop app's connections in `%APPDATA%\Cavdeck\connections.json` and credentials in Windows Credential Manager under the same Windows user.
+The CLI is installed under the same Velopack-managed application directory but keeps its own dependencies in a `cli` subdirectory. There is no separate CLI installer or CLI ZIP to download, and no separate .NET 10 installation is required. Desktop and CLI are updated and uninstalled together. The CLI shares the desktop app's connections in `%APPDATA%\Cavdeck\connections.json` and credentials in Windows Credential Manager under the same Windows user.
 
 The desktop updater will not apply an update while a CLI process is running. Close active CLI commands and retry the update. New CLI commands are rejected while an update is being applied. When manually updating or uninstalling with Setup.exe or MSI, close all CLI processes first; Velopack's installer hooks cannot cancel a manual install or uninstall.
 

@@ -121,22 +121,26 @@ try {
     if ($packagedFiles -notcontains 'lib/app/Cavdeck.exe') { throw 'Cavdeck.exe is missing from the package.' }
     foreach ($required in @(
             'lib/app/Cavdeck.runtimeconfig.json',
-            'lib/app/cavdeck-cli.exe',
-            'lib/app/cavdeck-cli.dll',
-            'lib/app/cavdeck-cli.deps.json',
-            'lib/app/cavdeck-cli.runtimeconfig.json')) {
+            'lib/app/cli/cavdeck-cli.exe',
+            'lib/app/cli/cavdeck-cli.dll',
+            'lib/app/cli/cavdeck-cli.deps.json',
+            'lib/app/cli/cavdeck-cli.runtimeconfig.json')) {
         if ($packagedFiles -notcontains $required) {
             throw "Unified package is missing $required."
         }
     }
-    if ($packagedFiles -notcontains 'lib/app/coreclr.dll') {
-        throw 'The self-contained .NET runtime is missing from the package.'
+    if ($packagedFiles -notcontains 'lib/app/coreclr.dll' -or
+            $packagedFiles -notcontains 'lib/app/cli/coreclr.dll') {
+        throw 'A self-contained .NET runtime is missing from the Desktop or CLI package.'
+    }
+    if ($packagedFiles -notcontains 'lib/app/cli/e_sqlite3.dll') {
+        throw 'The CLI SQLite native library is missing.'
     }
     if ($packagedFiles -notcontains 'lib/app/e_sqlite3.dll') {
         throw 'The Windows x64 SQLite native library is missing.'
     }
     $wrongPlatform = @($packagedFiles | Where-Object {
-        $_ -match '(?i)^lib/app/runtimes/(linux|osx|macos|android|ios|win-(x86|arm|arm64))/' -or
+        $_ -match '(?i)^lib/app/(cli/)?runtimes/(linux|osx|macos|android|ios|win-(x86|arm|arm64))/' -or
         $_ -match '(?i)^lib/app/(libe_sqlite3|e_sqlite3\.(so|dylib))'
     })
     if ($wrongPlatform.Count) {
@@ -150,14 +154,24 @@ try {
     $versionProbe = Join-Path ([IO.Path]::GetTempPath()) ('cavdeck-version-' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $versionProbe | Out-Null
     try {
-        foreach ($name in @('Cavdeck.exe', 'Cavdeck.dll', 'cavdeck-cli.exe', 'cavdeck-cli.dll',
-                'Cavdeck.Application.dll', 'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
+        foreach ($name in @('Cavdeck.exe', 'Cavdeck.dll', 'Cavdeck.Application.dll',
+                'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
             $entry = $package.GetEntry("lib/app/$name")
             if (!$entry) { throw "Full package is missing $name." }
             [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $versionProbe $name))
         }
-        & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') `
-            -AppDirectory $versionProbe -Version $Version
+
+        $cliProbe = Join-Path $versionProbe 'cli'
+        New-Item -ItemType Directory -Path $cliProbe | Out-Null
+        foreach ($name in @('cavdeck-cli.exe', 'cavdeck-cli.dll', 'Cavdeck.Application.dll',
+                'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
+            $entry = $package.GetEntry("lib/app/cli/$name")
+            if (!$entry) { throw "Full package is missing cli/$name." }
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $cliProbe $name))
+        }
+
+        & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $versionProbe -Version $Version -ApplicationKind Desktop
+        & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $cliProbe -Version $Version -ApplicationKind Cli
     }
     finally { Remove-Item -LiteralPath $versionProbe -Recurse -Force }
 }

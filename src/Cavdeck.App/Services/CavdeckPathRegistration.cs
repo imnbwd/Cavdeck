@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Cavdeck.App.Services;
 
 /// <summary>
-/// Registers the installed current directory in the current user's PATH.
+/// Registers the installed CLI directory in the current user's PATH.
 /// The MSI is deliberately per-user, so machine PATH and elevation are not required.
 /// </summary>
 internal static class CavdeckPathRegistration
@@ -46,7 +46,7 @@ internal static class CavdeckPathRegistration
             if (!OperatingSystem.IsWindows())
                 return false;
 
-            var appDirectory = GetInstalledCurrentDirectory();
+            var appDirectory = GetInstalledCliDirectory();
             if (appDirectory is null)
                 return false;
 
@@ -68,7 +68,7 @@ internal static class CavdeckPathRegistration
         }
     }
 
-    private static string? GetInstalledCurrentDirectory()
+    private static string? GetInstalledCliDirectory()
     {
         var current = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
         if (!string.Equals(Path.GetFileName(current), "current", StringComparison.OrdinalIgnoreCase))
@@ -78,7 +78,11 @@ internal static class CavdeckPathRegistration
         if (installRoot is null || !File.Exists(Path.Combine(installRoot, "Update.exe")))
             return null;
 
-        return current;
+        var cliDirectory = Path.Combine(current, "cli");
+        if (!File.Exists(Path.Combine(cliDirectory, "cavdeck-cli.exe")))
+            return null;
+
+        return cliDirectory;
     }
 
     private static bool PathsEqual(string left, string right) =>
