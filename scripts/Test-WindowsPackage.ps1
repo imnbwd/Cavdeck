@@ -133,7 +133,8 @@ try {
             $packagedFiles -notcontains 'lib/app/cli/coreclr.dll') {
         throw 'A self-contained .NET runtime is missing from the Desktop or CLI package.'
     }
-    if ($packagedFiles -notcontains 'lib/app/cli/e_sqlite3.dll') {
+    if ($packagedFiles -notcontains 'lib/app/cli/e_sqlite3.dll' -and
+            $packagedFiles -notcontains 'lib/app/cli/runtimes/win-x64/native/e_sqlite3.dll') {
         throw 'The CLI SQLite native library is missing.'
     }
     if ($packagedFiles -notcontains 'lib/app/e_sqlite3.dll') {

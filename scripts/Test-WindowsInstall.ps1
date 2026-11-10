@@ -99,7 +99,7 @@ try {
     }
     if (Test-Path $install) { throw "Uninstall left the install directory in place: $install" }
     $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
-    if (Test-PathContains $userPath (Join-Path $install 'current')) {
+    if (Test-PathContains $userPath (Join-Path $install 'current/cli')) {
         throw 'Setup.exe uninstall left the Cavdeck CLI directory in the user PATH.'
     }
     Write-Host 'Setup.exe silent install, CLI registration and uninstall passed.'
@@ -156,7 +156,7 @@ finally {
     }
     if (Test-Path $msiInstall) { throw "MSI uninstall left the installation directory: $msiInstall" }
     $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
-    if (Test-PathContains $userPath (Join-Path $msiInstall 'current')) {
+    if (Test-PathContains $userPath (Join-Path $msiInstall 'current/cli')) {
         throw 'MSI uninstall left the Cavdeck CLI directory in the user PATH.'
     }
     Write-Host 'MSI silent install, CLI registration and uninstall passed.'

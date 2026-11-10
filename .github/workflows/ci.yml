@@ -66,22 +66,13 @@ jobs:
           path: artifacts/windows-package/0.0.0/Releases/
           if-no-files-found: error
       - name: Smoke test silent install and uninstall
-        if: github.event_name == 'workflow_dispatch'
         shell: pwsh
         run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.0/Releases -Version 0.0.0 -DisposableMachine
       - name: Save installer smoke-test logs on failure
-        if: failure() && github.event_name == 'workflow_dispatch'
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cavdeck-win-x64-smoke-logs-${{ github.run_id }}
           path: artifacts/windows-package/0.0.0/smoke-logs/
           retention-days: 7
           if-no-files-found: ignore
-      - name: Save installer for manual VM review
-        if: github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v4
-        with:
-          name: cavdeck-win-x64-installer-${{ github.run_id }}
-          path: artifacts/windows-package/0.0.0/Releases/
-          retention-days: 7
-          if-no-files-found: error
