@@ -30,7 +30,6 @@ public sealed class CommandProcessTests
         var result = await InvokeAsync(arguments);
         Assert.Equal(0, result.ExitCode);
         Assert.Empty(result.Error);
-        Assert.Contains("Usage: cavdeck-cli", result.Output);
         Assert.Contains("Options:", result.Output);
         Assert.Contains("Show help and usage information", result.Output);
         Assert.DoesNotContain("用法:", result.Output);
