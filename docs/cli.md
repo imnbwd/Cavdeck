@@ -6,7 +6,9 @@ CLI help, status messages, and errors are displayed in English regardless of the
 
 ## Install and run
 
-Extract the entire Windows x64 CLI artifact. Keep its DLLs and runtime files beside `cavdeck.exe`. Run it from that directory or add the directory to PATH. The self-contained artifact includes .NET 10.
+Download `Cavdeck-Cli-<version>-win-x64.zip` from the [official GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page, verify its SHA-256 checksum against `SHA256SUMS.txt`, and extract the entire archive. Keep its DLLs and runtime files beside `cavdeck.exe`. Run it from that directory or add the directory to PATH. The self-contained artifact includes .NET 10.
+
+On a development branch, Windows CI also provides an independently tested CLI ZIP artifact; production versions are published with the corresponding desktop release.
 
 ```powershell
 .\cavdeck.exe --help
@@ -58,6 +60,19 @@ cavdeck stat 's3://assets/images/季度 报告.pdf' -c prod-r2
 The URI scheme applies to all S3-compatible providers. Keys preserve literal whitespace, percent escapes, and repeated slashes. Leading slashes in keys, dot segments, control characters, and keys beyond Cavdeck's 1,020-byte UTF-8 limit are rejected. A scoped connection uses its configured prefix for bucket-root listings and recursive transfers. Explicit keys and prefixes must be within the connection's scope.
 
 Listing returns one page, including in recursive mode. The default limit is 200. Pass the returned `nextPageToken` to `--page-token` with the same connection, bucket, prefix, and recursion settings. Results distinguish common prefixes, file objects, and zero-byte objects ending in `/` (`directoryMarker`). S3 can fold child markers into common prefixes in a delimiter listing. Use `--recursive` to inspect the marker objects themselves.
+
+## Output and help
+
+By default, commands display concise resource-specific tables. For example, `connection list` shows names, providers, regions and read-only state; `object list` shows object keys, types, sizes and modification times. Long fields are shortened in tables only. Add `--wide` to see full values and additional columns, or `--json` to retrieve the complete machine-readable result. `--wide` never changes JSON output.
+
+```powershell
+cavdeck connection list
+cavdeck connection list --wide
+cavdeck ls 's3://assets/' -c prod-r2 --wide
+cavdeck connection add --help
+```
+
+Missing or invalid options report an English error with a stable error code and exit code. Syntax diagnostics do not echo raw argument values because they may contain credentials or other sensitive data. Run `cavdeck --help` or `cavdeck <group> --help` for available commands and options.
 
 ## Connection management
 
