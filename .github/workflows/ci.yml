@@ -45,15 +45,15 @@ jobs:
         run: dotnet tool install --global vpk --version 1.2.161
       - name: Package and verify unified Desktop + CLI installer
         shell: pwsh
-        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.0 -SkipTests
+        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.1 -SkipTests
       - name: Smoke test packaged CLI
         shell: pwsh
         run: |
-          $cli = Join-Path $PWD 'artifacts/windows-package/0.0.0/publish/cli/cavdeck-cli.exe'
+          $cli = Join-Path $PWD 'artifacts/windows-package/0.0.1/publish/cli/cavdeck-cli.exe'
           & $cli --help
           if ($LASTEXITCODE -ne 0) { throw 'Packaged CLI help failed' }
           $version = (& $cli --version | Out-String).Trim()
-          if ($LASTEXITCODE -ne 0 -or ($version -split '\+', 2)[0] -ne '0.0.0') { throw 'Packaged CLI version mismatch' }
+          if ($LASTEXITCODE -ne 0 -or ($version -split '\+', 2)[0] -ne '0.0.1') { throw 'Packaged CLI version mismatch' }
           $output = & $cli connection list --json
           if ($LASTEXITCODE -ne 0) { throw 'Packaged CLI connection list failed' }
           $result = $output | ConvertFrom-Json
@@ -63,16 +63,16 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cavdeck-windows-x64-unified-package
-          path: artifacts/windows-package/0.0.0/Releases/
+          path: artifacts/windows-package/0.0.1/Releases/
           if-no-files-found: error
       - name: Smoke test silent install and uninstall
         shell: pwsh
-        run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.0/Releases -Version 0.0.0 -DisposableMachine
+        run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.1/Releases -Version 0.0.1 -DisposableMachine
       - name: Save installer smoke-test logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cavdeck-win-x64-smoke-logs-${{ github.run_id }}
-          path: artifacts/windows-package/0.0.0/smoke-logs/
+          path: artifacts/windows-package/0.0.1/smoke-logs/
           retention-days: 7
           if-no-files-found: ignore
