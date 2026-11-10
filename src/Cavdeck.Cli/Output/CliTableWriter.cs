@@ -108,10 +108,11 @@ internal static class CliTableWriter
             value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
             return "-";
 
-        if (column.Property is "sizeBytes" or "bytesTransferred" && value.TryGetInt64(out var bytes))
+        if ((column.Property is "sizeBytes" or "bytesTransferred") &&
+            value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var bytes))
             return FormatSize(bytes);
 
-        if (column.Property is "updatedAt" or "lastModified" &&
+        if ((column.Property is "updatedAt" or "lastModified") &&
             value.ValueKind == JsonValueKind.String &&
             value.TryGetDateTimeOffset(out var timestamp))
             return timestamp.ToUniversalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
