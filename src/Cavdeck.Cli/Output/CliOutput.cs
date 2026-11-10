@@ -22,18 +22,21 @@ internal static partial class CliRuntime
             if (operation == "transfer.show")
                 foreach (var field in document.GetProperty("run").EnumerateObject())
                     Console.WriteLine($"{field.Name,-16} {Display(field.Value)}");
-            var rows = items.EnumerateArray().Select(item => item.EnumerateObject()
-                .Where(field => operation != "connection.list" || field.Name != "endpoint").ToArray()).ToArray();
-            if (rows.Length == 0)
-                Console.WriteLine(CliText.Get("NoResults"));
-            else
+            if (!CliTableWriter.TryWrite(operation, document, parsed.GetValue<bool>("--wide"), Console.Out))
             {
-                var headers = rows[0].Select(field => field.Name.ToUpperInvariant()).ToArray();
-                var values = rows.Select(row => row.Select(field => Display(field.Value)).ToArray()).ToArray();
-                var widths = headers.Select((header, i) => Math.Max(header.Length, values.Max(row => row[i].Length))).ToArray();
-                Console.WriteLine(FormatRow(headers, widths));
-                foreach (var row in values)
-                    Console.WriteLine(FormatRow(row, widths));
+                var rows = items.EnumerateArray().Select(item => item.EnumerateObject()
+                    .Where(field => operation != "connection.list" || field.Name != "endpoint").ToArray()).ToArray();
+                if (rows.Length == 0)
+                    Console.WriteLine(CliText.Get("NoResults"));
+                else
+                {
+                    var headers = rows[0].Select(field => field.Name.ToUpperInvariant()).ToArray();
+                    var values = rows.Select(row => row.Select(field => Display(field.Value)).ToArray()).ToArray();
+                    var widths = headers.Select((header, i) => Math.Max(header.Length, values.Max(row => row[i].Length))).ToArray();
+                    Console.WriteLine(FormatRow(headers, widths));
+                    foreach (var row in values)
+                        Console.WriteLine(FormatRow(row, widths));
+                }
             }
             if (document.TryGetProperty("nextPageToken", out var next) && next.ValueKind != JsonValueKind.Null)
                 Console.WriteLine(CliText.Format("NextPage", Display(next)));
