@@ -4,7 +4,7 @@
                     xmlns:controls="clr-namespace:Cavdeck.App.Controls"
                     Title="{Binding Title}"
                     Style="{StaticResource AppWindowStyle}"
-                    ShowBrandName="False"
+                    WindowState="Maximized"
                     Width="1160" Height="780"
                     MinWidth="640" MinHeight="440"
                     WindowStartupLocation="CenterOwner"
