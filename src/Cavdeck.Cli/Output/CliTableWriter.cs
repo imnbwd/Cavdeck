@@ -154,7 +154,8 @@ internal static class CliTableWriter
         foreach (var rune in value.EnumerateRunes())
         {
             var category = Rune.GetUnicodeCategory(rune);
-            if (category is UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.LineSeparator or UnicodeCategory.ParagraphSeparator)
+            if (rune.Value < 0x20 || rune.Value is >= 0x7f and <= 0x9f ||
+                category is UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.LineSeparator or UnicodeCategory.ParagraphSeparator)
                 builder.Append(@"\u").Append(rune.Value.ToString("x4", CultureInfo.InvariantCulture));
             else
                 builder.Append(rune.ToString());
