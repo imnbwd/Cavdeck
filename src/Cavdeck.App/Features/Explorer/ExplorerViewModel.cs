@@ -991,7 +991,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
             _imagePreviewService, _connection, _bucket, gallery, _texts, initial);
         var window = new ImagePreviewWindow(model, _texts)
         {
-            Owner = Application.Current?.MainWindow
+            Owner = System.Windows.Application.Current?.MainWindow
         };
         window.Closed += (_, _) =>
         {
