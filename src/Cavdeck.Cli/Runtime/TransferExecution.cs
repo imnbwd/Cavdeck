@@ -23,7 +23,7 @@ internal static partial class CliRuntime
         "skip" => TransferConflictPolicy.Skip,
         "overwrite" => TransferConflictPolicy.Overwrite,
         "rename" => TransferConflictPolicy.Rename,
-        _ => throw new CliException(CliError.Arguments)
+        _ => throw new CliException(CliError.Arguments with { Message = CliText.Get("InvalidConflictPolicy") })
     };
 
     private static int WriteTransferResult(ParseResult p, string operation, Guid runId,
