@@ -217,6 +217,46 @@ public sealed class ConnectionServiceTests
         Assert.Equal("secret", vault.Items[reference].Secret);
     }
 
+    [Fact]
+    public async Task Client_revision_changes_only_when_client_settings_or_credentials_change()
+    {
+        var vault = new MemoryVault();
+        var catalog = new MemoryCatalog();
+        var service = new ConnectionService(catalog, vault, new ScriptedProbe());
+
+        var saved = await service.SaveAsync(new ConnectionDraft
+        {
+            Name = "Storage",
+            Provider = StorageProviderKind.AwsS3,
+            Region = "us-east-1",
+            AccessKeyId = "AKIDEXAMPLE123456789",
+            SecretAccessKey = "initial-secret"
+        });
+        Assert.Equal(1, saved.ClientRevision);
+
+        var renamed = await service.SaveAsync(new ConnectionDraft
+        {
+            Id = saved.Id,
+            Name = "Renamed",
+            Provider = saved.Provider,
+            Region = saved.Region,
+            AccessKeyId = "AKIDEXAMPLE123456789",
+            KeepExistingSecret = true
+        });
+        Assert.Equal(saved.ClientRevision, renamed.ClientRevision);
+
+        var rotated = await service.SaveAsync(new ConnectionDraft
+        {
+            Id = saved.Id,
+            Name = "Renamed",
+            Provider = saved.Provider,
+            Region = saved.Region,
+            AccessKeyId = "AKIDEXAMPLE123456789",
+            SecretAccessKey = "replacement-secret"
+        });
+        Assert.Equal(saved.ClientRevision + 1, rotated.ClientRevision);
+    }
+
     private sealed class MemoryVault : ICredentialVault
     {
         public Dictionary<string, (string Access, string Secret)> Items { get; } = new();

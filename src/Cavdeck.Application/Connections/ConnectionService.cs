@@ -153,7 +153,17 @@ public sealed class ConnectionService
             target.RestrictedBucket,
             target.KeyPrefix,
             target.ForcePathStyle,
-            target.AccountId);
+            target.AccountId)
+        {
+            ClientRevision = previousConnection?.ClientRevision ?? 0
+        };
+        var clientConfigurationChanged = previousConnection is null
+            || new ConnectionChange(previousConnection, connection, typedNewSecret).RequiresReconnect;
+        connection = connection with
+        {
+            ClientRevision = (previousConnection?.ClientRevision ?? 0)
+                + (clientConfigurationChanged ? 1 : 0)
+        };
 
         var credentialWriteAttempted = false;
         try

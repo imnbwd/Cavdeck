@@ -53,6 +53,7 @@ public sealed class ConnectionsViewModel : ViewModelBase
 
     public event EventHandler<StorageConnection>? BrowseRequested;
     public event EventHandler<Guid>? ConnectionDeleted;
+    public event EventHandler<Guid>? ConnectionDeletedExternally;
     public event EventHandler<ConnectionChange>? ConnectionUpdated;
     public Func<StorageConnection, Task<bool>>? BeforeDeleteAsync { get; set; }
     public Func<Guid, string>? DeleteImpact { get; set; }
@@ -65,7 +66,7 @@ public sealed class ConnectionsViewModel : ViewModelBase
             items.Add(change.Current);
         else
             items[index] = change.Current;
-        Replace(items);
+        ApplySnapshot(items, publishExternalChanges: false);
         ConnectionUpdated?.Invoke(this, change);
     }
 
@@ -94,7 +95,7 @@ public sealed class ConnectionsViewModel : ViewModelBase
         try
         {
             var connections = await Task.Run(() => _connections.ListAsync());
-            Replace(connections);
+            ReconcileExternal(connections);
             SetLoadError("");
         }
         catch (Exception exception)
@@ -173,8 +174,8 @@ public sealed class ConnectionsViewModel : ViewModelBase
             if (BeforeDeleteAsync is { } beforeDelete && !await beforeDelete(item.Connection))
                 return;
             await _connections.DeleteAsync(item.Id);
-            Replace(Items.Where(candidate => candidate.Id != item.Id)
-                .Select(candidate => candidate.Connection).ToList());
+            ApplySnapshot(Items.Where(candidate => candidate.Id != item.Id)
+                .Select(candidate => candidate.Connection).ToList(), publishExternalChanges: false);
             if (_selectedId == item.Id)
             {
                 _selectedId = null;
@@ -242,20 +243,83 @@ public sealed class ConnectionsViewModel : ViewModelBase
         }
     }
 
-    private void Replace(IReadOnlyList<StorageConnection> connections)
+    public void ReconcileExternal(IReadOnlyList<StorageConnection> connections) =>
+        ApplySnapshot(connections, publishExternalChanges: true);
+
+    private void ApplySnapshot(
+        IReadOnlyList<StorageConnection> connections,
+        bool publishExternalChanges)
     {
-        Items.Clear();
+        var previousCount = Items.Count;
+        var existing = Items.ToDictionary(item => item.Id);
+        var incomingIds = connections.Select(connection => connection.Id).ToHashSet();
+        var removed = Items.Where(item => !incomingIds.Contains(item.Id)).ToArray();
+        var updates = new List<ConnectionChange>();
+        var desired = new List<ConnectionItemViewModel>(connections.Count);
+
         foreach (var connection in connections)
         {
-            var item = new ConnectionItemViewModel(connection);
-            item.Refresh(_texts);
-            item.IsSelected = item.Id == _selectedId;
-            Items.Add(item);
+            if (existing.TryGetValue(connection.Id, out var item))
+            {
+                if (item.Connection != connection)
+                {
+                    var previous = item.Connection;
+                    item.UpdateConnection(connection, _texts);
+                    if (publishExternalChanges)
+                        updates.Add(new ConnectionChange(previous, connection));
+                }
+            }
+            else
+            {
+                item = new ConnectionItemViewModel(connection);
+                item.Refresh(_texts);
+            }
+
+            desired.Add(item);
         }
 
-        OnPropertyChanged(nameof(Count));
-        OnPropertyChanged(nameof(HasConnections));
-        RefreshSidebarStates();
+        foreach (var item in removed)
+            Items.Remove(item);
+
+        // Reuse existing item view models so selection and bindings remain stable.
+        for (var index = 0; index < desired.Count; index++)
+        {
+            var item = desired[index];
+            if (index < Items.Count && ReferenceEquals(Items[index], item))
+                continue;
+
+            var currentIndex = Items.IndexOf(item);
+            if (currentIndex >= 0)
+                Items.Move(currentIndex, index);
+            else
+                Items.Insert(index, item);
+        }
+
+        while (Items.Count > desired.Count)
+            Items.RemoveAt(Items.Count - 1);
+
+        if (_selectedId is Guid selectedId && !incomingIds.Contains(selectedId))
+        {
+            _selectedId = null;
+            OnPropertyChanged(nameof(SelectedId));
+        }
+
+        foreach (var item in Items)
+            item.IsSelected = item.Id == _selectedId;
+
+        if (previousCount != Items.Count)
+        {
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(HasConnections));
+            RefreshSidebarStates();
+        }
+
+        foreach (var change in updates)
+            ConnectionUpdated?.Invoke(this, change);
+
+        if (publishExternalChanges)
+            foreach (var item in removed)
+                ConnectionDeletedExternally?.Invoke(this, item.Id);
     }
 
     private void SetBusy(bool busy)
@@ -306,6 +370,27 @@ public sealed class ConnectionItemViewModel : ViewModelBase
 
     public StorageConnection Connection { get; private set; }
     public Guid Id => Connection.Id;
+
+    public void UpdateConnection(StorageConnection connection, LocalizationService texts)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+        if (connection.Id != Id)
+            throw new ArgumentException("A connection item cannot change its ID.", nameof(connection));
+        if (Connection == connection)
+            return;
+
+        Connection = connection;
+        _lastTestResult = null;
+        _lastTestPrefix = null;
+        _unexpectedTestFailure = false;
+        _isTesting = false;
+        Status = "";
+        StatusDetail = "";
+        StatusLevel = "Muted";
+        OnPropertyChanged(nameof(Connection));
+        OnPropertyChanged(nameof(Name));
+        Refresh(texts);
+    }
     public string Name => Connection.Name;
     public string Subtitle => _subtitle;
     public string ProviderLabel => _providerLabel;

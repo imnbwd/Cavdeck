@@ -72,6 +72,39 @@ public sealed partial class ExplorerConnectionReconnectTests
         Assert.Equal(new[] { old.Endpoint, updated.Endpoint }, provider.BrowsedEndpoints);
     }
 
+    [Fact]
+    public async Task External_connection_deletion_preserves_unsaved_preview_and_disables_storage_actions()
+    {
+        var connection = new StorageConnection(Guid.NewGuid(), "Deleted", StorageProviderKind.Minio,
+            "http://deleted:9000", "us-east-1", "credential", RestrictedBucket: "assets");
+        var provider = new Provider();
+        var texts = new LocalizationService();
+        var persistence = new Persistence();
+        var connections = new Connections(connection);
+        await using var engine = new TransferEngine(null!, new MemoryTransferJournal(), connections);
+        var preview = new PreviewService(provider);
+        using var explorer = new ExplorerViewModel(new ExplorerService(provider), engine, texts,
+            new DialogService(texts), new ToastService(texts), new ApplicationState(), persistence,
+            new PlaceLibrary(persistence), null!, preview, provider, new ExplorerClipboard(), connections);
+
+        await explorer.OpenAsync(connection);
+        var row = Assert.Single(explorer.Rows);
+        await explorer.OpenEntryAsync(row);
+        explorer.Preview.EditCommand.Execute(null);
+        explorer.Preview.EditorText = "unsaved draft";
+
+        explorer.MarkConnectionUnavailable();
+
+        Assert.True(explorer.HasUnsavedChanges);
+        Assert.False(explorer.HasConnection);
+        Assert.False(explorer.CanRefresh);
+        Assert.False(explorer.CanWrite);
+        Assert.False(explorer.CanOpen);
+        Assert.False(explorer.Preview.CanSave);
+        Assert.Equal(connection.Id, explorer.ConnectionId);
+        Assert.Equal("unsaved draft", explorer.Preview.EditorText);
+    }
+
     private sealed class Connections(StorageConnection current) : ITransferConnections
     {
         public StorageConnection Current { get; set; } = current;
