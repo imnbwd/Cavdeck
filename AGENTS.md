@@ -32,6 +32,12 @@ When changing UI copy, keep all four shipped languages consistent (English, Simp
 
 `Cavdeck.Cli` uses English for help text, status messages, and errors, including strings provided by `System.CommandLine`, regardless of the Windows display language. Set the CLI's `CurrentUICulture` to English before constructing its command tree; do not change `CurrentCulture` or the desktop application's localization settings. Keep CLI resource strings and `docs/cli.md` in English, while preserving Unicode support for connection names, file paths, and S3 keys. Add regression tests when changing CLI help or culture initialization.
 
+## CLI output and release conventions
+
+Keep CLI JSON schema version 1, error codes, exit codes and stdout/stderr separation stable when improving human-readable output. Use command-specific, Unicode-aware terminal tables; `--wide` may reveal additional columns and untruncated text, but must not modify JSON results. Never echo raw parser error messages or sensitive argument values. Keep short, actionable English option descriptions and add regression tests for missing options, Unicode, and redirected output.
+
+The production Windows CLI is a standalone, self-contained `Cavdeck-Cli-<version>-win-x64.zip` built and validated by `scripts/New-WindowsCliPackage.ps1`. Attach it to the manually reviewed draft GitHub Release and include its SHA-256 in `SHA256SUMS.txt`. Do not put the CLI archive into the Velopack desktop update feed.
+
 ## Light and dark mode
 
 Every surface, label, icon stroke, and state (hover, selected, disabled, focus) must read in both themes. `ThemeService` swaps `src/Cavdeck.App/Themes/Colors.Light.xaml` and `src/Cavdeck.App/Themes/Colors.Dark.xaml`. Bind colors with `DynamicResource` to those brushes. A hardcoded color, `Transparent` on a content surface, or a system brush such as `SystemColors.ControlTextBrush` does not follow the swap.
