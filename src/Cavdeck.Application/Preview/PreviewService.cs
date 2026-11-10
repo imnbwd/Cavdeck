@@ -58,14 +58,42 @@ public sealed class PreviewService
         _contentReader.PrepareFileAsync(
             connection, bucket, key, name, expectedBytes, maximumBytes, progress, cancellationToken);
 
-    public async Task<PreviewLoad> OpenAsync(
-        StorageConnection connection, string bucket, string key, string name, CancellationToken cancellationToken)
+    public Task<PreviewLoad> OpenAsync(
+        StorageConnection connection, string bucket, string key, string name, CancellationToken cancellationToken) =>
+        OpenCoreAsync(connection, bucket, key, name, immersiveImage: false, cancellationToken);
+
+    /// <summary>
+    /// Explicit user-initiated full-window image loading. Keeps the side-pane cap intact,
+    /// enforces a separate upper bound and does not introduce a persistent transfer task.
+    /// </summary>
+    public Task<PreviewLoad> OpenImageAsync(
+        StorageConnection connection, string bucket, string key, string name, CancellationToken cancellationToken) =>
+        OpenCoreAsync(connection, bucket, key, name, immersiveImage: true, cancellationToken);
+
+    private async Task<PreviewLoad> OpenCoreAsync(
+        StorageConnection connection, string bucket, string key, string name,
+        bool immersiveImage, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(connection);
         try
         {
             var head = await _contentReader.HeadAsync(connection, bucket, key, cancellationToken);
             var decision = PreviewRules.Decide(name, false, head.SizeBytes, head.ContentType);
+            var maxImageBytes = immersiveImage
+                ? PreviewRules.MaxImmersiveImageBytes
+                : PreviewRules.MaxImageBytes;
+
+            if (immersiveImage)
+            {
+                // No other file type becomes executable or viewable merely because
+                // the caller selected the image viewer.
+                if (PreviewRules.Classify(name, head.ContentType) != PreviewFileType.Image)
+                    return Closed(PreviewKind.External, head);
+                if (head.SizeBytes < 0 || head.SizeBytes > maxImageBytes)
+                    return Closed(PreviewKind.TooLarge, head);
+                decision = new PreviewDecision(PreviewKind.Image);
+            }
+
             if (decision.Kind is PreviewKind.TooLarge or PreviewKind.External or PreviewKind.Folder)
                 return Closed(decision.Kind, head);
 
@@ -74,10 +102,10 @@ public sealed class PreviewService
                 return new PreviewLoad(PreviewLoadKind.Pdf, head, null, TextCharset.Utf8, false, null, null);
 
             var max = decision.Kind == PreviewKind.Image
-                ? (int)PreviewRules.MaxImageBytes
+                ? (int)maxImageBytes
                 : (int)PreviewRules.MaxTextBytes;
             var body = await _contentReader.ReadAsync(connection, bucket, key, max, cancellationToken);
-            if (body.Truncated)
+            if (body.Truncated || body.Content.Length > max)
                 return Closed(PreviewKind.TooLarge, body.Head);
             if (decision.Kind == PreviewKind.Image)
                 return new PreviewLoad(PreviewLoadKind.Image, body.Head, null, TextCharset.Utf8, false, body.Content, null);

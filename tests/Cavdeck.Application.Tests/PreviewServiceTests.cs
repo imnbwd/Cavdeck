@@ -39,6 +39,51 @@ public sealed class PreviewServiceTests
     }
 
     [Fact]
+    public async Task Immersive_image_allows_explicit_read_above_side_pane_limit()
+    {
+        var head = Head(PreviewRules.MaxImageBytes + 1, "\"image\"", "image/jpeg");
+        var store = new PreviewStore { Head = head, Body = [0xFF, 0xD8, 0xFF] };
+        var service = new PreviewService(new SingleFactory(store));
+
+        var sidePane = await service.OpenAsync(
+            Connection(), "assets", "large.jpg", "large.jpg", CancellationToken.None);
+        var immersive = await service.OpenImageAsync(
+            Connection(), "assets", "large.jpg", "large.jpg", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.TooLarge, sidePane.Kind);
+        Assert.Equal(PreviewLoadKind.Image, immersive.Kind);
+        Assert.Equal(1, store.Reads);
+    }
+
+    [Fact]
+    public async Task Immersive_image_rejects_large_sources_without_reading_body()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(PreviewRules.MaxImmersiveImageBytes + 1, "\"large\"", "image/png")
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenImageAsync(
+            Connection(), "assets", "huge.png", "huge.png", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.TooLarge, opened.Kind);
+        Assert.Equal(0, store.Reads);
+    }
+
+    [Fact]
+    public async Task Immersive_image_rejects_non_images_even_with_a_small_body()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(10, "\"text\"", "text/plain"), Body = "hello"u8.ToArray()
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenImageAsync(
+            Connection(), "assets", "notes.txt", "notes.txt", CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.External, opened.Kind);
+        Assert.Equal(0, store.Reads);
+    }
+
+    [Fact]
     public async Task Pdf_returns_metadata_without_buffering_body()
     {
         var store = new PreviewStore { Head = Head(20_000_000, "\"pdf\"", "application/pdf") };

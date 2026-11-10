@@ -836,4 +836,17 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>Zu Pfad wechseln…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>Zu Pfad wechseln (Ctrl+G)</value></data>
   <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>Eine Verbindung verwendet bereits diesen Namen.</value></data>
+  <data name="ImageViewer_Open" xml:space="preserve"><value>Im Bildbetrachter öffnen</value></data>
+  <data name="ImageViewer_Loading" xml:space="preserve"><value>Bild wird geladen…</value></data>
+  <data name="ImageViewer_Retry" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="ImageViewer_Previous" xml:space="preserve"><value>Vorheriges Bild (←)</value></data>
+  <data name="ImageViewer_Next" xml:space="preserve"><value>Nächstes Bild (→)</value></data>
+  <data name="ImageViewer_ZoomOut" xml:space="preserve"><value>Verkleinern</value></data>
+  <data name="ImageViewer_ZoomIn" xml:space="preserve"><value>Vergrößern</value></data>
+  <data name="ImageViewer_ZoomLevel" xml:space="preserve"><value>Zoomstufe</value></data>
+  <data name="ImageViewer_Fit" xml:space="preserve"><value>Einpassen</value></data>
+  <data name="ImageViewer_FitTip" xml:space="preserve"><value>An Fenster anpassen (Strg+0)</value></data>
+  <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
+  <data name="ImageViewer_ActualTip" xml:space="preserve"><value>1:1-Anzeige der Bildpixel (Strg+1)</value></data>
+  <data name="ImageViewer_Hint" xml:space="preserve"><value>Mausrad: Zoom · Ziehen: Verschieben · ← →: Bilder wechseln · Esc: Schließen · F11: Maximieren</value></data>
 </root>

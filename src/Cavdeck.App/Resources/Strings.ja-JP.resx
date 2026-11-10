@@ -836,4 +836,17 @@
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>パスへ移動…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>パスへ移動（Ctrl+G）</value></data>
   <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>この名前は別の接続で使われています。</value></data>
+  <data name="ImageViewer_Open" xml:space="preserve"><value>画像ビューアーで開く</value></data>
+  <data name="ImageViewer_Loading" xml:space="preserve"><value>画像を読み込み中…</value></data>
+  <data name="ImageViewer_Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="ImageViewer_Previous" xml:space="preserve"><value>前の画像 (←)</value></data>
+  <data name="ImageViewer_Next" xml:space="preserve"><value>次の画像 (→)</value></data>
+  <data name="ImageViewer_ZoomOut" xml:space="preserve"><value>縮小</value></data>
+  <data name="ImageViewer_ZoomIn" xml:space="preserve"><value>拡大</value></data>
+  <data name="ImageViewer_ZoomLevel" xml:space="preserve"><value>ズーム倍率</value></data>
+  <data name="ImageViewer_Fit" xml:space="preserve"><value>ウィンドウに合わせる</value></data>
+  <data name="ImageViewer_FitTip" xml:space="preserve"><value>ウィンドウに合わせる (Ctrl+0)</value></data>
+  <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
+  <data name="ImageViewer_ActualTip" xml:space="preserve"><value>表示ピクセルで 1:1 にする (Ctrl+1)</value></data>
+  <data name="ImageViewer_Hint" xml:space="preserve"><value>ホイールで拡大縮小 · ドラッグで移動 · ← → で切替 · Esc で閉じる · F11 で最大化</value></data>
 </root>

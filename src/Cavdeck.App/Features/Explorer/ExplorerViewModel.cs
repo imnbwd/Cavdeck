@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Cavdeck.App.Controls;
 using Cavdeck.App.Localization;
 using Cavdeck.App.ViewModels;
@@ -13,6 +14,7 @@ using Cavdeck.Application.Places;
 using Cavdeck.Application.Sharing;
 using Cavdeck.App.Features.Sharing;
 using Cavdeck.Application.Transfers;
+using Cavdeck.Domain.Preview;
 using Cavdeck.Domain.Storage;
 using Cavdeck.Domain.Transfers;
 
@@ -98,6 +100,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private double _toolbarWidth = 800;
     private bool _toolbarSearchOpen;
     private readonly PreviewPaneViewModel _preview;
+    private readonly PreviewService _imagePreviewService;
+    private ImagePreviewWindow? _imageViewer;
     private Func<Task>? _afterLeave;
     private bool _showPreviewForClose;
     private int _leaveConfirmationId;
@@ -134,6 +138,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _clipboard.Changed += OnClipboardChanged;
         _clipboard.StorageChanged += OnStorageChanged;
         _preview = new PreviewPaneViewModel(preview, storage, texts, toasts);
+        _imagePreviewService = preview;
+        _preview.ImageViewerRequested += OnImageViewerRequested;
         _preview.LeaveResolved += (_, _) => ResumeAfterLeave();
         _preview.LeaveCancelled += (_, _) => _afterLeave = null;
         _preview.Saved += (_, head) => ApplySavedObject(head);
@@ -606,6 +612,9 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _mutation?.Cancel();
         _browse.Cancel();
         CancelHeaderLoad();
+        _imageViewer?.Close();
+        _imageViewer = null;
+        _preview.ImageViewerRequested -= OnImageViewerRequested;
         _preview.Dispose();
     }
 
@@ -956,6 +965,52 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         }
 
         return _preview.OpenAsync(_connection, _bucket, row.Name, row.Entry.Key, CanWrite);
+    }
+
+    private void OnImageViewerRequested(object? sender, EventArgs e)
+    {
+        if (_disposed || _connection is null || _bucket is null || !_preview.ShowImageViewer)
+            return;
+
+        var selectedKey = _preview.Key;
+        // Snapshot the displayed order, including any active sort or search result order.
+        // The gallery never mutates Explorer selection while it is being browsed.
+        var items = Rows
+            .Where(row => !row.IsFolder && PreviewRules.Classify(row.Name) == PreviewFileType.Image)
+            .Select(row => new ImagePreviewItem(row.Entry.Key, row.Name))
+            .ToList();
+
+        if (!items.Any(item => string.Equals(item.Key, selectedKey, StringComparison.Ordinal)))
+            items.Insert(0, new ImagePreviewItem(selectedKey, _preview.Title));
+
+        var gallery = new ImagePreviewGallery(items, selectedKey);
+        var initial = _preview.Image as BitmapSource;
+
+        _imageViewer?.Close();
+        var model = new ImagePreviewViewModel(
+            _imagePreviewService, _connection, _bucket, gallery, _texts, initial);
+        var window = new ImagePreviewWindow(model, _texts)
+        {
+            Owner = System.Windows.Application.Current?.MainWindow
+        };
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_imageViewer, window))
+                _imageViewer = null;
+        };
+
+        _imageViewer = window;
+        try
+        {
+            window.Show();
+            window.Activate();
+        }
+        catch (Exception exception)
+        {
+            _imageViewer = null;
+            model.Dispose();
+            ReportUnexpectedUiError(exception);
+        }
     }
 
     public ListingSort? ActiveSort => _sorted ? _sort : null;
