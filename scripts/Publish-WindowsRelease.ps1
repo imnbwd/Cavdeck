@@ -138,6 +138,13 @@ try {
         Write-Warning 'Installer smoke test skipped. Verify installation, uninstallation and upgrades in a clean disposable VM BEFORE publishing.'
     }
 
+    # Keep the Windows CLI separate from Velopack's desktop update packages.
+    & (Join-Path $PSScriptRoot 'New-WindowsCliPackage.ps1') -Version $Version -OutputDirectory $output
+    $cliArchiveName = "Cavdeck-Cli-$Version-win-x64.zip"
+    $cliArchive = Join-Path $output $cliArchiveName
+    if (!(Test-Path $cliArchive -PathType Leaf)) { throw 'Verified CLI ZIP is missing.' }
+    $cliChecksum = (Get-FileHash $cliArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+
     # Generate user-facing changes from merged pull requests since the previous release.
     # The repository-level .github/release.yml controls category names and label mapping.
     $generatedNotes = (& gh api "repos/$repository/releases/generate-notes" -f "tag_name=$tagName" -f "target_commitish=$sourceSha" --jq .body | Out-String).Trim()
@@ -160,7 +167,7 @@ try {
         '',
         '## Windows x64 Downloads',
         '',
-        '| Installer | SHA-256 |',
+        '| File | SHA-256 |',
         '| --- | --- |'
     )
     foreach ($name in @("Cavdeck-$Version-Setup.exe", "Cavdeck-$Version.msi")) {
@@ -172,13 +179,16 @@ try {
 
     $checksums = Join-Path $releaseDir 'SHA256SUMS.txt'
     if (!(Test-Path $checksums -PathType Leaf)) { throw 'SHA256SUMS.txt is missing.' }
+    # Velopack generates the installer/feed hashes; append the standalone CLI artifact.
+    Add-Content -Path $checksums -Value "$cliChecksum  $cliArchiveName" -Encoding utf8
+    $lines += "| $cliArchiveName | $cliChecksum |"
     $lines += @(
         '',
         '## Security and Verification',
         '',
         '**These GitHub installers are currently unsigned (not code-signed).** Windows may display an Unknown Publisher or Microsoft Defender SmartScreen warning.',
         '',
-        'Download installers only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify the SHA-256 checksum before installation.',
+        'Download installers and the standalone CLI ZIP only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify their SHA-256 checksums before use.',
         '',
         '**Verify the Setup installer (PowerShell):**',
         '',
@@ -193,6 +203,8 @@ try {
         '```',
         '',
         'Compare the result with the corresponding value above or the matching entry in `SHA256SUMS.txt`.',
+        '',
+        '**CLI package:** Extract `' + $cliArchiveName + '` to a directory and run `cavdeck.exe --help`. The self-contained package includes .NET 10.',
         '',
         '## Automatic Updates',
         '',
@@ -216,8 +228,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or !$draft.isDraft) {
         throw 'The uploaded release is not a draft. Inspect GitHub Releases immediately.'
     }
-    & gh release upload "v$Version" $checksums --repo $repository --clobber
-    if ($LASTEXITCODE -ne 0) { throw 'Checksum upload failed. Inspect the draft.' }
+    & gh release upload "v$Version" $cliArchive $checksums --repo $repository --clobber
+    if ($LASTEXITCODE -ne 0) { throw 'CLI ZIP or checksum upload failed. Inspect the draft.' }
     & gh release edit "v$Version" --repo $repository --notes-file $notesPath
     if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed. Inspect the draft.' }
 
