@@ -83,4 +83,6 @@ public sealed class FileApplicationActivityGate : IApplicationActivityGate
 
 /// <summary>Raised when a CLI command starts while the desktop updater owns the exclusive lease.</summary>
 public sealed class ApplicationUpdateInProgressException()
-    : IOException("Cavdeck is applying an update. Retry the command after the update completes.");
+    : IOException("Cavdeck is applying an update. Retry the command after the update completes.")
+{
+}
