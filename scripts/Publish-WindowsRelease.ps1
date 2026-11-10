@@ -198,7 +198,6 @@ try {
         '',
         'Compare the result with the corresponding value above or the matching entry in `SHA256SUMS.txt`.',
         '',
-        '**CLI:** The desktop installer also installs the command-line tool. Run cavdeck-cli --help from a new terminal after installation.',
         '',
         '## Automatic Updates',
         '',

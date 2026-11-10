@@ -756,7 +756,7 @@
   <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Cavdeck 启动后检查更新，不会中断当前操作。</value></data>
   <data name="Update_BackgroundDownload" xml:space="preserve"><value>后台下载更新</value></data>
   <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>自动下载可用更新，安装前仍需你的确认。</value></data>
-  <data name="Update_TransfersTitle" xml:space="preserve"><value>仍有未完成的传输任务</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>仍有传输任务或 CLI 命令正在运行</value></data>
   <data name="Update_TransfersMessage" xml:space="preserve"><value>重启更新前，请完成或取消所有排队中、运行中、等待重试和已暂停的传输任务，并关闭正在运行的 CLI 命令。</value></data>
   <data name="Update_RestartTitle" xml:space="preserve"><value>安装 Cavdeck 更新</value></data>
   <data name="Update_RestartMessage" xml:space="preserve"><value>Cavdeck 将保存工作区、关闭程序、安装已下载的更新，然后重新启动。是否继续？</value></data>

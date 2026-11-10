@@ -18,7 +18,7 @@ cavdeck-cli connection list --json
 
 There is no separate CLI installer or CLI ZIP to download, and no separate .NET 10 installation is required. Desktop and CLI are updated and uninstalled together. The CLI shares the desktop app's connections in `%APPDATA%\Cavdeck\connections.json` and credentials in Windows Credential Manager under the same Windows user.
 
-The desktop updater will not apply an update while a CLI process is running. Close active CLI commands and retry the update. New CLI commands are rejected while an update is being applied.
+The desktop updater will not apply an update while a CLI process is running. Close active CLI commands and retry the update. New CLI commands are rejected while an update is being applied. When manually updating or uninstalling with Setup.exe or MSI, close all CLI processes first; Velopack's installer hooks cannot cancel a manual install or uninstall.
 
 Build from source with the .NET 10 SDK:
 
