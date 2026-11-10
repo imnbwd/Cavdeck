@@ -57,10 +57,12 @@ public sealed class PreviewPaneLayoutTests
 
         Assert.Equal("Horizontal", (string?)actions.Attribute("Orientation"));
         var buttons = actions.Elements(Wpf + "Button").ToArray();
-        Assert.Equal(3, buttons.Length);
+        Assert.Equal(4, buttons.Length);
         Assert.Contains("ShellCommand", (string?)buttons[0].Attribute("Command"));
         Assert.Contains("DownloadCommand", (string?)buttons[1].Attribute("Command"));
-        Assert.Contains("ToggleExpandedCommand", (string?)buttons[2].Attribute("Command"));
+        Assert.Contains("ImageViewerCommand", (string?)buttons[2].Attribute("Command"));
+        Assert.Contains("ShowImageViewer", (string?)buttons[2].Attribute("Visibility"));
+        Assert.Contains("ToggleExpandedCommand", (string?)buttons[3].Attribute("Command"));
         Assert.All(buttons, button =>
         {
             Assert.NotNull(button.Attribute("ToolTip"));
@@ -88,7 +90,7 @@ public sealed class PreviewPaneLayoutTests
     {
         var buttons = View().Descendants(Wpf + "Button").ToArray();
         foreach (var command in new[] {
-                     "PreviewCommand", "EditCommand", "ToggleExpandedCommand",
+                     "PreviewCommand", "EditCommand", "ToggleExpandedCommand", "ImageViewerCommand",
                      "ShellCommand", "DownloadCommand", "SaveCommand",
                      "RevertCommand", "DiscardLeaveCommand", "StayCommand" })
             Assert.Contains(buttons, button =>

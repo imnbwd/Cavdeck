@@ -26,6 +26,8 @@ public static class PreviewRules
 {
     public const long MaxTextBytes = 1_048_576;
     public const long MaxImageBytes = 15_728_640;
+    // Explicitly opened images have a higher bounded-read budget than the side pane.
+    public const long MaxImmersiveImageBytes = 67_108_864;
     public const long MaxPdfBytes = 104_857_600;
     public const long MaxShellBytes = 104_857_600;
 

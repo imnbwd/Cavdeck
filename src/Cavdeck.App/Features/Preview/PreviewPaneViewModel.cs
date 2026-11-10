@@ -87,6 +87,11 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         EditCommand = new RelayCommand(_ => BeginEdit());
         PreviewCommand = new RelayCommand(_ => EndEdit());
         ToggleExpandedCommand = new RelayCommand(_ => ToggleExpanded());
+        ImageViewerCommand = new RelayCommand(_ =>
+        {
+            if (ShowImageViewer)
+                ImageViewerRequested?.Invoke(this, EventArgs.Empty);
+        });
     }
 
     private AsyncRelayCommand CreateAsyncCommand(Func<object?, Task> action) =>
@@ -99,6 +104,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public event EventHandler? LeaveResolved;
     public event EventHandler? LeaveCancelled;
     public event EventHandler? DownloadRequested;
+    public event EventHandler? ImageViewerRequested;
     public event EventHandler? StateChanged;
     public event EventHandler<ObjectHead>? Saved;
 
@@ -119,6 +125,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public ICommand EditCommand { get; }
     public ICommand PreviewCommand { get; }
     public ICommand ToggleExpandedCommand { get; }
+    public ICommand ImageViewerCommand { get; }
 
     public string Key => _key;
     public long Size => _size;
@@ -169,6 +176,9 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         (int)PreviewProgress);
     public bool ShowEditor => _isText && !_loading;
     public bool ShowImage => _isImage && !_loading;
+    public bool ShowImageViewer => _open && !_loading && _size >= 0
+        && _size <= PreviewRules.MaxImmersiveImageBytes
+        && (_isImage || PreviewRules.Classify(_name, _contentType) == PreviewFileType.Image);
     public bool ShowNotice => _notice.Length > 0 && !_isText && !_isImage;
     public bool ShowLoading => _loading;
     public bool ShowLeaveBar => _leavePending && !_conflictPending;
@@ -845,6 +855,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(CanPreviewAction));
         OnPropertyChanged(nameof(ShowEditor));
         OnPropertyChanged(nameof(ShowImage));
+        OnPropertyChanged(nameof(ShowImageViewer));
         OnPropertyChanged(nameof(ShowPdf));
         OnPropertyChanged(nameof(ShowPreviewDownload));
         OnPropertyChanged(nameof(ShowLoadingSpinner));

@@ -147,6 +147,13 @@
           <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconDownload}"/>
         </Button>
         <Button Style="{StaticResource PreviewIconAction}"
+                Command="{Binding ImageViewerCommand}"
+                Visibility="{Binding ShowImageViewer, Converter={StaticResource BoolVis}}"
+                ToolTip="{Binding Texts[ImageViewer_Open]}"
+                AutomationProperties.Name="{Binding Texts[ImageViewer_Open]}">
+          <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconImage}"/>
+        </Button>
+        <Button Style="{StaticResource PreviewIconAction}"
                 Command="{Binding ToggleExpandedCommand}"
                 ToolTip="{Binding ExpandLabel}"
                 AutomationProperties.Name="{Binding ExpandLabel}">
@@ -261,6 +268,9 @@
       <Border Background="{DynamicResource SurfaceMutedBrush}" CornerRadius="{DynamicResource RadiusSmall}"
               Visibility="{Binding ShowImage, Converter={StaticResource BoolVis}}">
         <Image Source="{Binding Image}" Stretch="Uniform" Margin="12"
+               MouseLeftButtonDown="PreviewImage_MouseLeftButtonDown"
+               Cursor="Hand"
+               ToolTip="{Binding Texts[ImageViewer_Open]}"
                AutomationProperties.Name="{Binding Title}"/>
       </Border>
       <!-- Notice states use the same centered, theme-aware empty-state treatment as other pages. -->

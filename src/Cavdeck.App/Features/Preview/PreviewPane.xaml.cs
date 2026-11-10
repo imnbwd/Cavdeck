@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Web.WebView2.Core;
 
 namespace Cavdeck.App.Features.Preview;
@@ -34,6 +35,15 @@ public partial class PreviewPane : UserControl
             Dispatcher.BeginInvoke(Editor.Focus);
         if (e.PropertyName is nameof(PreviewPaneViewModel.PdfPath) or nameof(PreviewPaneViewModel.ShowPdf))
             _ = NavigatePdfAsync();
+    }
+
+    private void PreviewImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 2 || _model?.ShowImageViewer != true)
+            return;
+
+        _model.ImageViewerCommand.Execute(null);
+        e.Handled = true;
     }
 
     private async Task NavigatePdfAsync()

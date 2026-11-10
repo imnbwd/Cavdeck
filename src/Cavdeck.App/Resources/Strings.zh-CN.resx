@@ -840,4 +840,17 @@
   <data name="ExplorerPath_Menu" xml:space="preserve"><value>前往路径…</value></data>
   <data name="ExplorerPath_Tooltip" xml:space="preserve"><value>前往路径（Ctrl+G）</value></data>
   <data name="Connection_Issue_NameDuplicate" xml:space="preserve"><value>已有连接使用此名称。</value></data>
+  <data name="ImageViewer_Open" xml:space="preserve"><value>在图片查看器中打开</value></data>
+  <data name="ImageViewer_Loading" xml:space="preserve"><value>正在加载图片…</value></data>
+  <data name="ImageViewer_Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="ImageViewer_Previous" xml:space="preserve"><value>上一张图片 (←)</value></data>
+  <data name="ImageViewer_Next" xml:space="preserve"><value>下一张图片 (→)</value></data>
+  <data name="ImageViewer_ZoomOut" xml:space="preserve"><value>缩小</value></data>
+  <data name="ImageViewer_ZoomIn" xml:space="preserve"><value>放大</value></data>
+  <data name="ImageViewer_ZoomLevel" xml:space="preserve"><value>缩放比例</value></data>
+  <data name="ImageViewer_Fit" xml:space="preserve"><value>适应窗口</value></data>
+  <data name="ImageViewer_FitTip" xml:space="preserve"><value>适应窗口大小 (Ctrl+0)</value></data>
+  <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
+  <data name="ImageViewer_ActualTip" xml:space="preserve"><value>按显示像素 1:1 查看 (Ctrl+1)</value></data>
+  <data name="ImageViewer_Hint" xml:space="preserve"><value>滚轮缩放 · 拖拽平移 · ← → 切换图片 · Esc 关闭 · F11 最大化</value></data>
 </root>
