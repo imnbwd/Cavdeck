@@ -126,9 +126,12 @@ if ($msiResult.ExitCode -ne 0) {
 }
 try {
     $msiApp = Join-Path $msiInstall 'current/Cavdeck.exe'
-    $msiCli = Join-Path $msiInstall 'current/cavdeck-cli.exe'
-    if (!(Test-Path $msiApp -PathType Leaf) -or !(Test-Path $msiCli -PathType Leaf)) {
-        throw "MSI did not install both Cavdeck.exe and cavdeck-cli.exe in $msiInstall."
+    $msiCli = Join-Path $msiInstall 'current/cli/cavdeck-cli.exe'
+    if (!(Test-Path $msiApp -PathType Leaf)) {
+        throw "MSI did not install the Desktop executable: $msiApp"
+    }
+    if (!(Test-Path $msiCli -PathType Leaf)) {
+        throw "MSI did not install the CLI executable: $msiCli"
     }
     $msiCliHelp = (& $msiCli --help | Out-String)
     if ($LASTEXITCODE -ne 0 -or $msiCliHelp -notmatch 'Usage:') { throw 'MSI-installed CLI help failed.' }
@@ -159,5 +162,6 @@ finally {
     if (Test-PathContains $userPath (Join-Path $msiInstall 'current/cli')) {
         throw 'MSI uninstall left the Cavdeck CLI directory in the user PATH.'
     }
-    Write-Host 'MSI silent install, CLI registration and uninstall passed.'
 }
+
+Write-Host 'MSI silent install, CLI registration and uninstall passed.'
