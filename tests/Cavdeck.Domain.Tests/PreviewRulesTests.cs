@@ -27,7 +27,13 @@ public sealed class PreviewRulesTests
 
     [Theory]
     [InlineData("clip.mp4", null, PreviewFileType.Video)]
+    [InlineData("MOVIE.MKV", null, PreviewFileType.Video)]
+    [InlineData("screen.webm", null, PreviewFileType.Video)]
     [InlineData("track.mp3", null, PreviewFileType.Audio)]
+    [InlineData("album.FLAC", null, PreviewFileType.Audio)]
+    [InlineData("voice.m4a", null, PreviewFileType.Audio)]
+    [InlineData("track.mp3", "image/png", PreviewFileType.Audio)]
+    [InlineData("clip.mp4", "text/plain", PreviewFileType.Video)]
     [InlineData("unknown.bin", "video/mp4", PreviewFileType.Video)]
     [InlineData("unknown.bin", "image/png; charset=binary", PreviewFileType.Image)]
     [InlineData("unknown.bin", "application/pdf", PreviewFileType.Pdf)]
@@ -43,6 +49,8 @@ public sealed class PreviewRulesTests
     {
         Assert.Equal(PreviewKind.External, PreviewRules.Decide("track.mp3", false, 100).Kind);
         Assert.Equal(PreviewKind.External, PreviewRules.Decide("clip.mp4", false, 100).Kind);
+        Assert.Equal(PreviewKind.External, PreviewRules.Decide("movie.mkv", false, 100).Kind);
+        Assert.Equal(PreviewKind.External, PreviewRules.Decide("album.flac", false, 100).Kind);
     }
 
     [Fact]
