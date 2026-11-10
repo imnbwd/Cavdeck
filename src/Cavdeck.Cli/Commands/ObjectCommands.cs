@@ -43,8 +43,10 @@ internal static partial class CliRuntime
         {
             var term = p.GetValue(query)!;
             var mode = p.GetValue(match)!;
-            if (string.IsNullOrWhiteSpace(term) || mode is not ("name" or "key-prefix"))
+            if (string.IsNullOrWhiteSpace(term))
                 throw new CliException(CliError.Arguments);
+            if (mode is not ("name" or "key-prefix"))
+                throw new CliException(CliError.Arguments with { Message = CliText.Get("InvalidSearchMatch") });
             if (mode == "key-prefix")
                 StorageUri.ValidateKey(term);
             var uri = StorageUri.Parse(p.GetValue(scope)!);

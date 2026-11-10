@@ -59,21 +59,21 @@ internal static partial class CliRuntime
         var selector = new Argument<string>("connection") { Description = CliText.Get("ConnectionSelector") };
         var name = new Option<string?>("--name") { Required = !update, Description = CliText.Get("ConnectionName") };
         var provider = new Option<string?>("--provider") { Required = !update, Description = CliText.Get("ConnectionProvider") };
-        var region = new Option<string?>("--region");
-        var endpoint = new Option<string?>("--endpoint");
-        var account = new Option<string?>("--account-id");
-        var access = new Option<string?>("--access-key-id");
+        var region = new Option<string?>("--region") { Description = CliText.Get("RegionDescription") };
+        var endpoint = new Option<string?>("--endpoint") { Description = CliText.Get("EndpointDescription") };
+        var account = new Option<string?>("--account-id") { Description = CliText.Get("AccountIdDescription") };
+        var access = new Option<string?>("--access-key-id") { Description = CliText.Get("AccessKeyIdDescription") };
         var accessEnv = new Option<string?>("--access-key-id-env") { Description = CliText.Get("AccessEnv") };
         var secretEnv = new Option<string?>("--secret-env") { Description = CliText.Get("SecretEnv") };
-        var pathStyle = new Option<bool>("--force-path-style");
-        var defaultPathStyle = new Option<bool>("--no-force-path-style");
-        var readOnly = new Option<bool>("--read-only");
-        var writable = new Option<bool>("--writable");
-        var bucket = new Option<string?>("--restricted-bucket");
-        var prefix = new Option<string?>("--key-prefix");
-        var clearEndpoint = new Option<bool>("--clear-endpoint");
-        var clearBucket = new Option<bool>("--clear-restricted-bucket");
-        var clearPrefix = new Option<bool>("--clear-key-prefix");
+        var pathStyle = new Option<bool>("--force-path-style") { Description = CliText.Get("ForcePathStyleDescription") };
+        var defaultPathStyle = new Option<bool>("--no-force-path-style") { Description = CliText.Get("NoForcePathStyleDescription") };
+        var readOnly = new Option<bool>("--read-only") { Description = CliText.Get("ReadOnlyDescription") };
+        var writable = new Option<bool>("--writable") { Description = CliText.Get("WritableDescription") };
+        var bucket = new Option<string?>("--restricted-bucket") { Description = CliText.Get("RestrictedBucketDescription") };
+        var prefix = new Option<string?>("--key-prefix") { Description = CliText.Get("KeyPrefixDescription") };
+        var clearEndpoint = new Option<bool>("--clear-endpoint") { Description = CliText.Get("ClearEndpointDescription") };
+        var clearBucket = new Option<bool>("--clear-restricted-bucket") { Description = CliText.Get("ClearBucketDescription") };
+        var clearPrefix = new Option<bool>("--clear-key-prefix") { Description = CliText.Get("ClearPrefixDescription") };
         foreach (var option in new Option[] { name, provider, region, endpoint, account, access, accessEnv, secretEnv,
             pathStyle, readOnly, bucket, prefix })
             command.Options.Add(option);
@@ -94,7 +94,7 @@ internal static partial class CliRuntime
                 "cloudflare-r2" => StorageProviderKind.CloudflareR2,
                 "minio" => StorageProviderKind.Minio,
                 "s3-compatible" => StorageProviderKind.S3Compatible,
-                _ => throw new CliException(CliError.Arguments)
+                _ => throw new CliException(CliError.Arguments with { Message = CliText.Get("InvalidProvider") })
             };
             var endpointValue = p.GetValue(endpoint);
             var regionValue = p.GetValue(region);

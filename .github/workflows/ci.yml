@@ -20,14 +20,18 @@ jobs:
         run: |
           $tokens = $null
           $errors = $null
-          [System.Management.Automation.Language.Parser]::ParseFile(
-            (Join-Path $PWD 'scripts/Publish-WindowsRelease.ps1'),
-            [ref]$tokens,
-            [ref]$errors
-          ) | Out-Null
-          if ($errors.Count -gt 0) {
-            $errors | ForEach-Object { Write-Error $_.Message }
-            exit 1
+          foreach ($script in @('scripts/Publish-WindowsRelease.ps1', 'scripts/New-WindowsCliPackage.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Join-Path $PWD $script),
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error ($script + ': ' + $_.Message) }
+              exit 1
+            }
           }
       - uses: actions/setup-dotnet@v4
         with:
@@ -38,16 +42,19 @@ jobs:
         run: dotnet build Cavdeck.sln --no-restore -c Release
       - name: Unit tests
         run: dotnet test Cavdeck.sln --no-build -c Release
-      - name: Publish standalone Windows CLI
-        run: dotnet publish src/Cavdeck.Cli/Cavdeck.Cli.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -o artifacts/cli/win-x64
+      - name: Package and verify standalone Windows CLI
+        shell: pwsh
+        run: ./scripts/New-WindowsCliPackage.ps1 -Version 0.0.0 -OutputDirectory artifacts/cli
       - name: Smoke test published CLI
         shell: pwsh
         run: |
           $cli = Join-Path $PWD 'artifacts/cli/win-x64/cavdeck.exe'
           & $cli --help
           if ($LASTEXITCODE -ne 0) { throw 'CLI help failed' }
-          & $cli --version
-          if ($LASTEXITCODE -ne 0) { throw 'CLI version failed' }
+          $version = (& $cli --version | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or ($version -split '\+', 2)[0] -ne '0.0.0') { throw 'CLI version mismatch' }
+          $zip = Join-Path $PWD 'artifacts/cli/Cavdeck-Cli-0.0.0-win-x64.zip'
+          if (!(Test-Path $zip -PathType Leaf)) { throw 'CLI ZIP missing' }
           $output = & $cli connection list --json
           if ($LASTEXITCODE -ne 0) { throw 'CLI connection list failed' }
           $result = $output | ConvertFrom-Json
@@ -58,6 +65,11 @@ jobs:
         with:
           name: cavdeck-cli-win-x64
           path: artifacts/cli/win-x64/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cavdeck-cli-win-x64-zip
+          path: artifacts/cli/Cavdeck-Cli-0.0.0-win-x64.zip
           if-no-files-found: error
       - name: Install pinned Velopack CLI
         if: github.event_name == 'workflow_dispatch'

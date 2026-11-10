@@ -102,6 +102,47 @@ public sealed class CommandProcessTests
     }
 
     [Fact]
+    public async Task MissingConnectionReportsTheOptionWithoutChangingErrorContract()
+    {
+        var result = await InvokeAsync("bucket", "list", "--json");
+        Assert.Equal(2, result.ExitCode);
+        Assert.Empty(result.Output);
+        using var json = JsonDocument.Parse(result.Error);
+        var error = json.RootElement.GetProperty("error");
+        Assert.Equal("INVALID_ARGUMENTS", error.GetProperty("code").GetString());
+        Assert.Contains("--connection", error.GetProperty("message").GetString());
+    }
+
+    [Fact]
+    public async Task InvalidOptionsDoNotReflectUntrustedValues()
+    {
+        const string untrustedValue = "fictional-private-key-12345";
+        var result = await InvokeAsync("bucket", "list", "--unknown-flag", untrustedValue, "--json");
+        Assert.Equal(2, result.ExitCode);
+        Assert.Empty(result.Output);
+        Assert.DoesNotContain(untrustedValue, result.Error);
+        using var json = JsonDocument.Parse(result.Error);
+        Assert.Equal("INVALID_ARGUMENTS", json.RootElement.GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task InvalidOutputFormatExplainsAllowedValues()
+    {
+        var result = await InvokeAsync("connection", "list", "--format", "xml", "--json");
+        Assert.Equal(2, result.ExitCode);
+        Assert.Empty(result.Output);
+        Assert.Contains("table or json", result.Error);
+    }
+
+    [Fact]
+    public async Task WideOptionDoesNotChangeJsonOutput()
+    {
+        var regular = await InvokeAsync("connection", "list", "--json", "--no-input");
+        var wide = await InvokeAsync("connection", "list", "--json", "--wide", "--no-input");
+        Assert.Equal(regular, wide);
+    }
+
+    [Fact]
     public async Task AliasesUseSameValidation()
     {
         var full = await InvokeAsync("object", "list", "s3:///", "-c", "missing", "--recursive", "--format", "json");
