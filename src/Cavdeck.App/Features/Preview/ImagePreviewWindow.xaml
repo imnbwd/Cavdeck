@@ -101,6 +101,7 @@
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
           <Button Style="{StaticResource ViewerToolbarButton}" Click="ZoomOut_Click"
+                  IsEnabled="{Binding HasImage}"
                   ToolTip="{Binding Texts[ImageViewer_ZoomOut]}"
                   AutomationProperties.Name="{Binding Texts[ImageViewer_ZoomOut]}">
             <TextBlock Text="−" FontSize="19"/>
@@ -109,6 +110,7 @@
                      VerticalAlignment="Center" FontWeight="SemiBold"
                      AutomationProperties.Name="{Binding Texts[ImageViewer_ZoomLevel]}"/>
           <Button Style="{StaticResource ViewerToolbarButton}" Click="ZoomIn_Click"
+                  IsEnabled="{Binding HasImage}"
                   ToolTip="{Binding Texts[ImageViewer_ZoomIn]}"
                   AutomationProperties.Name="{Binding Texts[ImageViewer_ZoomIn]}">
             <TextBlock Text="+" FontSize="19"/>
@@ -116,10 +118,12 @@
           <Border Width="1" Height="22" Margin="8,0"
                   Background="{DynamicResource BorderBrush}"/>
           <Button Style="{StaticResource ViewerToolbarButton}" Click="Fit_Click"
+                  IsEnabled="{Binding HasImage}"
                   Content="{Binding Texts[ImageViewer_Fit]}"
                   ToolTip="{Binding Texts[ImageViewer_FitTip]}"
                   AutomationProperties.Name="{Binding Texts[ImageViewer_Fit]}"/>
           <Button Style="{StaticResource ViewerToolbarButton}" Click="Actual_Click"
+                  IsEnabled="{Binding HasImage}"
                   Content="{Binding Texts[ImageViewer_ActualSize]}"
                   ToolTip="{Binding Texts[ImageViewer_ActualTip]}"
                   AutomationProperties.Name="{Binding Texts[ImageViewer_ActualSize]}"/>
