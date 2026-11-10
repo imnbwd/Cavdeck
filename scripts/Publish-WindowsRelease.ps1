@@ -198,7 +198,7 @@ try {
         '',
         'Compare the result with the corresponding value above or the matching entry in `SHA256SUMS.txt`.',
         '',
-        '**CLI package:** Extract `' + $cliArchiveName + '` to a directory and run `cavdeck.exe --help`. The self-contained package includes .NET 10.',
+        '**CLI:** The desktop installer also installs the command-line tool. Run cavdeck-cli --help from a new terminal after installation.',
         '',
         '## Automatic Updates',
         '',
