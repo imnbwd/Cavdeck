@@ -32,7 +32,7 @@ public sealed class ConnectionCatalogSyncService : IDisposable
         _catalog = catalog;
         _connections = connections;
         _viewModel = viewModel;
-        _dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
+        _dispatcher = System.Windows.Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
     }
 
     public void Start()
