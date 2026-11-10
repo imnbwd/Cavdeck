@@ -184,7 +184,7 @@ try {
     $checksumEntries = @(Get-Content $checksums | Where-Object { ![string]::IsNullOrWhiteSpace($_) })
     $checksumEntries += "$cliHash  $cliArchiveName"
     $checksumEntries |
-        Sort-Object { ($_ -split '\\s{2}', 2)[1] } |
+        Sort-Object { ($_ -split '\s{2}', 2)[1] } |
         Set-Content -Path $checksums -Encoding utf8
     $lines += "| $cliArchiveName | $cliHash |"
     $lines += @(
