@@ -2,6 +2,8 @@
 
 Cavdeck CLI runs on Windows x64. It shares the desktop app's connections in `%APPDATA%\Cavdeck\connections.json` and stores credentials in Windows Credential Manager under the same Windows user.
 
+CLI help, status messages, and errors are displayed in English regardless of the Windows display language. This does not change the desktop app's language setting or prevent Unicode connection names, local paths, and S3 object keys.
+
 ## Install and run
 
 Extract the entire Windows x64 CLI artifact. Keep its DLLs and runtime files beside `cavdeck.exe`. Run it from that directory or add the directory to PATH. The self-contained artifact includes .NET 10.

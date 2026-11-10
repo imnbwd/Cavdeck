@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using Cavdeck.Domain.Storage;
 using Cavdeck.Infrastructure.Connections;
@@ -18,6 +19,49 @@ public sealed class CommandProcessTests
         Assert.Equal(0, result.ExitCode);
         Assert.NotEmpty(result.Output);
         Assert.Empty(result.Error);
+    }
+
+    [Theory]
+    [InlineData("--help")]
+    [InlineData("connection", "--help")]
+    [InlineData("transfer", "upload", "--help")]
+    public async Task HelpUsesEnglishForBuiltInAndCommandDescriptions(params string[] arguments)
+    {
+        var result = await InvokeAsync(arguments);
+        Assert.Equal(0, result.ExitCode);
+        Assert.Empty(result.Error);
+        Assert.Contains("Usage:", result.Output);
+        Assert.Contains("Options:", result.Output);
+        Assert.Contains("Show help and usage information", result.Output);
+        Assert.DoesNotContain("用法:", result.Output);
+        Assert.DoesNotContain("选项:", result.Output);
+        if (arguments.Length == 1)
+        {
+            Assert.Contains("Access S3-compatible storage using saved Cavdeck connections.", result.Output);
+            Assert.Contains("Show version information", result.Output);
+        }
+    }
+
+    [Fact]
+    public void EnglishUiCultureOverridesChineseWithoutChangingFormattingCulture()
+    {
+        var originalUiCulture = CultureInfo.CurrentUICulture;
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("zh-CN");
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+
+            CliRuntime.UseEnglishUiCulture();
+
+            Assert.Equal("en-US", CultureInfo.CurrentUICulture.Name);
+            Assert.Equal("de-DE", CultureInfo.CurrentCulture.Name);
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = originalUiCulture;
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 
     [Theory]

@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Cavdeck.Cli;
@@ -6,9 +7,14 @@ namespace Cavdeck.Cli;
 internal static partial class CliRuntime
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    private static readonly CultureInfo EnglishUiCulture = CultureInfo.GetCultureInfo("en-US");
+
+    internal static void UseEnglishUiCulture() => CultureInfo.CurrentUICulture = EnglishUiCulture;
 
     public static async Task<int> RunAsync(string[] args)
     {
+        // System.CommandLine localizes built-in help independently of Cavdeck's .resx strings.
+        UseEnglishUiCulture();
         var root = new RootCommand(CliText.Get("RootDescription"));
         var format = new Option<string?>("--format") { Recursive = true, Description = CliText.Get("FormatDescription") };
         var json = new Option<bool>("--json") { Recursive = true, Description = CliText.Get("JsonDescription") };
