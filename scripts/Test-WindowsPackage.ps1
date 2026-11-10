@@ -121,10 +121,10 @@ try {
     if ($packagedFiles -notcontains 'lib/app/Cavdeck.exe') { throw 'Cavdeck.exe is missing from the package.' }
     foreach ($required in @(
             'lib/app/Cavdeck.runtimeconfig.json',
-            'lib/app/cli/cavdeck-cli.exe',
-            'lib/app/cli/cavdeck-cli.dll',
-            'lib/app/cli/cavdeck-cli.deps.json',
-            'lib/app/cli/cavdeck-cli.runtimeconfig.json')) {
+            'lib/app/cli/cavdeck.exe',
+            'lib/app/cli/cavdeck.dll',
+            'lib/app/cli/cavdeck.deps.json',
+            'lib/app/cli/cavdeck.runtimeconfig.json')) {
         if ($packagedFiles -notcontains $required) {
             throw "Unified package is missing $required."
         }
@@ -164,7 +164,7 @@ try {
 
         $cliProbe = Join-Path $versionProbe 'cli'
         New-Item -ItemType Directory -Path $cliProbe | Out-Null
-        foreach ($name in @('cavdeck-cli.exe', 'cavdeck-cli.dll', 'Cavdeck.Application.dll',
+        foreach ($name in @('cavdeck.exe', 'cavdeck.dll', 'Cavdeck.Application.dll',
                 'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
             $entry = $package.GetEntry("lib/app/cli/$name")
             if (!$entry) { throw "Full package is missing cli/$name." }

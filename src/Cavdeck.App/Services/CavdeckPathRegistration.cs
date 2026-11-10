@@ -79,7 +79,7 @@ internal static class CavdeckPathRegistration
             return null;
 
         var cliDirectory = Path.Combine(current, "cli");
-        if (!File.Exists(Path.Combine(cliDirectory, "cavdeck-cli.exe")))
+        if (!File.Exists(Path.Combine(cliDirectory, "cavdeck.exe")))
             return null;
 
         return cliDirectory;

@@ -75,8 +75,8 @@ try {
     if (!(Test-Path (Join-Path $desktopPublish 'Cavdeck.exe') -PathType Leaf)) {
         throw 'Desktop publish is missing Cavdeck.exe.'
     }
-    if (!(Test-Path (Join-Path $cliPublish 'cavdeck-cli.exe') -PathType Leaf)) {
-        throw 'CLI publish is missing cavdeck-cli.exe.'
+    if (!(Test-Path (Join-Path $cliPublish 'cavdeck.exe') -PathType Leaf)) {
+        throw 'CLI publish is missing cavdeck.exe.'
     }
 
     & (Join-Path $PSScriptRoot 'Assemble-WindowsPublish.ps1') -DesktopDirectory $desktopPublish -CliDirectory $cliPublish -OutputDirectory $publish
@@ -86,7 +86,7 @@ try {
     & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory $publish -Version $Version -ApplicationKind Desktop
     & (Join-Path $PSScriptRoot 'Test-WindowsAppVersion.ps1') -AppDirectory (Join-Path $publish 'cli') -Version $Version -ApplicationKind Cli
 
-    $cli = Join-Path $publish 'cli/cavdeck-cli.exe'
+    $cli = Join-Path $publish 'cli/cavdeck.exe'
     $cliVersion = (& $cli --version | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or ($cliVersion -split '\+', 2)[0] -ne $Version) {
         throw "Published CLI version mismatch: expected $Version, received $cliVersion."

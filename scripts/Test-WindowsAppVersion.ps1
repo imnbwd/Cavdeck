@@ -19,8 +19,8 @@ if ($ApplicationKind -eq 'Desktop') {
     $expectedAssemblies = @('Cavdeck.dll') + $sharedAssemblies
 }
 else {
-    $expectedExecutables = @('cavdeck-cli.exe')
-    $expectedAssemblies = @('cavdeck-cli.dll') + $sharedAssemblies
+    $expectedExecutables = @('cavdeck.exe')
+    $expectedAssemblies = @('cavdeck.dll') + $sharedAssemblies
 }
 
 foreach ($name in $expectedExecutables + $expectedAssemblies) {

@@ -49,7 +49,7 @@ jobs:
       - name: Smoke test packaged CLI
         shell: pwsh
         run: |
-          $cli = Join-Path $PWD 'artifacts/windows-package/0.0.1/publish/cli/cavdeck-cli.exe'
+          $cli = Join-Path $PWD 'artifacts/windows-package/0.0.1/publish/cli/cavdeck.exe'
           & $cli --help
           if ($LASTEXITCODE -ne 0) { throw 'Packaged CLI help failed' }
           $version = (& $cli --version | Out-String).Trim()

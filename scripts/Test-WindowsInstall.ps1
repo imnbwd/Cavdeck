@@ -69,7 +69,7 @@ if ($setup.ExitCode -ne 0) {
 
 $updater = Join-Path $install 'Update.exe'
 $app = Join-Path $install 'current/Cavdeck.exe'
-$cli = Join-Path $install 'current/cli/cavdeck-cli.exe'
+$cli = Join-Path $install 'current/cli/cavdeck.exe'
 if (!(Test-Path $updater -PathType Leaf) -or !(Test-Path $app -PathType Leaf) -or !(Test-Path $cli -PathType Leaf)) {
     throw "Installation did not create the updater, desktop app and CLI in $install."
 }
@@ -126,7 +126,7 @@ if ($msiResult.ExitCode -ne 0) {
 }
 try {
     $msiApp = Join-Path $msiInstall 'current/Cavdeck.exe'
-    $msiCli = Join-Path $msiInstall 'current/cli/cavdeck-cli.exe'
+    $msiCli = Join-Path $msiInstall 'current/cli/cavdeck.exe'
     if (!(Test-Path $msiApp -PathType Leaf)) {
         throw "MSI did not install the Desktop executable: $msiApp"
     }

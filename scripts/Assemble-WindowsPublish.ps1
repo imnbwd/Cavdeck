@@ -52,10 +52,10 @@ foreach ($name in $requiredFiles) {
 }
 
 $requiredCliFiles = @(
-    'cavdeck-cli.exe',
-    'cavdeck-cli.dll',
-    'cavdeck-cli.deps.json',
-    'cavdeck-cli.runtimeconfig.json'
+    'cavdeck.exe',
+    'cavdeck.dll',
+    'cavdeck.deps.json',
+    'cavdeck.runtimeconfig.json'
 )
 foreach ($name in $requiredCliFiles) {
     if (!(Test-Path (Join-Path $cliTarget $name) -PathType Leaf)) {

@@ -176,7 +176,7 @@ try {
         '',
         '## Command-line interface',
         '',
-        'The Windows installer also installs the Cavdeck CLI. Open a new terminal after installation and run cavdeck-cli --help.',
+        'The Windows installer also installs the Cavdeck CLI. Open a new terminal after installation and run cavdeck --help.',
         '',
         '## Security and Verification',
         '',
