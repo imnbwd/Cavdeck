@@ -756,7 +756,7 @@ Logs: {1}</value></data>
   <data name="Update_AutoCheckHelp" xml:space="preserve"><value>Check for updates after Cavdeck starts, without interrupting your work.</value></data>
   <data name="Update_BackgroundDownload" xml:space="preserve"><value>Download updates in background</value></data>
   <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>Download updates automatically. Your confirmation is required to install.</value></data>
-  <data name="Update_TransfersTitle" xml:space="preserve"><value>Transfer tasks are unfinished</value></data>
+  <data name="Update_TransfersTitle" xml:space="preserve"><value>Transfers or CLI commands are still active</value></data>
   <data name="Update_TransfersMessage" xml:space="preserve"><value>Finish or cancel all queued, running, retrying and paused transfers, and close any running CLI commands, before restarting to update.</value></data>
   <data name="Update_RestartTitle" xml:space="preserve"><value>Install Cavdeck update</value></data>
   <data name="Update_RestartMessage" xml:space="preserve"><value>Cavdeck will save your workspace, close, install the downloaded update and restart. Continue?</value></data>

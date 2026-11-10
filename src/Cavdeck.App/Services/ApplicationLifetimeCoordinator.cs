@@ -103,7 +103,11 @@ public sealed class ApplicationLifetimeCoordinator
         // only after the desktop process has exited.
         _updateLease = updateLease;
         _exiting = true;
-        _window.BeginUpdateRestart(updater);
+        if (!_window.BeginUpdateRestart(updater))
+        {
+            CancelExit();
+            return false;
+        }
         return true;
     }
 

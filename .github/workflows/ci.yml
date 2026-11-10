@@ -45,7 +45,7 @@ jobs:
         run: dotnet tool install --global vpk --version 1.2.161
       - name: Package and verify unified Desktop + CLI installer
         shell: pwsh
-        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.0 -SkipTests -NoRestore
+        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.0 -SkipTests
       - name: Smoke test packaged CLI
         shell: pwsh
         run: |
@@ -68,13 +68,13 @@ jobs:
       - name: Smoke test silent install and uninstall
         if: github.event_name == 'workflow_dispatch'
         shell: pwsh
-        run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.1/Releases -Version 0.0.1 -DisposableMachine
+        run: ./scripts/Test-WindowsInstall.ps1 -ReleasesDirectory artifacts/windows-package/0.0.0/Releases -Version 0.0.0 -DisposableMachine
       - name: Save installer smoke-test logs on failure
         if: failure() && github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: cavdeck-win-x64-smoke-logs-${{ github.run_id }}
-          path: artifacts/windows-package/0.0.1/smoke-logs/
+          path: artifacts/windows-package/0.0.0/smoke-logs/
           retention-days: 7
           if-no-files-found: ignore
       - name: Save installer for manual VM review
@@ -82,6 +82,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cavdeck-win-x64-installer-${{ github.run_id }}
-          path: artifacts/windows-package/0.0.1/Releases/
+          path: artifacts/windows-package/0.0.0/Releases/
           retention-days: 7
           if-no-files-found: error

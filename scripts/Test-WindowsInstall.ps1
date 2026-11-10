@@ -85,7 +85,7 @@ if (!(Test-PathContains $userPath (Join-Path $install 'current'))) {
 }
 try {
     if ($RequireSignature) {
-        foreach ($file in @($updater, $app)) {
+        foreach ($file in @($updater, $app, $cli)) {
             $signature = Get-AuthenticodeSignature -FilePath $file
             if ($signature.Status -ne 'Valid') { throw "Installed binary is not trusted: $file ($($signature.Status))." }
         }
@@ -141,10 +141,12 @@ try {
         throw 'MSI did not register the CLI directory in the current user PATH.'
     }
     if ($RequireSignature) {
-        $signature = Get-AuthenticodeSignature -FilePath $msiApp
-        if ($signature.Status -ne 'Valid') { throw "MSI-installed app is not trusted: $($signature.Status)." }
+        foreach ($file in @($msiApp, $msiCli)) {
+            $signature = Get-AuthenticodeSignature -FilePath $file
+            if ($signature.Status -ne 'Valid') { throw "MSI-installed binary is not trusted: $file ($($signature.Status))." }
+        }
     }
-    Write-Host 'MSI silent installation passed.'
+    Write-Host 'MSI silent installation, CLI and PATH registration passed.'
 }
 finally {
     $msiUninstallLog = Join-Path $logs 'msi-uninstall.log'

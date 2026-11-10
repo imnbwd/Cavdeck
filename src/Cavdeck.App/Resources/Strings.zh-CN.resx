@@ -589,7 +589,7 @@
   <data name="Transfer_FailedMarkTip" xml:space="preserve"><value>有传输任务失败</value></data>
   <data name="Tray_UnfinishedTitle" xml:space="preserve"><value>仍有传输任务未完成</value></data>
   <data name="Tray_UnfinishedMessage" xml:space="preserve"><value>当前有 {0} 个正在传输、{1} 个排队或等待重试、{2} 个已暂停。退出 Cavdeck 将停止这些任务。</value></data>
-  <data name="Tray_ExplicitExitMessage" xml:space="preserve"><value>仍有未完成的传输任务。退出将停止这些任务。</value></data>
+  <data name="Tray_ExplicitExitMessage" xml:space="preserve"><value>仍有传输任务或 CLI 命令正在运行。退出将停止这些任务。</value></data>
   <data name="Tray_KeepBackground" xml:space="preserve"><value>继续后台传输</value></data>
   <data name="Tray_ExitApplication" xml:space="preserve"><value>退出 Cavdeck</value></data>
   <data name="Tray_Unavailable" xml:space="preserve"><value>系统托盘不可用。请保持窗口打开，或退出 Cavdeck。</value></data>
