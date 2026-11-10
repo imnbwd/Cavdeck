@@ -6,7 +6,7 @@ CLI help, status messages, and errors are displayed in English regardless of the
 
 ## Install and run
 
-Cavdeck CLI is included in the same Windows x64 installer as the desktop app. Install Cavdeck using the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) Setup.exe or MSI. Both installers use a per-user installation and add the installed CLI directory (`current\\cli`) to the current user's PATH.
+Cavdeck CLI is included in the same Windows x64 installer as the desktop app. Install Cavdeck using the official [GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) Setup.exe or MSI. Both installers use a per-user installation and add the installed CLI directory (`current\cli`) to the current user's PATH.
 
 Open a new terminal after installation and run:
 
