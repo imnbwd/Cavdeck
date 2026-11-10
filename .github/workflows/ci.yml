@@ -45,7 +45,7 @@ jobs:
         run: dotnet tool install --global vpk --version 1.2.161
       - name: Package and verify unified Desktop + CLI installer
         shell: pwsh
-        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.0 -SkipTests -NoRestore
+        run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.0 -SkipTests
       - name: Smoke test packaged CLI
         shell: pwsh
         run: |

@@ -222,8 +222,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or !$draft.isDraft) {
         throw 'The uploaded release is not a draft. Inspect GitHub Releases immediately.'
     }
-    & gh release upload "v$Version" $cliArchive $checksums --repo $repository --clobber
-    if ($LASTEXITCODE -ne 0) { throw 'CLI ZIP or checksum upload failed. Inspect the draft.' }
+    & gh release upload "v$Version" $checksums --repo $repository --clobber
+    if ($LASTEXITCODE -ne 0) { throw 'Checksum upload failed. Inspect the draft.' }
     & gh release edit "v$Version" --repo $repository --notes-file $notesPath
     if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed. Inspect the draft.' }
 
