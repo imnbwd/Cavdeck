@@ -138,13 +138,6 @@ try {
         Write-Warning 'Installer smoke test skipped. Verify installation, uninstallation and upgrades in a clean disposable VM BEFORE publishing.'
     }
 
-    # Keep the Windows CLI separate from Velopack's desktop update packages.
-    & (Join-Path $PSScriptRoot 'New-WindowsCliPackage.ps1') -Version $Version -OutputDirectory $output
-    $cliArchiveName = "Cavdeck-Cli-$Version-win-x64.zip"
-    $cliArchive = Join-Path $output $cliArchiveName
-    if (!(Test-Path $cliArchive -PathType Leaf)) { throw 'Verified CLI ZIP is missing.' }
-    $cliChecksum = (Get-FileHash $cliArchive -Algorithm SHA256).Hash.ToLowerInvariant()
-
     # Generate user-facing changes from merged pull requests since the previous release.
     # The repository-level .github/release.yml controls category names and label mapping.
     $generatedNotes = (& gh api "repos/$repository/releases/generate-notes" -f "tag_name=$tagName" -f "target_commitish=$sourceSha" --jq .body | Out-String).Trim()
@@ -179,16 +172,17 @@ try {
 
     $checksums = Join-Path $releaseDir 'SHA256SUMS.txt'
     if (!(Test-Path $checksums -PathType Leaf)) { throw 'SHA256SUMS.txt is missing.' }
-    # Velopack generates the installer/feed hashes; append the standalone CLI artifact.
-    Add-Content -Path $checksums -Value "$cliChecksum  $cliArchiveName" -Encoding utf8
-    $lines += "| $cliArchiveName | $cliChecksum |"
     $lines += @(
+        '',
+        '## Command-line interface',
+        '',
+        'The Windows installer also installs the Cavdeck CLI. Open a new terminal after installation and run cavdeck-cli --help.',
         '',
         '## Security and Verification',
         '',
         '**These GitHub installers are currently unsigned (not code-signed).** Windows may display an Unknown Publisher or Microsoft Defender SmartScreen warning.',
         '',
-        'Download installers and the standalone CLI ZIP only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify their SHA-256 checksums before use.',
+        'Download installers only from the [official Cavdeck GitHub Releases](https://github.com/imnbwd/Cavdeck/releases) page and verify their SHA-256 checksums before use.',
         '',
         '**Verify the Setup installer (PowerShell):**',
         '',

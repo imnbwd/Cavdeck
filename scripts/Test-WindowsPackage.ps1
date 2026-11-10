@@ -45,8 +45,8 @@ $dialogView.Execute()
 $dialogs = @()
 while ($dialogRecord = $dialogView.Fetch()) { $dialogs += $dialogRecord.StringData(1) }
 $dialogView.Close()
-if ($dialogs -notcontains 'WelcomeDlg' -or $dialogs -notcontains 'InstallScopeDlg') {
-    throw 'MSI installation wizard or user/machine choice is missing.'
+if ($dialogs -notcontains 'WelcomeDlg') {
+    throw 'MSI installation wizard is missing.'
 }
 $versionView = $msiDatabase.OpenView("SELECT ``Value`` FROM ``Property`` WHERE ``Property``='ProductVersion'")
 $versionView.Execute()
@@ -119,8 +119,18 @@ $package = [IO.Compression.ZipFile]::OpenRead(
 try {
     $packagedFiles = @($package.Entries | ForEach-Object FullName)
     if ($packagedFiles -notcontains 'lib/app/Cavdeck.exe') { throw 'Cavdeck.exe is missing from the package.' }
-    if ($packagedFiles -notcontains 'lib/app/Cavdeck.runtimeconfig.json') {
-        throw 'The .NET runtime configuration is missing from the package.'
+    foreach ($required in @(
+            'lib/app/Cavdeck.runtimeconfig.json',
+            'lib/app/cavdeck-cli.exe',
+            'lib/app/cavdeck-cli.dll',
+            'lib/app/cavdeck-cli.deps.json',
+            'lib/app/cavdeck-cli.runtimeconfig.json')) {
+        if ($packagedFiles -notcontains $required) {
+            throw "Unified package is missing $required."
+        }
+    }
+    if ($packagedFiles -notcontains 'lib/app/coreclr.dll') {
+        throw 'The self-contained .NET runtime is missing from the package.'
     }
     if ($packagedFiles -notcontains 'lib/app/e_sqlite3.dll') {
         throw 'The Windows x64 SQLite native library is missing.'
@@ -140,8 +150,8 @@ try {
     $versionProbe = Join-Path ([IO.Path]::GetTempPath()) ('cavdeck-version-' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $versionProbe | Out-Null
     try {
-        foreach ($name in @('Cavdeck.exe', 'Cavdeck.dll', 'Cavdeck.Application.dll',
-                'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
+        foreach ($name in @('Cavdeck.exe', 'Cavdeck.dll', 'cavdeck-cli.exe', 'cavdeck-cli.dll',
+                'Cavdeck.Application.dll', 'Cavdeck.Domain.dll', 'Cavdeck.Infrastructure.dll')) {
             $entry = $package.GetEntry("lib/app/$name")
             if (!$entry) { throw "Full package is missing $name." }
             [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $versionProbe $name))

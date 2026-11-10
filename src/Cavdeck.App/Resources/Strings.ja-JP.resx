@@ -753,7 +753,7 @@
   <data name="Update_BackgroundDownload" xml:space="preserve"><value>更新をバックグラウンドでダウンロード</value></data>
   <data name="Update_BackgroundDownloadHelp" xml:space="preserve"><value>更新を自動ダウンロードします。インストールには確認が必要です。</value></data>
   <data name="Update_TransfersTitle" xml:space="preserve"><value>未完了の転送があります</value></data>
-  <data name="Update_TransfersMessage" xml:space="preserve"><value>更新のために再起動する前に、待機中・実行中・再試行待ち・一時停止中の転送をすべて完了またはキャンセルしてください。</value></data>
+  <data name="Update_TransfersMessage" xml:space="preserve"><value>更新のために再起動する前に、待機中・実行中・再試行待ち・一時停止中の転送をすべて完了またはキャンセルし、実行中の CLI コマンドを終了してください。</value></data>
   <data name="Update_RestartTitle" xml:space="preserve"><value>Cavdeck の更新をインストール</value></data>
   <data name="Update_RestartMessage" xml:space="preserve"><value>作業内容を保存して Cavdeck を終了し、更新をインストールした後に再起動します。続行しますか？</value></data>
   <data name="Update_SaveFailed" xml:space="preserve"><value>作業内容を保存できませんでした。更新を中止し、Cavdeck は開いたままにします。</value></data>
