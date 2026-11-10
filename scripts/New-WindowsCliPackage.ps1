@@ -10,7 +10,12 @@ Set-StrictMode -Version Latest
 if ($env:OS -ne 'Windows_NT') { throw 'Cavdeck CLI packages require Windows.' }
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$output = [IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
+$output = if ([IO.Path]::IsPathRooted($OutputDirectory)) {
+    [IO.Path]::GetFullPath($OutputDirectory)
+}
+else {
+    [IO.Path]::GetFullPath((Join-Path $root $OutputDirectory))
+}
 $artifactRoot = [IO.Path]::GetFullPath((Join-Path $root 'artifacts'))
 if (!$output.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar,
         [StringComparison]::OrdinalIgnoreCase)) {
