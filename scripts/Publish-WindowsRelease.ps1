@@ -130,6 +130,15 @@ try {
     & (Join-Path $PSScriptRoot 'New-WindowsPackage.ps1') -Version $Version -SkipTests
     if ($LASTEXITCODE -ne 0) { throw 'Windows packaging or verification failed.' }
 
+    # Preserve the standalone CLI ZIP as a separate GitHub Release asset. It is
+    # deliberately not added to the Velopack desktop update feed.
+    & (Join-Path $PSScriptRoot 'New-WindowsCliPackage.ps1') -Version $Version
+    if ($LASTEXITCODE -ne 0) { throw 'Standalone CLI packaging or verification failed.' }
+    $cliArchiveName = "Cavdeck-Cli-$Version-win-x64.zip"
+    $cliArchive = Join-Path $root "artifacts/cli/$cliArchiveName"
+    if (!(Test-Path $cliArchive -PathType Leaf)) { throw "Standalone CLI archive is missing: $cliArchiveName" }
+    $cliHash = (Get-FileHash $cliArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+
     if ($DisposableMachine) {
         & (Join-Path $PSScriptRoot 'Test-WindowsInstall.ps1') -ReleasesDirectory $releaseDir -Version $Version -DisposableMachine
         if ($LASTEXITCODE -ne 0) { throw 'Installer smoke test failed.' }
@@ -172,6 +181,12 @@ try {
 
     $checksums = Join-Path $releaseDir 'SHA256SUMS.txt'
     if (!(Test-Path $checksums -PathType Leaf)) { throw 'SHA256SUMS.txt is missing.' }
+    $checksumEntries = @(Get-Content $checksums | Where-Object { ![string]::IsNullOrWhiteSpace($_) })
+    $checksumEntries += "$cliHash  $cliArchiveName"
+    $checksumEntries |
+        Sort-Object { ($_ -split '\\s{2}', 2)[1] } |
+        Set-Content -Path $checksums -Encoding utf8
+    $lines += "| $cliArchiveName | $cliHash |"
     $lines += @(
         '',
         '## Command-line interface',
@@ -221,8 +236,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or !$draft.isDraft) {
         throw 'The uploaded release is not a draft. Inspect GitHub Releases immediately.'
     }
-    & gh release upload "v$Version" $checksums --repo $repository --clobber
-    if ($LASTEXITCODE -ne 0) { throw 'Checksum upload failed. Inspect the draft.' }
+    & gh release upload "v$Version" $checksums $cliArchive --repo $repository --clobber
+    if ($LASTEXITCODE -ne 0) { throw 'Checksum and standalone CLI upload failed. Inspect the draft.' }
     & gh release edit "v$Version" --repo $repository --notes-file $notesPath
     if ($LASTEXITCODE -ne 0) { throw 'Release notes update failed. Inspect the draft.' }
 

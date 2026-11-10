@@ -1,6 +1,7 @@
 #if DEBUG
 using System.IO;
 #endif
+using System.Diagnostics;
 using System.Windows;
 using Cavdeck.App.Controls;
 using Cavdeck.App.Localization;
@@ -109,6 +110,7 @@ public partial class App : System.Windows.Application
 #else
             RegisterServices();
 #endif
+            ReconcileUpdateActivity();
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
@@ -236,6 +238,33 @@ public partial class App : System.Windows.Application
             if (MainWindow is not null && HasFlag(e, "--design-preview"))
                 ShutdownMode = ShutdownMode.OnMainWindowClose;
 #endif
+        }
+    }
+
+    private void ReconcileUpdateActivity()
+    {
+        try
+        {
+            var updateState = Services.GetRequiredService<IUpdateService>().GetLocalState();
+            // If Velopack cannot read its local state, keep the marker and fail closed.
+            if (updateState.Status == UpdateStatus.Failed)
+                return;
+
+            var processPath = Environment.ProcessPath;
+            if (string.IsNullOrWhiteSpace(processPath))
+                return;
+
+            var currentVersion = FileVersionInfo.GetVersionInfo(processPath).ProductVersion;
+            if (string.IsNullOrWhiteSpace(currentVersion))
+                return;
+
+            Services.GetRequiredService<IApplicationActivityGate>().ReconcileUpdatePending(
+                currentVersion, updateState.Status == UpdateStatus.Downloaded);
+        }
+        catch (Exception ex)
+        {
+            // Coordination recovery must not prevent the Desktop from starting.
+            DiagnosticLog.Current.Queue("update-coordination", ex);
         }
     }
 

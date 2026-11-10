@@ -46,6 +46,14 @@ jobs:
       - name: Package and verify unified Desktop + CLI installer
         shell: pwsh
         run: ./scripts/New-WindowsPackage.ps1 -Version 0.0.1 -SkipTests
+      - name: Package standalone CLI archive
+        shell: pwsh
+        run: ./scripts/New-WindowsCliPackage.ps1 -Version 0.0.1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cavdeck-cli-win-x64
+          path: artifacts/cli/Cavdeck-Cli-0.0.1-win-x64.zip
+          if-no-files-found: error
       - name: Smoke test packaged CLI
         shell: pwsh
         run: |

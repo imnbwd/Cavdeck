@@ -32,7 +32,7 @@ public sealed class CommandProcessTests
         Assert.Empty(result.Error);
         Assert.Contains("Options:", result.Output);
         if (arguments.Length == 1)
-            Assert.Contains("usage: cavdeck", result.Output.ToLowerInvariant());
+            Assert.Matches(@"(?is)Usage:\s*cavdeck\b", result.Output);
         Assert.Contains("Show help and usage information", result.Output);
         Assert.DoesNotContain("用法:", result.Output);
         Assert.DoesNotContain("选项:", result.Output);

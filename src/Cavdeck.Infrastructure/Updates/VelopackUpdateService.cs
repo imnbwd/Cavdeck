@@ -12,10 +12,15 @@ public sealed class VelopackUpdateService : IUpdateService
 {
     private const string OfficialRepository = "https://github.com/imnbwd/Cavdeck";
     private readonly ITransferActivity _transfers;
+    private readonly IApplicationActivityGate _activityGate;
     private UpdateManager? _manager;
     private UpdateInfo? _available;
 
-    public VelopackUpdateService(ITransferActivity transfers) => _transfers = transfers;
+    public VelopackUpdateService(ITransferActivity transfers, IApplicationActivityGate activityGate)
+    {
+        _transfers = transfers;
+        _activityGate = activityGate;
+    }
 
     public bool HasPendingUpdate => GetLocalState().Status == UpdateStatus.Downloaded;
 
@@ -103,9 +108,24 @@ public sealed class VelopackUpdateService : IUpdateService
         var pending = manager.UpdatePendingRestart
             ?? throw new InvalidOperationException("No downloaded update is ready.");
 
-        // Never call ApplyUpdatesAndRestart: it kills this process without the
-        // application's normal persistence, cancellation and shutdown flow.
-        manager.WaitExitThenApplyUpdates(pending, silent: false, restart: true);
+        // The Desktop's exclusive lease prevents concurrent CLI work while this marker
+        // is created. The marker survives process exit, when Windows releases the lease,
+        // and is removed by the newly installed Desktop after Velopack has completed.
+        _activityGate.MarkUpdatePending(pending.Version.ToString());
+        try
+        {
+            // Never call ApplyUpdatesAndRestart: it kills this process without the
+            // application's normal persistence, cancellation and shutdown flow.
+            manager.WaitExitThenApplyUpdates(pending, silent: false, restart: true);
+        }
+        catch
+        {
+            // Scheduling failed before the process was handed to Velopack. The caller
+            // still owns the exclusive lease, so it is safe to remove the marker here.
+            try { _activityGate.ClearUpdatePending(); }
+            catch { /* Keep the marker if cleanup cannot be proven safe. */ }
+            throw;
+        }
     }
 
     private UpdateManager Manager()

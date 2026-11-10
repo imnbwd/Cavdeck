@@ -47,4 +47,72 @@ public sealed class ApplicationActivityGateTests
             Directory.Delete(root, recursive: true);
         }
     }
+
+    [Fact]
+    public void PendingUpdateMarkerBlocksCliAfterDesktopProcessReleasesItsLease()
+    {
+        var root = Directory.CreateTempSubdirectory("cavdeck-activity-gate-").FullName;
+        try
+        {
+            var gate = new FileApplicationActivityGate(Path.Combine(root, "application.lock"));
+            using (var update = gate.TryAcquireUpdateLease())
+            {
+                Assert.NotNull(update);
+                gate.MarkUpdatePending("1.2.3");
+            }
+
+            Assert.Throws<ApplicationUpdateInProgressException>(() => gate.AcquireCliLease());
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void PendingUpdateMarkerIsReconciledAgainstTheInstalledVersion()
+    {
+        var root = Directory.CreateTempSubdirectory("cavdeck-activity-gate-").FullName;
+        try
+        {
+            var gate = new FileApplicationActivityGate(Path.Combine(root, "application.lock"));
+            using (var update = gate.TryAcquireUpdateLease())
+            {
+                Assert.NotNull(update);
+                gate.MarkUpdatePending("1.2.3");
+            }
+
+            gate.ReconcileUpdatePending("1.2.2", hasPendingUpdate: true);
+            Assert.Throws<ApplicationUpdateInProgressException>(() => gate.AcquireCliLease());
+
+            gate.ReconcileUpdatePending("1.2.3.0+commit", hasPendingUpdate: true);
+            using var cli = gate.AcquireCliLease();
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void StalePendingUpdateMarkerIsClearedWhenVelopackHasNoPendingUpdate()
+    {
+        var root = Directory.CreateTempSubdirectory("cavdeck-activity-gate-").FullName;
+        try
+        {
+            var gate = new FileApplicationActivityGate(Path.Combine(root, "application.lock"));
+            using (var update = gate.TryAcquireUpdateLease())
+            {
+                Assert.NotNull(update);
+                gate.MarkUpdatePending("1.2.3");
+            }
+
+            gate.ReconcileUpdatePending("1.2.2", hasPendingUpdate: false);
+            using var cli = gate.AcquireCliLease();
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
 }
