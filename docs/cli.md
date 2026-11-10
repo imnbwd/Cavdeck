@@ -2,7 +2,7 @@
 
 Cavdeck CLI lets you manage S3-compatible storage from PowerShell or another Windows terminal. You can list buckets, upload and download files, search objects, copy or move data between connections, create download links, and inspect or resume transfer runs.
 
-**Platform:** Windows x64. **Current release:** Cavdeck 1.3.0. **Command:** `cavdeck`.
+**Platform:** Windows x64. **Version covered:** Cavdeck CLI 1.3.0. **Command:** `cavdeck`.
 
 The CLI and Cavdeck Desktop use the same saved connections **when run as the same Windows user**, but maintain separate transfer queues and history. The CLI does not require the desktop window to be open. Its help, messages, and errors are in English; Unicode connection names, paths, and object keys are supported.
 
