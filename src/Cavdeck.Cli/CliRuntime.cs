@@ -14,6 +14,11 @@ internal static partial class CliRuntime
 
     public static async Task<int> RunAsync(string[] args)
     {
+        // An empty root or a resource group is a discovery request, not an error.
+        if (args.Length == 0 || args.Length == 1 &&
+            args[0] is "connection" or "bucket" or "object" or "transfer")
+            args = [..args, "--help"];
+
         // System.CommandLine localizes built-in help independently of Cavdeck's .resx strings.
         UseEnglishUiCulture();
         var root = new RootCommand(CliText.Get("RootDescription"));
