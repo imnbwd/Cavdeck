@@ -983,10 +983,7 @@
                         <Path Style="{StaticResource ThumbnailFallbackGlyph}"/>
                         <Image Source="{Binding Thumbnail}" Stretch="Uniform" Width="20" Height="20"
                                IsHitTestVisible="False"
-                               Loaded="Thumbnail_Loaded"
-                               Unloaded="Thumbnail_Unloaded"
-                               IsVisibleChanged="Thumbnail_VisibilityChanged"
-                               DataContextChanged="Thumbnail_ContextChanged"/>
+                               explorer:ThumbnailLoader.Enabled="True"/>
                       </Grid>
                       <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center"
                                  TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
@@ -1103,10 +1100,7 @@
                           StrokeThickness="{Binding DataContext.Explorer.TileIconStrokeThickness, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
                     <Image Source="{Binding Thumbnail}" Stretch="Uniform"
                            IsHitTestVisible="False"
-                           Loaded="Thumbnail_Loaded"
-                           Unloaded="Thumbnail_Unloaded"
-                           IsVisibleChanged="Thumbnail_VisibilityChanged"
-                           DataContextChanged="Thumbnail_ContextChanged"/>
+                           explorer:ThumbnailLoader.Enabled="True"/>
                   </Grid>
                   <TextBlock TextAlignment="Center" TextWrapping="Wrap"
                              ToolTip="{Binding DisplayName}"

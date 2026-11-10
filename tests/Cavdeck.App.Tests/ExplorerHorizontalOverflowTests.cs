@@ -36,9 +36,12 @@ public sealed class ExplorerHorizontalOverflowTests
         Assert.Equal("*", (string?)definitions[1].Attribute("Width"));
         Assert.Equal("0", (string?)definitions[1].Attribute("MinWidth"));
 
-        var icon = Assert.Single(layout.Elements(Wpf + "Path"));
-        Assert.Equal("0", (string?)icon.Attribute("Grid.Column"));
-        Assert.Equal("{StaticResource FileGlyph}", (string?)icon.Attribute("Style"));
+        var iconHost = Assert.Single(layout.Elements(Wpf + "Grid"));
+        Assert.Equal("0", (string?)iconHost.Attribute("Grid.Column"));
+        Assert.Equal("20", (string?)iconHost.Attribute("Width"));
+        var icon = Assert.Single(iconHost.Elements(Wpf + "Path"));
+        Assert.Equal("{StaticResource ThumbnailFallbackGlyph}", (string?)icon.Attribute("Style"));
+        Assert.Single(iconHost.Elements(Wpf + "Image"));
 
         var name = Assert.Single(layout.Elements(Wpf + "TextBlock"));
         Assert.Equal("1", (string?)name.Attribute("Grid.Column"));
@@ -112,6 +115,9 @@ public sealed class ExplorerHorizontalOverflowTests
         // Use the real XAML layout, replacing only the icon style dependency so
         // the template can be measured without starting the complete application.
         var nameTemplate = new XElement(ObjectGrid(LoadView()).Descendants(Wpf + "DataTemplate").Single());
+        // Thumbnail presenters are viewport-driven and require the Explorer visual
+        // tree. The layout-only test measures text with the glyph placeholder.
+        nameTemplate.Descendants(Wpf + "Image").Remove();
         var icon = nameTemplate.Descendants(Wpf + "Path").Single();
         icon.SetAttributeValue("Style", null);
         icon.SetAttributeValue("Width", "16");

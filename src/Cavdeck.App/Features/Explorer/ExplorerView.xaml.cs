@@ -52,14 +52,14 @@ public partial class ExplorerView : UserControl
         {
             if (!IsVisible)
             {
-                CancelAllThumbnailRequests();
+                ThumbnailLoader.CancelVisible(this);
                 _explorer?.CancelGoToPath();
                 ClearDropFeedback();
             }
         };
         Unloaded += (_, _) =>
         {
-            CancelAllThumbnailRequests();
+            ThumbnailLoader.CancelVisible(this);
             _objectsGridReflowTimer.Stop();
             ClearDropFeedback();
             CancelMarquee();
@@ -99,7 +99,7 @@ public partial class ExplorerView : UserControl
 
     private void UnhookExplorer()
     {
-        CancelAllThumbnailRequests();
+        ThumbnailLoader.CancelVisible(this);
         CancelMarquee();
         ClearDropFeedback();
         ClearPendingEmptyObjectsFocus();

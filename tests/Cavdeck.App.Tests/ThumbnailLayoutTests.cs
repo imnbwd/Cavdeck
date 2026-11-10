@@ -7,6 +7,7 @@ public sealed class ThumbnailLayoutTests
 {
     private static readonly XNamespace Wpf = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
     private static readonly XNamespace Xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
+    private static readonly XNamespace Explorer = "clr-namespace:Cavdeck.App.Features.Explorer";
 
     [Fact]
     public void Both_virtualized_file_views_load_only_realized_image_elements()
@@ -20,10 +21,9 @@ public sealed class ThumbnailLayoutTests
         Assert.Equal(2, images.Length);
         foreach (var image in images)
         {
-            Assert.Equal("Thumbnail_Loaded", (string?)image.Attribute("Loaded"));
-            Assert.Equal("Thumbnail_Unloaded", (string?)image.Attribute("Unloaded"));
-            Assert.Equal("Thumbnail_VisibilityChanged", (string?)image.Attribute("IsVisibleChanged"));
-            Assert.Equal("Thumbnail_ContextChanged", (string?)image.Attribute("DataContextChanged"));
+            Assert.Equal("True", (string?)image.Attribute(Explorer + "ThumbnailLoader.Enabled"));
+            Assert.Null(image.Attribute("Loaded"));
+            Assert.Null(image.Attribute("Unloaded"));
             Assert.Equal("False", (string?)image.Attribute("IsHitTestVisible"));
             Assert.Equal("Uniform", (string?)image.Attribute("Stretch"));
         }
