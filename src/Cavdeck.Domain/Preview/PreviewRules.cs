@@ -34,6 +34,16 @@ public static class PreviewRules
         "png", "jpg", "jpeg", "gif", "bmp", "webp"
     };
 
+    private static readonly HashSet<string> AudioExtensions = new(StringComparer.Ordinal)
+    {
+        "mp3", "wav", "m4a", "aac", "flac", "ogg", "opus", "wma"
+    };
+
+    private static readonly HashSet<string> VideoExtensions = new(StringComparer.Ordinal)
+    {
+        "mp4", "m4v", "mov", "avi", "mkv", "webm", "wmv"
+    };
+
     private static readonly HashSet<string> TextExtensions = BuildTextExtensions();
 
     private static readonly HashSet<string> TextNames = new(StringComparer.OrdinalIgnoreCase)
@@ -61,6 +71,10 @@ public static class PreviewRules
                     return PreviewFileType.Pdf;
                 if (TextExtensions.Contains(extension))
                     return PreviewFileType.Text;
+                if (AudioExtensions.Contains(extension))
+                    return PreviewFileType.Audio;
+                if (VideoExtensions.Contains(extension))
+                    return PreviewFileType.Video;
             }
         }
 
