@@ -125,4 +125,28 @@
   <data name="NextOffset" xml:space="preserve"><value>More jobs are available. Use --offset {0}.</value></data>
   <data name="ConfirmationRequired" xml:space="preserve"><value>Use --yes to confirm a move or an overwrite.</value></data>
   <data name="PreviewOrConfirm" xml:space="preserve"><value>Use --dry-run to preview or --yes to execute. Choose one.</value></data>
+  <data name="InvalidOutputFormat" xml:space="preserve"><value>Invalid --format value. Allowed: table or json.</value></data>
+  <data name="ConflictingOutputFormat" xml:space="preserve"><value>--json cannot be combined with --format table.</value></data>
+  <data name="MissingOption" xml:space="preserve"><value>Missing required option: {0}. Run cavdeck --help for usage.</value></data>
+  <data name="UnknownOption" xml:space="preserve"><value>Unknown option: {0}. Run cavdeck --help for usage.</value></data>
+  <data name="InvalidOption" xml:space="preserve"><value>Invalid value or syntax for option: {0}. Run cavdeck --help for usage.</value></data>
+  <data name="MissingArgument" xml:space="preserve"><value>A required argument is missing. Run cavdeck --help for usage.</value></data>
+  <data name="InvalidSyntax" xml:space="preserve"><value>Unrecognized command or invalid argument. Run cavdeck --help for usage.</value></data>
+  <data name="InvalidConflictPolicy" xml:space="preserve"><value>Invalid --on-conflict value. Allowed: fail, skip, overwrite, rename.</value></data>
+  <data name="InvalidSearchMatch" xml:space="preserve"><value>Invalid --match value. Allowed: name, key-prefix.</value></data>
+  <data name="InvalidProvider" xml:space="preserve"><value>Invalid --provider value. Allowed: aws-s3, cloudflare-r2, minio, s3-compatible.</value></data>
+  <data name="RegionDescription" xml:space="preserve"><value>AWS region; also used for S3-compatible endpoints.</value></data>
+  <data name="EndpointDescription" xml:space="preserve"><value>S3 endpoint URL (required for MinIO and generic S3 providers).</value></data>
+  <data name="AccountIdDescription" xml:space="preserve"><value>Cloudflare R2 account ID.</value></data>
+  <data name="AccessKeyIdDescription" xml:space="preserve"><value>Access key ID (prefer --access-key-id-env for automation).</value></data>
+  <data name="ForcePathStyleDescription" xml:space="preserve"><value>Use path-style S3 requests.</value></data>
+  <data name="NoForcePathStyleDescription" xml:space="preserve"><value>Disable path-style S3 requests.</value></data>
+  <data name="ReadOnlyDescription" xml:space="preserve"><value>Save the connection as read-only.</value></data>
+  <data name="WritableDescription" xml:space="preserve"><value>Allow write operations on the connection.</value></data>
+  <data name="RestrictedBucketDescription" xml:space="preserve"><value>Restrict access to one bucket.</value></data>
+  <data name="KeyPrefixDescription" xml:space="preserve"><value>Restrict access to a key prefix.</value></data>
+  <data name="ClearEndpointDescription" xml:space="preserve"><value>Clear the custom endpoint.</value></data>
+  <data name="ClearBucketDescription" xml:space="preserve"><value>Clear the bucket restriction.</value></data>
+  <data name="ClearPrefixDescription" xml:space="preserve"><value>Clear the key prefix restriction.</value></data>
+  <data name="WideDescription" xml:space="preserve"><value>Show full-width values and additional table columns.</value></data>
 </root>
