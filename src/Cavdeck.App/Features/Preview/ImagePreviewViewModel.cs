@@ -40,7 +40,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         _image = initialImage;
         PreviousCommand = new RelayCommand(_ => Move(-1));
         NextCommand = new RelayCommand(_ => Move(1));
-        RetryCommand = new RelayCommand(_ => _ = LoadAsync());
+        RetryCommand = new RelayCommand(parameter => { _ = LoadAsync(); });
     }
 
     public LocalizationService Texts { get; }
@@ -48,6 +48,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
     public ICommand NextCommand { get; }
     public ICommand RetryCommand { get; }
     public BitmapSource? Image => _image;
+    public bool HasImage => _image is not null;
     public bool IsLoading => _loading;
     public bool ShowError => !_loading && _error.Length > 0;
     public string Error => _error;
@@ -131,6 +132,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
     private void PublishState()
     {
         OnPropertyChanged(nameof(Image));
+        OnPropertyChanged(nameof(HasImage));
         OnPropertyChanged(nameof(IsLoading));
         OnPropertyChanged(nameof(ShowError));
         OnPropertyChanged(nameof(Error));
