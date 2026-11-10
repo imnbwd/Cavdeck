@@ -63,6 +63,35 @@ public sealed class TransferRunTests : IDisposable
     }
 
     [Fact]
+    public async Task MovePreflightRejectsUnsupportedConditionalDeleteAndDisposesLease()
+    {
+        var store = new Remote { SupportsConditionalDeletes = false };
+
+        var exception = await Assert.ThrowsAsync<StorageException>(() =>
+            CliRuntime.EnsureMoveSupportedAsync(store, Connection, default));
+
+        Assert.Equal("ConditionalDeleteUnsupported", exception.Failure.ErrorCode);
+        Assert.True(store.LastOpenWrite);
+        Assert.Equal(1, store.DisposeCount);
+
+        var error = CliError.FromStorage(exception.Failure);
+        Assert.Equal(9, error.ExitCode);
+        Assert.Equal("UNSUPPORTED_CONDITIONAL_DELETE", error.Code);
+        Assert.Contains("Use copy instead.", error.Message);
+    }
+
+    [Fact]
+    public async Task MovePreflightAllowsVerifiedConditionalDelete()
+    {
+        var store = new Remote();
+
+        await CliRuntime.EnsureMoveSupportedAsync(store, Connection, default);
+
+        Assert.True(store.LastOpenWrite);
+        Assert.Equal(1, store.DisposeCount);
+    }
+
+    [Fact]
     public async Task RecursiveUploadWaitsForAllJobsAndPreservesRelativeNames()
     {
         var source = Directory.CreateDirectory(Path.Combine(_root, "source")).FullName;
@@ -209,13 +238,25 @@ public sealed class TransferRunTests : IDisposable
         public Action<Remote, string>? BeforePut { get; init; }
         public Func<string, CancellationToken, Task>? BeforeRead { get; init; }
         public bool SupportsWrites { get; init; } = true;
+        public bool SupportsConditionalDeletes { get; init; } = true;
+        public bool LastOpenWrite { get; private set; }
+        public int DisposeCount { get; private set; }
 
-        public Task<IRemoteTransferLease> OpenAsync(StorageConnection connection, bool write, CancellationToken token) =>
-            Task.FromResult<IRemoteTransferLease>(this);
+        public Task<IRemoteTransferLease> OpenAsync(StorageConnection connection, bool write, CancellationToken token)
+        {
+            LastOpenWrite = write;
+            return Task.FromResult<IRemoteTransferLease>(this);
+        }
         public void EnsureVerifiedConditionalPut()
         {
             if (!SupportsWrites)
                 throw new StorageException(new(StorageFailureKind.Unsupported, "ConditionalWriteUnsupported", null, null, null));
+        }
+
+        public void EnsureVerifiedConditionalDelete()
+        {
+            if (!SupportsConditionalDeletes)
+                throw new StorageException(new(StorageFailureKind.Unsupported, "ConditionalDeleteUnsupported", null, null, null));
         }
 
         public Task<RemoteIdentity?> HeadAsync(string bucket, string key, CancellationToken token) =>
@@ -250,7 +291,11 @@ public sealed class TransferRunTests : IDisposable
             new(Convert.ToHexString(System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(contents))),
                 System.Text.Encoding.UTF8.GetByteCount(contents), DateTimeOffset.UnixEpoch);
 
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            DisposeCount++;
+            return ValueTask.CompletedTask;
+        }
         public void EnsureConditionalMultipartSupported() => throw new NotSupportedException();
         public Task<RemoteIdentity> PutAsync(string bucket, string key, Stream content, long length, string? type,
             string md5, IProgress<long>? progress, CancellationToken token) => throw new NotSupportedException();

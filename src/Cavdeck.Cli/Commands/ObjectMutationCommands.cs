@@ -68,6 +68,13 @@ internal static partial class CliRuntime
             if (sameBucket && (fromPrefix ? toKey.StartsWith(fromKey, StringComparison.Ordinal) : fromKey == toKey))
                 throw new CliException(new(5, "SOURCE_DESTINATION_OVERLAP", CliText.Get("CopyOverlap")));
 
+            if (move)
+            {
+                // Reject unsupported moves before enumerating a prefix or creating a durable run.
+                await EnsureMoveSupportedAsync(
+                    services.GetRequiredService<IRemoteObjectTransfer>(), src, token);
+            }
+
             var explorer = services.GetRequiredService<ExplorerService>();
             var options = services.GetRequiredService<TransferEngineOptions>();
             Guid? batchId = null;
@@ -83,6 +90,13 @@ internal static partial class CliRuntime
                 new { sourceConnectionId = src.Id, destinationConnectionId = dst.Id, batchId }, run);
         });
         return command;
+    }
+
+    internal static async Task EnsureMoveSupportedAsync(
+        IRemoteObjectTransfer remote, StorageConnection source, CancellationToken cancellationToken)
+    {
+        await using var sourceLease = await remote.OpenAsync(source, write: true, cancellationToken);
+        sourceLease.EnsureVerifiedConditionalDelete();
     }
 
     private static async Task<IReadOnlyList<DownloadItem>> BuildCopyManifestAsync(ExplorerService explorer,

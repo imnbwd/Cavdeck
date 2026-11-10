@@ -119,7 +119,7 @@
   <data name="RunCorrupted" xml:space="preserve"><value>The transfer journal or run metadata could not be read.</value></data>
   <data name="RunSkipped" xml:space="preserve"><value>Transfer run {0} could not be read.</value></data>
   <data name="LegacyRunNotResumable" xml:space="preserve"><value>This older run lacks the connection checkpoints required for safe recovery.</value></data>
-  <data name="ConditionalDeleteUnsupported" xml:space="preserve"><value>This provider has no verified ETag-conditional delete support.</value></data>
+  <data name="ConditionalDeleteUnsupported" xml:space="preserve"><value>The source provider does not support the safe conditional delete required for Move. Use copy instead.</value></data>
   <data name="SearchComplete" xml:space="preserve"><value>Search complete. Scanned {0} objects in {1} requests.</value></data>
   <data name="SearchPartial" xml:space="preserve"><value>Partial results. Scanned {0} objects in {1} requests. Use the next page token to continue.</value></data>
   <data name="NextOffset" xml:space="preserve"><value>More jobs are available. Use --offset {0}.</value></data>
