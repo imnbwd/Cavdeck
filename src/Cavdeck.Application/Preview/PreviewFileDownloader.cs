@@ -11,6 +11,8 @@ public sealed class PreviewFileDownloader
 {
     private readonly IObjectStorageProviderFactory _providers;
     private readonly string _directory;
+    private readonly object _activeGate = new();
+    private readonly HashSet<string> _activeCopies = new(StringComparer.OrdinalIgnoreCase);
 
     public PreviewFileDownloader(IObjectStorageProviderFactory providers, string? directory = null)
     {
@@ -52,6 +54,8 @@ public sealed class PreviewFileDownloader
                 await stream.FlushAsync(token);
             }
             token.ThrowIfCancellationRequested();
+            lock (_activeGate)
+                _activeCopies.Add(Path.GetFullPath(path));
             return path;
         }
         catch
@@ -63,31 +67,64 @@ public sealed class PreviewFileDownloader
 
     public void Release(string? path)
     {
-        if (string.IsNullOrWhiteSpace(path))
+        if (!TryGetManagedPath(path, out var fullPath))
             return;
+
+        lock (_activeGate)
+            _activeCopies.Remove(fullPath);
+
         try
         {
-            if (!string.Equals(Path.GetDirectoryName(Path.GetFullPath(path)),
-                    Path.GetFullPath(_directory).TrimEnd(Path.DirectorySeparatorChar),
-                    StringComparison.OrdinalIgnoreCase))
-                return;
-            File.Delete(path);
+            File.Delete(fullPath);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Active PDF renderers and external apps can keep file handles open.
-            // Prune aged copies on the next preview operation.
+            // Active PDF renderers can keep file handles open. A later prune retries.
+        }
+    }
+
+    public void Detach(string? path)
+    {
+        if (!TryGetManagedPath(path, out var fullPath))
+            return;
+
+        lock (_activeGate)
+            _activeCopies.Remove(fullPath);
+    }
+
+    private bool TryGetManagedPath(string? path, out string fullPath)
+    {
+        fullPath = "";
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+
+        try
+        {
+            fullPath = Path.GetFullPath(path);
+            var directory = Path.GetDirectoryName(fullPath);
+            var expectedDirectory = Path.GetFullPath(_directory)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            return string.Equals(directory, expectedDirectory, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is ArgumentException or IOException or NotSupportedException)
+        {
+            return false;
         }
     }
 
     private void PruneOldCopies()
     {
         var cutoff = DateTime.UtcNow.AddDays(-2);
+        HashSet<string> active;
+        lock (_activeGate)
+            active = new HashSet<string>(_activeCopies, StringComparer.OrdinalIgnoreCase);
+
         foreach (var path in Directory.EnumerateFiles(_directory))
         {
             try
             {
-                if (File.GetLastWriteTimeUtc(path) < cutoff)
+                if (!active.Contains(Path.GetFullPath(path))
+                    && File.GetLastWriteTimeUtc(path) < cutoff)
                     File.Delete(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }

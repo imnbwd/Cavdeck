@@ -19,8 +19,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     private readonly IObjectStorageProviderFactory _storage;
     private readonly LocalizationService _texts;
     private readonly ToastService _toasts;
-    private CancellationTokenSource? _load;
-    private int _generation;
+    private readonly PreviewSession _session = new();
     private StorageConnection? _connection;
     private string? _bucket;
     private string _key = "";
@@ -57,7 +56,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     private string _status = "";
     private string _saveError = "";
     private ImageSource? _image;
-    private string? _pdfPath;
+    private PreviewFileLease? _pdfLease;
     private bool _preparingFile;
     private bool _previewRecoverable;
     private long _downloadedBytes;
@@ -81,7 +80,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         ShellCommand = CreateAsyncCommand(_ => OpenWithShellAsync());
         DownloadCommand = new RelayCommand(_ => DownloadRequested?.Invoke(this, EventArgs.Empty));
         RetryCommand = CreateAsyncCommand(_ => OpenCurrentAsync());
-        CancelPreviewCommand = new RelayCommand(_ => _load?.Cancel());
+        CancelPreviewCommand = new RelayCommand(_ => _session.CancelCurrent());
         ShowContentCommand = new RelayCommand(_ => ShowContent());
         ShowDetailsCommand = new RelayCommand(_ => ShowDetails());
         CopyDraftCommand = new RelayCommand(_ => CopyDraft());
@@ -160,8 +159,8 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public string SaveError => _saveError;
     public string LoadingMessage => _texts["Preview_Loading"];
     public ImageSource? Image => _image;
-    public string? PdfPath => _pdfPath;
-    public bool ShowPdf => _pdfPath is not null && !_loading;
+    public string? PdfPath => _pdfLease?.FilePath;
+    public bool ShowPdf => PdfPath is not null && !_loading;
     public bool ShowPreviewDownload => _preparingFile && _loading;
     public bool ShowLoadingSpinner => _loading && !_preparingFile;
     public double PreviewProgress => _size > 0 ? Math.Clamp(100.0 * _downloadedBytes / _size, 0, 100) : 0;
@@ -207,8 +206,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void InvalidateContext()
     {
-        _generation++;
-        CancelLoad();
+        _session.Reset();
         _loading = false;
         _preparingFile = false;
         OnPropertyChanged(nameof(IsLoading));
@@ -328,9 +326,9 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void Close()
     {
-        _generation++;
-        CancelLoad();
-        SetPdfPath(null);
+        _session.Reset();
+        SetPdfLease(null);
+        _loading = false;
         _preparingFile = false;
         _previewRecoverable = false;
         SetExpanded(false);
@@ -391,8 +389,8 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void Dispose()
     {
-        CancelLoad();
-        SetPdfPath(null);
+        _session.Dispose();
+        SetPdfLease(null);
     }
 
     private async Task OpenCurrentAsync()
@@ -400,11 +398,14 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         if (_connection is null || _bucket is null || _key.Length == 0)
             return;
 
-        var generation = ++_generation;
-        CancelLoad();
-        SetPdfPath(null);
-        _load = new CancellationTokenSource();
-        var token = _load.Token;
+        var connection = _connection;
+        var bucket = _bucket;
+        var key = _key;
+        var name = _name;
+        var operation = _session.Begin(new PreviewObjectId(connection.Id, bucket, key));
+        var token = operation.Token;
+
+        SetPdfLease(null);
         _loading = true;
         _preparingFile = false;
         _previewRecoverable = false;
@@ -424,16 +425,13 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         RaiseEditorState();
         RaiseBars();
 
-        string? pendingFile = null;
+        PreviewFileLease? pendingLease = null;
         try
         {
-            var connection = _connection;
-            var bucket = _bucket;
-            var key = _key;
-            var name = _name;
             var loaded = await _preview.OpenAsync(connection, bucket, key, name, token);
-            if (generation != _generation)
+            if (!_session.IsCurrent(operation))
                 return;
+
             var image = loaded.Kind == PreviewLoadKind.Image
                 ? await Task.Run(() => DecodeImage(loaded.Image), token)
                 : null;
@@ -449,30 +447,31 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
                 var progress = new Progress<long>(bytes =>
                 {
-                    if (generation != _generation || !_preparingFile || token.IsCancellationRequested)
+                    if (!_session.IsCurrent(operation) || !_preparingFile || token.IsCancellationRequested)
                         return;
                     _downloadedBytes = Math.Max(0, bytes);
                     OnPropertyChanged(nameof(PreviewProgress));
                     OnPropertyChanged(nameof(PreviewProgressLabel));
                 });
-                pendingFile = await _preview.PrepareFileAsync(
+                pendingLease = await _preview.PrepareFileAsync(
                     connection, bucket, key, name, loaded.Head.SizeBytes,
                     PreviewRules.MaxPdfBytes, progress, token);
                 token.ThrowIfCancellationRequested();
             }
 
-            if (generation != _generation)
+            if (!_session.IsCurrent(operation))
                 return;
+
             Apply(loaded, image);
             if (loaded.Kind == PreviewLoadKind.Pdf)
             {
-                SetPdfPath(pendingFile);
-                pendingFile = null; // active viewer now owns the completed local copy
+                SetPdfLease(pendingLease);
+                pendingLease = null;
             }
         }
         catch (OperationCanceledException)
         {
-            if (generation == _generation && _open && _preparingFile)
+            if (_session.IsCurrent(operation) && _open && _preparingFile)
             {
                 _previewRecoverable = true;
                 _downloadSuggested = true;
@@ -481,7 +480,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         }
         catch (StorageException exception)
         {
-            if (generation == _generation)
+            if (_session.IsCurrent(operation))
             {
                 var preparing = _preparingFile;
                 Apply(new PreviewLoad(PreviewLoadKind.Failed, null, null,
@@ -495,7 +494,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            if (generation == _generation)
+            if (_session.IsCurrent(operation))
             {
                 _previewRecoverable = true;
                 _downloadSuggested = true;
@@ -504,25 +503,32 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         }
         finally
         {
-            _preview.ReleasePreparedFile(pendingFile);
-            if (generation == _generation)
+            try
             {
-                _preparingFile = false;
-                _loading = false;
-                OnPropertyChanged(nameof(IsLoading));
-                OnPropertyChanged(nameof(FileSummary));
-                OnPropertyChanged(nameof(ShowFileSummary));
-                RaiseEditorState();
-                RaiseBars();
+                if (pendingLease is not null)
+                    await pendingLease.DisposeAsync();
+            }
+            finally
+            {
+                if (_session.Complete(operation))
+                {
+                    _preparingFile = false;
+                    _loading = false;
+                    OnPropertyChanged(nameof(IsLoading));
+                    OnPropertyChanged(nameof(FileSummary));
+                    OnPropertyChanged(nameof(ShowFileSummary));
+                    RaiseEditorState();
+                    RaiseBars();
+                }
             }
         }
     }
 
     public void PdfViewerFailed()
     {
-        if (!_open || _pdfPath is null)
+        if (!_open || _pdfLease is null)
             return;
-        SetPdfPath(null);
+        SetPdfLease(null);
         _previewRecoverable = true;
         _downloadSuggested = true;
         SetNotice("Preview_PdfFailed");
@@ -530,16 +536,17 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         RaiseBars();
     }
 
-    private void SetPdfPath(string? path)
+    private void SetPdfLease(PreviewFileLease? lease)
     {
-        if (string.Equals(_pdfPath, path, StringComparison.Ordinal))
+        if (ReferenceEquals(_pdfLease, lease))
             return;
-        var old = _pdfPath;
-        _pdfPath = path;
+
+        var old = _pdfLease;
+        _pdfLease = lease;
         OnPropertyChanged(nameof(PdfPath));
         OnPropertyChanged(nameof(ShowPdf));
         if (old is not null)
-            _preview.ReleasePreparedFile(old);
+            _ = old.DisposeAsync();
     }
 
     private void Apply(PreviewLoad loaded, ImageSource? decodedImage)
@@ -720,24 +727,36 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         if (_connection is null || _bucket is null || _key.Length == 0 || !_shellAllowed || _loading)
             return;
 
-        var generation = _generation;
-        var token = _load?.Token ?? CancellationToken.None;
-        string? shellCopy = null;
+        var connection = _connection;
+        var bucket = _bucket;
+        var key = _key;
+        var name = _name;
+        var size = _size;
+        var operation = _session.Begin(new PreviewObjectId(connection.Id, bucket, key));
+        var token = operation.Token;
+        PreviewFileLease? shellLease = null;
         _loading = true;
         OnPropertyChanged(nameof(IsLoading));
         RaiseEditorState();
         try
         {
-            shellCopy = await _preview.PrepareFileAsync(
-                _connection, _bucket, _key, _name, _size, PreviewRules.MaxShellBytes, null, token);
+            shellLease = await _preview.PrepareFileAsync(
+                connection, bucket, key, name, size, PreviewRules.MaxShellBytes, null, token);
 
-            if (generation != _generation || token.IsCancellationRequested)
+            token.ThrowIfCancellationRequested();
+            if (!_session.IsCurrent(operation))
                 return;
+
+            var shellPath = shellLease.FilePath;
             await Task.Run(() => System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo(shellCopy) { UseShellExecute = true }), token);
-            // Once launched, the external application may still need the copy; prune after retention.
-            shellCopy = null;
-            if (generation != _generation)
+                new System.Diagnostics.ProcessStartInfo(shellPath) { UseShellExecute = true }), token);
+
+            // The external application owns the copy after launch. It is retained under
+            // the existing stale-file cleanup policy rather than deleted with this lease.
+            shellLease.Detach();
+            shellLease = null;
+
+            if (!_session.IsCurrent(operation))
                 return;
             _toasts.Show(new ToastRequest
             {
@@ -748,23 +767,32 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         }
         catch (StorageException exception)
         {
-            SetSaveError(ExplorerText.FailureTitle(_texts, exception.Failure));
+            if (_session.IsCurrent(operation))
+                SetSaveError(ExplorerText.FailureTitle(_texts, exception.Failure));
         }
         catch (OperationCanceledException)
         {
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
-            SetSaveError(_texts["Preview_ShellFailed"]);
+            if (_session.IsCurrent(operation))
+                SetSaveError(_texts["Preview_ShellFailed"]);
         }
         finally
         {
-            _preview.ReleasePreparedFile(shellCopy);
-            if (generation == _generation)
+            try
             {
-                _loading = false;
-                OnPropertyChanged(nameof(IsLoading));
-                RaiseEditorState();
+                if (shellLease is not null)
+                    await shellLease.DisposeAsync();
+            }
+            finally
+            {
+                if (_session.Complete(operation))
+                {
+                    _loading = false;
+                    OnPropertyChanged(nameof(IsLoading));
+                    RaiseEditorState();
+                }
             }
         }
     }
@@ -884,13 +912,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     {
         SetProperty(ref _saveError, value, nameof(SaveError));
         UpdateStatus();
-    }
-
-    private void CancelLoad()
-    {
-        _load?.Cancel();
-        _load?.Dispose();
-        _load = null;
     }
 
     private static ImageSource? DecodeImage(byte[]? bytes)
