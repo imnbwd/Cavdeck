@@ -83,7 +83,7 @@ public sealed class CliTableWriterTests
         using var output = new StringWriter();
 
         Assert.True(CliTableWriter.TryWrite("bucket.list", data, false, output));
-        Assert.DoesNotContain("\u001b", output.ToString());
+        Assert.False(output.ToString().Contains((char)0x1b), "Terminal output must not contain a raw ESC character.");
         Assert.Contains("\\u001b", output.ToString());
     }
 }
