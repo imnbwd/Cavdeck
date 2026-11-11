@@ -3,7 +3,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:Cavdeck.App.Controls"
                     xmlns:preview="clr-namespace:Cavdeck.App.Features.Preview"
-                    Title="{Binding FileName}"
+                    Title="{Binding FileName}" ShowBrandName="False"
                     Style="{StaticResource AppWindowStyle}"
                     Width="1060" Height="720"
                     MinWidth="520" MinHeight="320"
@@ -89,6 +89,13 @@
       </Setter>
     </Style>
   </controls:AppWindow.Resources>
+
+  <!-- The constrained center column trims long names without pushing caption buttons away. -->
+  <controls:AppWindow.TitleBarCenter>
+    <TextBlock x:Name="MediaCaption" Text="{Binding FileName}"
+               FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+               VerticalAlignment="Center" ToolTip="{Binding FileName}"/>
+  </controls:AppWindow.TitleBarCenter>
 
   <Grid Background="{DynamicResource WindowBackgroundBrush}">
     <Grid.RowDefinitions>

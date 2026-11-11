@@ -68,6 +68,10 @@ public sealed class MediaPreviewLayoutTests
     {
         var view = Window();
         Assert.Equal("1060", (string?)view.Root?.Attribute("Width"));
+        Assert.Equal("False", (string?)view.Root?.Attribute("ShowBrandName"));
+        var caption = Assert.Single(view.Descendants(Wpf + "TextBlock").Where(label =>
+            (string?)label.Attribute(Xaml + "Name") == "MediaCaption"));
+        Assert.Equal("CharacterEllipsis", (string?)caption.Attribute("TextTrimming"));
         Assert.DoesNotContain(view.Descendants(Wpf + "TextBlock"), label =>
             (string?)label.Attribute(Xaml + "Name") == "KindLabelLabel");
         var artwork = Assert.Single(view.Descendants(Wpf + "Grid").Where(grid =>

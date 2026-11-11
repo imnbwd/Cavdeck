@@ -73,7 +73,7 @@ public partial class MediaPreviewWindow : AppWindow
             MinWidth = 440;
             MinHeight = 280;
             // File identity lives in the audio panel, not in two stacked headers.
-            Title = $"{Texts["Media_KindAudio"]} — Cavdeck";
+            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
             // Keep the media element loaded for sound, but do not display a black frame.
             Player.Opacity = 0;
         }
@@ -258,7 +258,7 @@ public partial class MediaPreviewWindow : AppWindow
         if (_disposed)
             return;
         if (!_isVideo)
-            Title = $"{Texts["Media_KindAudio"]} — Cavdeck";
+            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
         UpdatePlaybackLabels();
         Feedback.Headline = Texts[_feedbackKey];
         Feedback.PrimaryButtonText = Texts[_feedbackKey is "Media_Unsupported" or "Media_DownloadFailed"
