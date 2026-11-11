@@ -16,6 +16,7 @@ namespace Cavdeck.App.Controls;
 public class AppWindow : Window
 {
     private const int DwmwaWindowCornerPreference = 33;
+    private const int DwmwcpDoNotRound = 1;
     private const int DwmwcpRound = 2;
     private const int MonitorDefaultToNearest = 2;
     private const int WmDpiChanged = 0x02E0;
@@ -49,6 +50,15 @@ public class AppWindow : Window
     public static readonly DependencyProperty ShowBrandNameProperty =
         DependencyProperty.Register(nameof(ShowBrandName), typeof(bool), typeof(AppWindow),
             new PropertyMetadata(true));
+
+    public static readonly DependencyProperty IsImmersiveFullScreenProperty =
+        DependencyProperty.Register(nameof(IsImmersiveFullScreen), typeof(bool), typeof(AppWindow),
+            new PropertyMetadata(false, (d, _) =>
+            {
+                var window = (AppWindow)d;
+                window.UpdateChromeMetrics();
+                window.ApplyCornerPreference();
+            }));
 
     public static readonly DependencyProperty MaximizedPaddingProperty =
         DependencyProperty.Register(
@@ -98,6 +108,12 @@ public class AppWindow : Window
     {
         get => (bool)GetValue(ShowBrandNameProperty);
         set => SetValue(ShowBrandNameProperty, value);
+    }
+
+    public bool IsImmersiveFullScreen
+    {
+        get => (bool)GetValue(IsImmersiveFullScreenProperty);
+        set => SetValue(IsImmersiveFullScreenProperty, value);
     }
 
     public Thickness MaximizedPadding
@@ -199,6 +215,14 @@ public class AppWindow : Window
 
     private void UpdateChromeMetrics()
     {
+        if (IsImmersiveFullScreen)
+        {
+            MaximizedPadding = new Thickness(0);
+            _chrome.CaptionHeight = 0;
+            _chrome.ResizeBorderThickness = new Thickness(0);
+            return;
+        }
+
         if (WindowState == WindowState.Maximized)
         {
             MaximizedPadding = GetMaximizedInset();
@@ -355,7 +379,7 @@ public class AppWindow : Window
         var hwnd = new WindowInteropHelper(this).Handle;
         if (hwnd == IntPtr.Zero)
             return;
-        var preference = DwmwcpRound;
+        var preference = IsImmersiveFullScreen ? DwmwcpDoNotRound : DwmwcpRound;
         _ = DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref preference, sizeof(int));
     }
 

@@ -97,14 +97,15 @@
                VerticalAlignment="Center" ToolTip="{Binding FileName}"/>
   </controls:AppWindow.TitleBarCenter>
 
-  <Grid Background="{DynamicResource WindowBackgroundBrush}">
+  <Grid x:Name="PlaybackRoot" Background="{DynamicResource WindowBackgroundBrush}"
+        PreviewMouseMove="PlaybackRoot_PreviewMouseMove">
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
     <!-- Video takes the available space. Audio displays a compact file identity in the same surface. -->
-    <Grid x:Name="MediaSurface" Grid.Row="0" ClipToBounds="True"
+    <Grid x:Name="MediaSurface" Grid.Row="0" ClipToBounds="True" Focusable="True"
           Background="{DynamicResource SurfaceMutedBrush}"
           MouseLeftButtonDown="MediaSurface_MouseLeftButtonDown">
       <MediaElement x:Name="Player" LoadedBehavior="Manual" UnloadedBehavior="Close"
@@ -135,7 +136,8 @@
       </Grid>
     </Grid>
 
-    <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}"
+    <Border x:Name="ControlsBar" Grid.Row="1" Panel.ZIndex="1"
+            Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
             Padding="16,8,16,12">
       <Grid>
@@ -147,7 +149,16 @@
         <Slider Grid.Row="0" x:Name="SeekSlider" Minimum="0" Maximum="1" Value="0"
                 Margin="0" IsEnabled="False" Style="{StaticResource MediaSliderStyle}"
                 ValueChanged="SeekSlider_ValueChanged"
-                AutomationProperties.Name="{Binding Texts[Media_Seek]}"/>
+                AutomationProperties.Name="{Binding Texts[Media_Seek]}"
+                ToolTipService.IsEnabled="False">
+          <Slider.ToolTip>
+            <ToolTip x:Name="SeekPreviewTip" Placement="MousePoint" StaysOpen="True"
+                     IsHitTestVisible="False" Background="{DynamicResource SurfaceBrush}"
+                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+              <TextBlock x:Name="SeekPreviewText" Foreground="{DynamicResource PrimaryTextBrush}"/>
+            </ToolTip>
+          </Slider.ToolTip>
+        </Slider>
         <TextBlock Grid.Row="1" x:Name="TimeLabel" Text="00:00 / 00:00"
                    HorizontalAlignment="Right" Margin="0,-1,0,6"
                    Foreground="{DynamicResource MutedTextBrush}"
@@ -179,6 +190,17 @@
             </Button>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <ComboBox x:Name="SpeedSelector" Width="76" Height="32" Margin="0,0,10,0"
+                      VerticalAlignment="Center" SelectedIndex="1"
+                      SelectionChanged="SpeedSelector_SelectionChanged"
+                      ToolTip="{Binding Texts[Media_Speed]}"
+                      AutomationProperties.Name="{Binding Texts[Media_Speed]}">
+              <ComboBoxItem Content="0.75×" Tag="0.75"/>
+              <ComboBoxItem Content="1×" Tag="1"/>
+              <ComboBoxItem Content="1.25×" Tag="1.25"/>
+              <ComboBoxItem Content="1.5×" Tag="1.5"/>
+              <ComboBoxItem Content="2×" Tag="2"/>
+            </ComboBox>
             <Button x:Name="MuteButton" Style="{StaticResource MediaIconButton}"
                     Click="Mute_Click" Margin="0,0,2,0"
                     AutomationProperties.Name="{Binding Texts[Media_Mute]}">
@@ -190,6 +212,14 @@
                     Width="84" Margin="0" VerticalAlignment="Center"
                     ValueChanged="VolumeSlider_ValueChanged"
                     AutomationProperties.Name="{Binding Texts[Media_Volume]}"/>
+            <Button x:Name="FullscreenButton" Style="{StaticResource MediaIconButton}"
+                    Visibility="Collapsed" Margin="8,0,0,0"
+                    Click="Fullscreen_Click"
+                    ToolTip="{Binding Texts[Media_EnterFullscreen]}"
+                    AutomationProperties.Name="{Binding Texts[Media_EnterFullscreen]}">
+              <Path x:Name="FullscreenGlyph" Style="{StaticResource IconGlyph}"
+                    Data="{StaticResource IconMediaExpand}"/>
+            </Button>
           </StackPanel>
         </Grid>
       </Grid>

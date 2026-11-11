@@ -27,6 +27,28 @@ public sealed class MediaPlaybackTests
             MediaPlaybackMath.Skip(TimeSpan.FromSeconds(29), 5, duration));
     }
 
+    [Theory]
+    [InlineData(0.75, true)]
+    [InlineData(1.0, true)]
+    [InlineData(1.25, true)]
+    [InlineData(1.5, true)]
+    [InlineData(2.0, true)]
+    [InlineData(0, false)]
+    [InlineData(3.0, false)]
+    [InlineData(double.NaN, false)]
+    public void Speed_options_are_bounded(double ratio, bool expected) =>
+        Assert.Equal(expected, MediaPlaybackMath.IsSupportedSpeed(ratio));
+
+    [Theory]
+    [InlineData(true, false, 2.9, false)]
+    [InlineData(true, false, 3.0, true)]
+    [InlineData(true, true, 5.0, false)]
+    [InlineData(false, false, 10.0, false)]
+    public void Fullscreen_controls_hide_only_when_playing_and_idle(
+        bool playing, bool interacting, double seconds, bool expected) =>
+        Assert.Equal(expected, MediaPlaybackMath.ShouldHideControls(
+            playing, interacting, TimeSpan.FromSeconds(seconds)));
+
     [Fact]
     public void Unknown_duration_and_invalid_seek_values_do_not_change_position()
     {

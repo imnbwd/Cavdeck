@@ -151,7 +151,8 @@
                 </StackPanel>
               </Grid>
 
-              <Border Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+              <Border x:Name="WindowContent" Grid.Row="1"
+                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
                 <ContentPresenter/>
               </Border>
               <Border x:Name="WindowTransitionCover" Grid.RowSpan="2"
@@ -160,6 +161,13 @@
             </Grid>
           </Border>
           <ControlTemplate.Triggers>
+            <Trigger Property="IsImmersiveFullScreen" Value="True">
+              <Setter TargetName="Frame" Property="BorderThickness" Value="0"/>
+              <Setter TargetName="TitleBar" Property="Visibility" Value="Collapsed"/>
+              <Setter TargetName="WindowContent" Property="Grid.Row" Value="0"/>
+              <Setter TargetName="WindowContent" Property="Grid.RowSpan" Value="2"/>
+              <Setter TargetName="WindowContent" Property="BorderThickness" Value="0"/>
+            </Trigger>
             <Trigger Property="IsActive" Value="False">
               <Setter TargetName="TitleText" Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
               <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>

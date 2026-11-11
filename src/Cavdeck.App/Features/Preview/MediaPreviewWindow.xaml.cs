@@ -1,8 +1,12 @@
 using System.ComponentModel;
 using System.IO;
+using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Cavdeck.App.Controls;
@@ -29,6 +33,7 @@ public partial class MediaPreviewWindow : AppWindow
     private readonly long _size;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private readonly DispatcherTimer _surfaceClickTimer = new();
     private PreviewFileLease? _lease;
     private bool _disposed;
     private bool _ready;
@@ -36,7 +41,17 @@ public partial class MediaPreviewWindow : AppWindow
     private bool _dragging;
     private bool _settingSeek;
     private bool _muted;
+    private bool _ended;
+    private bool _fullScreen;
+    private bool _speedUnsupported;
+    private bool _settingSpeed;
     private readonly bool _isVideo;
+    private Rect _previousBounds;
+    private WindowState _previousWindowState;
+    private ResizeMode _previousResizeMode;
+    private bool _previousTopmost;
+    private DateTime _lastPointerActivityUtc = DateTime.UtcNow;
+    private Point? _lastPointerPosition;
     private TimeSpan _duration;
     private string _feedbackKey = "Media_Loading";
     private long _downloadedBytes;
@@ -59,7 +74,6 @@ public partial class MediaPreviewWindow : AppWindow
         FileName = name;
         Texts = texts;
         _isVideo = type == PreviewFileType.Video;
-        
 
         InitializeComponent();
         DataContext = this;
@@ -78,6 +92,20 @@ public partial class MediaPreviewWindow : AppWindow
             Player.Opacity = 0;
         }
 
+        FullscreenButton.Visibility = _isVideo ? Visibility.Visible : Visibility.Collapsed;
+        _surfaceClickTimer.Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime());
+        _surfaceClickTimer.Tick += SurfaceClickTimer_Tick;
+        // Do not cover other applications while the full-screen viewer is inactive.
+        Activated += (_, _) =>
+        {
+            if (_fullScreen)
+                Topmost = true;
+        };
+        Deactivated += (_, _) =>
+        {
+            if (_fullScreen)
+                Topmost = false;
+        };
         Player.Volume = VolumeSlider.Value;
         Feedback.PrimaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;
@@ -87,12 +115,24 @@ public partial class MediaPreviewWindow : AppWindow
         UpdatePlaybackLabels();
         _timer.Tick += Timer_Tick;
         SeekSlider.AddHandler(Thumb.DragStartedEvent,
-            new DragStartedEventHandler((_, _) => _dragging = true), true);
+            new DragStartedEventHandler((_, _) =>
+            {
+                if (!_ready)
+                    return;
+                _dragging = true;
+                UpdateSeekPreview();
+                SeekPreviewTip.IsOpen = true;
+                ShowFullscreenControls();
+            }), true);
         SeekSlider.AddHandler(Thumb.DragCompletedEvent,
             new DragCompletedEventHandler((_, _) =>
             {
+                SeekPreviewTip.IsOpen = false;
+                if (!_dragging)
+                    return;
+                var target = SeekSlider.Value;
                 _dragging = false;
-                ApplySeek(SeekSlider.Value);
+                ApplySeek(target);
             }), true);
         Texts.PropertyChanged += Texts_PropertyChanged;
         Loaded += (_, _) => _ = LoadAsync();
@@ -167,6 +207,7 @@ public partial class MediaPreviewWindow : AppWindow
         if (_disposed)
             return;
         _ready = true;
+        _ended = false;
         _duration = Player.NaturalDuration.HasTimeSpan
             ? Player.NaturalDuration.TimeSpan : TimeSpan.Zero;
         SeekSlider.IsEnabled = _duration > TimeSpan.Zero;
@@ -175,6 +216,7 @@ public partial class MediaPreviewWindow : AppWindow
         BackButton.IsEnabled = _duration > TimeSpan.Zero;
         ForwardButton.IsEnabled = _duration > TimeSpan.Zero;
         Feedback.Visibility = Visibility.Collapsed;
+        ApplyPlaybackSpeed();
         UpdateTimeLabel();
         Player.Play();
         _playing = true;
@@ -186,10 +228,13 @@ public partial class MediaPreviewWindow : AppWindow
     {
         if (_disposed)
             return;
-        Player.Stop();
+        // Keep the last frame/time visible and expose an explicit replay state.
+        Player.Pause();
         _playing = false;
+        _ended = true;
         _timer.Stop();
-        UpdateSeekValue(0);
+        UpdateSeekValue(_duration.TotalSeconds);
+        ShowFullscreenControls();
         UpdatePlaybackLabels();
     }
 
@@ -199,7 +244,9 @@ public partial class MediaPreviewWindow : AppWindow
             return;
         _ready = false;
         _playing = false;
+        _ended = false;
         _timer.Stop();
+        ShowFullscreenControls();
         PlayPauseButton.IsEnabled = false;
         SeekSlider.IsEnabled = false;
         BackButton.IsEnabled = false;
@@ -231,11 +278,19 @@ public partial class MediaPreviewWindow : AppWindow
             Player.Pause();
             _playing = false;
             _timer.Stop();
+            ShowFullscreenControls();
         }
         else
         {
+            if (_ended)
+            {
+                Player.Position = TimeSpan.Zero;
+                _ended = false;
+                UpdateSeekValue(0);
+            }
             Player.Play();
             _playing = true;
+            _lastPointerActivityUtc = DateTime.UtcNow;
             _timer.Start();
         }
         UpdatePlaybackLabels();
@@ -243,7 +298,7 @@ public partial class MediaPreviewWindow : AppWindow
 
     private void UpdatePlaybackLabels()
     {
-        var playLabel = Texts[_playing ? "Media_Pause" : "Media_Play"];
+        var playLabel = Texts[_playing ? "Media_Pause" : _ended ? "Media_Replay" : "Media_Play"];
         PlayPauseGlyph.Data = (Geometry)FindResource(_playing ? "IconMediaPause" : "IconMediaPlay");
         PlayPauseButton.ToolTip = playLabel;
         System.Windows.Automation.AutomationProperties.SetName(PlayPauseButton, playLabel);
@@ -251,6 +306,17 @@ public partial class MediaPreviewWindow : AppWindow
         MuteGlyph.Data = (Geometry)FindResource(_muted ? "IconMediaMuted" : "IconMediaVolume");
         MuteButton.ToolTip = muteLabel;
         System.Windows.Automation.AutomationProperties.SetName(MuteButton, muteLabel);
+        if (_isVideo)
+        {
+            var fullscreenLabel = Texts[_fullScreen ? "Media_ExitFullscreen" : "Media_EnterFullscreen"];
+            FullscreenGlyph.Data = (Geometry)FindResource(_fullScreen
+                ? "IconMediaCollapse" : "IconMediaExpand");
+            FullscreenButton.ToolTip = fullscreenLabel;
+            System.Windows.Automation.AutomationProperties.SetName(FullscreenButton, fullscreenLabel);
+        }
+        SpeedSelector.ToolTip = Texts[_speedUnsupported ? "Media_SpeedUnsupported" : "Media_Speed"];
+        if (_dragging)
+            UpdateSeekPreview();
     }
 
     private void Texts_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -270,6 +336,7 @@ public partial class MediaPreviewWindow : AppWindow
 
     private void Timer_Tick(object? sender, EventArgs e)
     {
+        UpdateFullscreenControls();
         if (!_ready || _dragging)
             return;
         UpdateSeekValue(Player.Position.TotalSeconds);
@@ -285,7 +352,8 @@ public partial class MediaPreviewWindow : AppWindow
 
     private void UpdateTimeLabel()
     {
-        var current = _dragging ? TimeSpan.FromSeconds(SeekSlider.Value) : Player.Position;
+        var current = _dragging ? TimeSpan.FromSeconds(SeekSlider.Value)
+            : _ended ? _duration : Player.Position;
         TimeLabel.Text = $"{MediaPlaybackMath.Clock(current)} / {MediaPlaybackMath.Clock(_duration)}";
     }
 
@@ -294,6 +362,8 @@ public partial class MediaPreviewWindow : AppWindow
         if (!_ready || _duration <= TimeSpan.Zero)
             return;
         Player.Position = MediaPlaybackMath.Seek(Player.Position, seconds, _duration);
+        _ended = false;
+        UpdatePlaybackLabels();
         UpdateTimeLabel();
     }
 
@@ -302,7 +372,10 @@ public partial class MediaPreviewWindow : AppWindow
         if (_settingSeek || !_ready)
             return;
         if (_dragging)
+        {
             UpdateTimeLabel();
+            UpdateSeekPreview();
+        }
         else
             ApplySeek(e.NewValue);
     }
@@ -337,52 +410,250 @@ public partial class MediaPreviewWindow : AppWindow
         if (!_ready || _duration <= TimeSpan.Zero)
             return;
         Player.Position = MediaPlaybackMath.Skip(Player.Position, seconds, _duration);
+        _ended = false;
         UpdateSeekValue(Player.Position.TotalSeconds);
+        UpdatePlaybackLabels();
+        ShowFullscreenControls();
+    }
+
+    private void UpdateSeekPreview()
+    {
+        if (!_dragging)
+            return;
+        SeekPreviewText.Text = string.Format(Texts["Media_SeekPreview"],
+            MediaPlaybackMath.Clock(TimeSpan.FromSeconds(SeekSlider.Value)));
+    }
+
+    private void SpeedSelector_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+        ApplyPlaybackSpeed();
+
+    private void ApplyPlaybackSpeed()
+    {
+        if (!_ready || _settingSpeed || SpeedSelector.SelectedItem is not ComboBoxItem option ||
+            !double.TryParse(option.Tag?.ToString(), NumberStyles.Float,
+                CultureInfo.InvariantCulture, out var ratio) ||
+            !MediaPlaybackMath.IsSupportedSpeed(ratio))
+            return;
+
+        try
+        {
+            Player.SpeedRatio = ratio;
+            _speedUnsupported = false;
+        }
+        catch (InvalidOperationException)
+        {
+            ResetUnsupportedSpeed();
+        }
+        catch (NotSupportedException)
+        {
+            ResetUnsupportedSpeed();
+        }
+
+        SpeedSelector.ToolTip = Texts[_speedUnsupported ? "Media_SpeedUnsupported" : "Media_Speed"];
+    }
+
+    private void ResetUnsupportedSpeed()
+    {
+        _speedUnsupported = true;
+        _settingSpeed = true;
+        try
+        {
+            SpeedSelector.SelectedIndex = 1;
+        }
+        finally
+        {
+            _settingSpeed = false;
+        }
+    }
+
+    private void SurfaceClickTimer_Tick(object? sender, EventArgs e)
+    {
+        _surfaceClickTimer.Stop();
+        TogglePlayback();
     }
 
     private void MediaSurface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && _ready)
+        if (e.ChangedButton != MouseButton.Left || !_ready)
+            return;
+
+        if (_isVideo && e.ClickCount >= 2)
+        {
+            _surfaceClickTimer.Stop();
+            ToggleFullscreen();
+        }
+        else if (_isVideo)
+        {
+            // Defer a single click until the OS double-click window has elapsed,
+            // so a video double click never briefly pauses or resumes playback.
+            _surfaceClickTimer.Stop();
+            _surfaceClickTimer.Start();
+        }
+        else
         {
             TogglePlayback();
-            e.Handled = true;
         }
+        ShowFullscreenControls();
+        e.Handled = true;
+    }
+
+    private void PlaybackRoot_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_fullScreen)
+            return;
+        var point = e.GetPosition(PlaybackRoot);
+        if (_lastPointerPosition is Point previous &&
+            Math.Abs(previous.X - point.X) + Math.Abs(previous.Y - point.Y) < 1)
+            return;
+        _lastPointerPosition = point;
+        ShowFullscreenControls();
+    }
+
+    private void ShowFullscreenControls()
+    {
+        if (!_fullScreen)
+            return;
+        _lastPointerActivityUtc = DateTime.UtcNow;
+        ControlsBar.Visibility = Visibility.Visible;
+    }
+
+    private void UpdateFullscreenControls()
+    {
+        if (!_fullScreen)
+            return;
+        var interacting = _dragging || ControlsBar.IsMouseOver || SpeedSelector.IsDropDownOpen
+            || SeekSlider.IsKeyboardFocusWithin || VolumeSlider.IsKeyboardFocusWithin;
+        if (MediaPlaybackMath.ShouldHideControls(_playing, interacting,
+                DateTime.UtcNow - _lastPointerActivityUtc))
+            ControlsBar.Visibility = Visibility.Collapsed;
+    }
+
+    private void Fullscreen_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
+
+    private void ToggleFullscreen()
+    {
+        if (!_isVideo)
+            return;
+        if (_fullScreen)
+            ExitFullscreen();
+        else
+            EnterFullscreen();
+    }
+
+    private void EnterFullscreen()
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        var monitor = MonitorFromWindow(hwnd, 2); // nearest monitor
+        var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+        if (monitor == IntPtr.Zero || !GetMonitorInfo(monitor, ref info) ||
+            PresentationSource.FromVisual(this)?.CompositionTarget is not { } target)
+            return;
+
+        var physicalTopLeft = new Point(info.Monitor.Left, info.Monitor.Top);
+        var physicalBottomRight = new Point(info.Monitor.Right, info.Monitor.Bottom);
+        var topLeft = target.TransformFromDevice.Transform(physicalTopLeft);
+        var bottomRight = target.TransformFromDevice.Transform(physicalBottomRight);
+
+        _previousWindowState = WindowState;
+        _previousBounds = WindowState == WindowState.Normal
+            ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+        _previousResizeMode = ResizeMode;
+        _previousTopmost = Topmost;
+        _fullScreen = true;
+        IsImmersiveFullScreen = true;
+        WindowState = WindowState.Normal;
+        ResizeMode = ResizeMode.NoResize;
+        Topmost = true; // cover the taskbar on the selected display
+        Left = topLeft.X;
+        Top = topLeft.Y;
+        Width = bottomRight.X - topLeft.X;
+        Height = bottomRight.Y - topLeft.Y;
+
+        PlaybackRoot.RowDefinitions[1].Height = new GridLength(0);
+        Grid.SetRow(ControlsBar, 0);
+        ControlsBar.VerticalAlignment = VerticalAlignment.Bottom;
+        ControlsBar.Margin = new Thickness(16, 0, 16, 16);
+        ControlsBar.CornerRadius = new CornerRadius(12);
+        ControlsBar.BorderThickness = new Thickness(0);
+        ControlsBar.Opacity = 0.94;
+        MediaSurface.Focus();
+        _lastPointerPosition = null;
+        ShowFullscreenControls();
+        UpdatePlaybackLabels();
+    }
+
+    private void ExitFullscreen()
+    {
+        if (!_fullScreen)
+            return;
+        _fullScreen = false;
+        ControlsBar.Visibility = Visibility.Visible;
+        Grid.SetRow(ControlsBar, 1);
+        PlaybackRoot.RowDefinitions[1].Height = GridLength.Auto;
+        ControlsBar.VerticalAlignment = VerticalAlignment.Stretch;
+        ControlsBar.Margin = new Thickness(0);
+        ControlsBar.CornerRadius = new CornerRadius(0);
+        ControlsBar.BorderThickness = new Thickness(0, 1, 0, 0);
+        ControlsBar.Opacity = 1;
+        Topmost = _previousTopmost;
+        ResizeMode = _previousResizeMode;
+        Left = _previousBounds.Left;
+        Top = _previousBounds.Top;
+        Width = _previousBounds.Width;
+        Height = _previousBounds.Height;
+        IsImmersiveFullScreen = false;
+        WindowState = _previousWindowState;
+        UpdatePlaybackLabels();
     }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
         {
-            Close();
+            if (SpeedSelector.IsDropDownOpen)
+                SpeedSelector.IsDropDownOpen = false;
+            else if (_fullScreen)
+                ExitFullscreen();
+            else
+                Close();
             e.Handled = true;
         }
         else if (e.Key == Key.F11 && _isVideo)
         {
-            WindowState = WindowState == WindowState.Maximized
-                ? WindowState.Normal : WindowState.Maximized;
+            ToggleFullscreen();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.F && _isVideo && Keyboard.Modifiers == ModifierKeys.None
+                 && !SpeedSelector.IsKeyboardFocusWithin)
+        {
+            ToggleFullscreen();
             e.Handled = true;
         }
         else if (e.Key == Key.Space && !SeekSlider.IsKeyboardFocusWithin
                  && !VolumeSlider.IsKeyboardFocusWithin
                  && Keyboard.FocusedElement is not ButtonBase
+                 && !SpeedSelector.IsKeyboardFocusWithin
                  && Keyboard.Modifiers == ModifierKeys.None)
         {
             TogglePlayback();
             e.Handled = true;
         }
         else if (e.Key == Key.Left && Keyboard.Modifiers == ModifierKeys.None
-                 && !SeekSlider.IsKeyboardFocusWithin && !VolumeSlider.IsKeyboardFocusWithin)
+                 && !SeekSlider.IsKeyboardFocusWithin && !VolumeSlider.IsKeyboardFocusWithin
+                 && !SpeedSelector.IsKeyboardFocusWithin)
         {
             Skip(-5);
             e.Handled = true;
         }
         else if (e.Key == Key.Right && Keyboard.Modifiers == ModifierKeys.None
-                 && !SeekSlider.IsKeyboardFocusWithin && !VolumeSlider.IsKeyboardFocusWithin)
+                 && !SeekSlider.IsKeyboardFocusWithin && !VolumeSlider.IsKeyboardFocusWithin
+                 && !SpeedSelector.IsKeyboardFocusWithin)
         {
             Skip(5);
             e.Handled = true;
         }
-        else if (e.Key == Key.M && Keyboard.Modifiers == ModifierKeys.None)
+        else if (e.Key == Key.M && Keyboard.Modifiers == ModifierKeys.None
+                 && !SpeedSelector.IsKeyboardFocusWithin)
         {
             Mute_Click(sender, new RoutedEventArgs());
             e.Handled = true;
@@ -397,6 +668,9 @@ public partial class MediaPreviewWindow : AppWindow
         _lifetime.Cancel();
         _timer.Stop();
         _timer.Tick -= Timer_Tick;
+        _surfaceClickTimer.Stop();
+        _surfaceClickTimer.Tick -= SurfaceClickTimer_Tick;
+        SeekPreviewTip.IsOpen = false;
         Texts.PropertyChanged -= Texts_PropertyChanged;
         try
         {
@@ -415,5 +689,28 @@ public partial class MediaPreviewWindow : AppWindow
             }
             _lifetime.Dispose();
         }
+    }
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDoubleClickTime();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorRect
+    {
+        public int Left, Top, Right, Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo
+    {
+        public int Size;
+        public MonitorRect Monitor, Work;
+        public int Flags;
     }
 }

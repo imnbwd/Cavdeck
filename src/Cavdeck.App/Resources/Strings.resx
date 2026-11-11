@@ -870,9 +870,15 @@ Repair the file and retry before changing connections.</value></data>
   <data name="Media_DownloadFailed" xml:space="preserve"><value>Couldn't prepare this media file. Check the connection and try again.</value></data>
   <data name="Media_KindAudio" xml:space="preserve"><value>Audio</value></data>
   <data name="Media_KindVideo" xml:space="preserve"><value>Video</value></data>
-  <data name="Media_Hint" xml:space="preserve"><value>Space: play/pause · ← →: skip 5 s · M: mute · Esc: close · F11: maximize video</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>Space: play/pause · ← →: skip 5 s · M: mute · Esc: exit full screen/close · F11: full screen</value></data>
   <data name="Media_SkipBackward" xml:space="preserve"><value>Back 5 seconds</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>Forward 5 seconds</value></data>
+  <data name="Media_Speed" xml:space="preserve"><value>Playback speed</value></data>
+  <data name="Media_SpeedUnsupported" xml:space="preserve"><value>This Windows codec could not change playback speed.</value></data>
+  <data name="Media_EnterFullscreen" xml:space="preserve"><value>Enter full screen (F11)</value></data>
+  <data name="Media_ExitFullscreen" xml:space="preserve"><value>Exit full screen (Esc)</value></data>
+  <data name="Media_Replay" xml:space="preserve"><value>Replay</value></data>
+  <data name="Media_SeekPreview" xml:space="preserve"><value>Seek to {0}</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} of {1}</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Preview</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Couldn't open this preview</value></data>
