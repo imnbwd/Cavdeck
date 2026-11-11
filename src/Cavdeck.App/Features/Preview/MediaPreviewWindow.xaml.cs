@@ -95,6 +95,17 @@ public partial class MediaPreviewWindow : AppWindow
         FullscreenButton.Visibility = _isVideo ? Visibility.Visible : Visibility.Collapsed;
         _surfaceClickTimer.Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime());
         _surfaceClickTimer.Tick += SurfaceClickTimer_Tick;
+        // Do not cover other applications while the full-screen viewer is inactive.
+        Activated += (_, _) =>
+        {
+            if (_fullScreen)
+                Topmost = true;
+        };
+        Deactivated += (_, _) =>
+        {
+            if (_fullScreen)
+                Topmost = false;
+        };
         Player.Volume = VolumeSlider.Value;
         Feedback.PrimaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;

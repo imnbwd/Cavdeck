@@ -16,6 +16,7 @@ namespace Cavdeck.App.Controls;
 public class AppWindow : Window
 {
     private const int DwmwaWindowCornerPreference = 33;
+    private const int DwmwcpDoNotRound = 1;
     private const int DwmwcpRound = 2;
     private const int MonitorDefaultToNearest = 2;
     private const int WmDpiChanged = 0x02E0;
@@ -52,7 +53,12 @@ public class AppWindow : Window
 
     public static readonly DependencyProperty IsImmersiveFullScreenProperty =
         DependencyProperty.Register(nameof(IsImmersiveFullScreen), typeof(bool), typeof(AppWindow),
-            new PropertyMetadata(false, (d, _) => ((AppWindow)d).UpdateChromeMetrics()));
+            new PropertyMetadata(false, (d, _) =>
+            {
+                var window = (AppWindow)d;
+                window.UpdateChromeMetrics();
+                window.ApplyCornerPreference();
+            }));
 
     public static readonly DependencyProperty MaximizedPaddingProperty =
         DependencyProperty.Register(
@@ -373,7 +379,7 @@ public class AppWindow : Window
         var hwnd = new WindowInteropHelper(this).Handle;
         if (hwnd == IntPtr.Zero)
             return;
-        var preference = DwmwcpRound;
+        var preference = IsImmersiveFullScreen ? DwmwcpDoNotRound : DwmwcpRound;
         _ = DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref preference, sizeof(int));
     }
 
