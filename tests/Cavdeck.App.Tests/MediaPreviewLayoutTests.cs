@@ -57,9 +57,50 @@ public sealed class MediaPreviewLayoutTests
         var view = Window();
         Assert.Equal("Window_PreviewKeyDown",
             (string?)view.Root?.Attribute("PreviewKeyDown"));
-        Assert.Contains(view.Descendants(Wpf + "StackPanel"), panel =>
-            (string?)panel.Attribute(Xaml + "Name") == "AudioArtwork");
-        Assert.Contains(view.Descendants(Wpf + "TextBlock"), label =>
+        Assert.Contains(view.Descendants(Wpf + "Grid"), grid =>
+            (string?)grid.Attribute(Xaml + "Name") == "AudioArtwork");
+        Assert.DoesNotContain(view.Descendants(Wpf + "TextBlock"), label =>
             ((string?)label.Attribute("Text"))?.Contains("Media_Hint") == true);
+    }
+
+    [Fact]
+    public void Audio_is_compact_and_keeps_file_identity_out_of_the_video_header()
+    {
+        var view = Window();
+        Assert.Equal("1060", (string?)view.Root?.Attribute("Width"));
+        Assert.DoesNotContain(view.Descendants(Wpf + "TextBlock"), label =>
+            (string?)label.Attribute(Xaml + "Name") == "KindLabelLabel");
+        var artwork = Assert.Single(view.Descendants(Wpf + "Grid").Where(grid =>
+            (string?)grid.Attribute(Xaml + "Name") == "AudioArtwork"));
+        Assert.Contains(artwork.Descendants(Wpf + "TextBlock"), label =>
+            (string?)label.Attribute("Text") == "{Binding FileName}");
+        Assert.Equal("2", (string?)Assert.Single(view.Descendants().Where(element =>
+            (string?)element.Attribute(Xaml + "Name") == "Feedback"))
+            .Attribute("Grid.RowSpan"));
+    }
+
+    [Fact]
+    public void Playback_has_icon_buttons_and_themed_seek_and_volume_controls()
+    {
+        var view = Window();
+        foreach (var name in new[] { "PlayPauseButton", "BackButton", "ForwardButton", "MuteButton" })
+        {
+            var button = Assert.Single(view.Descendants(Wpf + "Button").Where(element =>
+                (string?)element.Attribute(Xaml + "Name") == name));
+            Assert.NotEmpty(button.Descendants(Wpf + "Path"));
+            Assert.Empty(button.Descendants(Wpf + "TextBlock"));
+        }
+
+        foreach (var name in new[] { "SeekSlider", "VolumeSlider" })
+        {
+            var slider = Assert.Single(view.Descendants(Wpf + "Slider").Where(element =>
+                (string?)element.Attribute(Xaml + "Name") == name));
+            Assert.Equal("{StaticResource MediaSliderStyle}", (string?)slider.Attribute("Style"));
+        }
+
+        var mediaSliderStyle = Assert.Single(view.Descendants(Wpf + "Style").Where(element =>
+            (string?)element.Attribute(Xaml + "Key") == "MediaSliderStyle"));
+        Assert.Contains(mediaSliderStyle.Descendants(Wpf + "Track"), track =>
+            (string?)track.Attribute(Xaml + "Name") == "PART_Track");
     }
 }
