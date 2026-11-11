@@ -107,7 +107,7 @@
                     MediaFailed="Player_MediaFailed"/>
       <Grid x:Name="AudioArtwork" Visibility="Collapsed" MaxWidth="700"
             HorizontalAlignment="Stretch" VerticalAlignment="Center"
-            Margin="20,12" IsHitTestVisible="False">
+            Margin="20,12">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="56"/>
           <ColumnDefinition Width="*" MinWidth="0"/>
