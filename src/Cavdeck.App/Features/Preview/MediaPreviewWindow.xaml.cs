@@ -59,7 +59,7 @@ public partial class MediaPreviewWindow : AppWindow
         FileName = name;
         Texts = texts;
         _isVideo = type == PreviewFileType.Video;
-        KindLabel = texts[_isVideo ? "Media_KindVideo" : "Media_KindAudio"];
+        
 
         InitializeComponent();
         DataContext = this;
@@ -68,9 +68,12 @@ public partial class MediaPreviewWindow : AppWindow
             ? Visibility.Visible : Visibility.Collapsed;
         if (type == PreviewFileType.Audio)
         {
-            Width = 740;
-            Height = 390;
-            MinHeight = 340;
+            Width = 640;
+            Height = 292;
+            MinWidth = 440;
+            MinHeight = 280;
+            // File identity lives in the audio panel, not in two stacked headers.
+            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
             // Keep the media element loaded for sound, but do not display a black frame.
             Player.Opacity = 0;
         }
@@ -80,7 +83,7 @@ public partial class MediaPreviewWindow : AppWindow
         Feedback.ShowPrimaryButton = true;
         Feedback.IsIndeterminate = true;
         Feedback.ShowProgress = true;
-        KindLabelLabel.Text = KindLabel;
+
         UpdatePlaybackLabels();
         _timer.Tick += Timer_Tick;
         SeekSlider.AddHandler(Thumb.DragStartedEvent,
@@ -97,7 +100,6 @@ public partial class MediaPreviewWindow : AppWindow
     }
 
     public string FileName { get; }
-    public string KindLabel { get; }
     public LocalizationService Texts { get; }
 
     private async Task LoadAsync()
@@ -241,21 +243,23 @@ public partial class MediaPreviewWindow : AppWindow
 
     private void UpdatePlaybackLabels()
     {
-        PlayPauseButton.Content = Texts[_playing ? "Media_Pause" : "Media_Play"];
-        PlayPauseButton.ToolTip = PlayPauseButton.Content;
-        System.Windows.Automation.AutomationProperties.SetName(PlayPauseButton,
-            (string)PlayPauseButton.Content);
-        MuteButton.Content = Texts[_muted ? "Media_Unmute" : "Media_Mute"];
-        MuteButton.ToolTip = MuteButton.Content;
-        System.Windows.Automation.AutomationProperties.SetName(MuteButton, (string)MuteButton.Content);
+        var playLabel = Texts[_playing ? "Media_Pause" : "Media_Play"];
+        PlayPauseGlyph.Data = (Geometry)FindResource(_playing ? "IconMediaPause" : "IconMediaPlay");
+        PlayPauseButton.ToolTip = playLabel;
+        System.Windows.Automation.AutomationProperties.SetName(PlayPauseButton, playLabel);
+        var muteLabel = Texts[_muted ? "Media_Unmute" : "Media_Mute"];
+        MuteGlyph.Data = (Geometry)FindResource(_muted ? "IconMediaMuted" : "IconMediaVolume");
+        MuteButton.ToolTip = muteLabel;
+        System.Windows.Automation.AutomationProperties.SetName(MuteButton, muteLabel);
     }
 
     private void Texts_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (_disposed)
             return;
+        if (!_isVideo)
+            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
         UpdatePlaybackLabels();
-        KindLabelLabel.Text = Texts[_isVideo ? "Media_KindVideo" : "Media_KindAudio"];
         Feedback.Headline = Texts[_feedbackKey];
         Feedback.PrimaryButtonText = Texts[_feedbackKey is "Media_Unsupported" or "Media_DownloadFailed"
             ? "Media_Close" : "Media_Cancel"];

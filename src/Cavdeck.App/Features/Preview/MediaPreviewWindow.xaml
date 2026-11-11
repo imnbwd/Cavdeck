@@ -3,7 +3,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:Cavdeck.App.Controls"
                     xmlns:preview="clr-namespace:Cavdeck.App.Features.Preview"
-                    Title="{Binding FileName}"
+                    Title="{Binding FileName}" ShowBrandName="False"
                     Style="{StaticResource AppWindowStyle}"
                     Width="1060" Height="720"
                     MinWidth="520" MinHeight="320"
@@ -11,33 +11,100 @@
                     UseLayoutRounding="True" SnapsToDevicePixels="True"
                     PreviewKeyDown="Window_PreviewKeyDown">
   <controls:AppWindow.Resources>
-    <Style x:Key="MediaControlButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+    <Style x:Key="MediaIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+      <Setter Property="Width" Value="36"/>
       <Setter Property="Height" Value="36"/>
-      <Setter Property="MinWidth" Value="38"/>
-      <Setter Property="Padding" Value="12,0"/>
-      <Setter Property="Margin" Value="3,0"/>
+      <Setter Property="MinWidth" Value="36"/>
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="Margin" Value="0,0,4,0"/>
+    </Style>
+    <Style x:Key="MediaPrimaryButton" TargetType="Button" BasedOn="{StaticResource MediaIconButton}">
+      <Setter Property="Width" Value="40"/>
+      <Setter Property="Height" Value="40"/>
+      <Setter Property="MinWidth" Value="40"/>
+      <Setter Property="MinHeight" Value="40"/>
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+      <Setter Property="controls:ChromeAssist.HoverBackground" Value="{DynamicResource AccentHoverBrush}"/>
+    </Style>
+    <!-- Small branded track, with the normal WPF Track/Thumb semantics preserved. -->
+    <Style x:Key="MediaSliderStyle" TargetType="Slider">
+      <Setter Property="Height" Value="24"/>
+      <Setter Property="Focusable" Value="True"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Slider">
+            <Grid SnapsToDevicePixels="True">
+              <Border x:Name="SliderFocus" Height="22" CornerRadius="6" BorderThickness="1"
+                      BorderBrush="{DynamicResource FocusBorderBrush}"
+                      Opacity="0" IsHitTestVisible="False"/>
+              <Track x:Name="PART_Track" VerticalAlignment="Center" Height="20"
+                     Minimum="{TemplateBinding Minimum}"
+                     Maximum="{TemplateBinding Maximum}"
+                     Value="{TemplateBinding Value}"
+                     IsDirectionReversed="False">
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="Slider.DecreaseLarge" IsTabStop="False" Focusable="False">
+                    <RepeatButton.Template>
+                      <ControlTemplate TargetType="RepeatButton">
+                        <Border Height="4" Background="{DynamicResource AccentBrush}"
+                                VerticalAlignment="Center" CornerRadius="2"/>
+                      </ControlTemplate>
+                    </RepeatButton.Template>
+                  </RepeatButton>
+                </Track.DecreaseRepeatButton>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="Slider.IncreaseLarge" IsTabStop="False" Focusable="False">
+                    <RepeatButton.Template>
+                      <ControlTemplate TargetType="RepeatButton">
+                        <Border Height="4" Background="{DynamicResource BorderStrongBrush}"
+                                VerticalAlignment="Center" CornerRadius="2"/>
+                      </ControlTemplate>
+                    </RepeatButton.Template>
+                  </RepeatButton>
+                </Track.IncreaseRepeatButton>
+                <Track.Thumb>
+                  <Thumb Width="12" Height="12" Focusable="False">
+                    <Thumb.Template>
+                      <ControlTemplate TargetType="Thumb">
+                        <Ellipse Fill="{DynamicResource AccentBrush}"
+                                 Stroke="{DynamicResource SurfaceBrush}" StrokeThickness="1"/>
+                      </ControlTemplate>
+                    </Thumb.Template>
+                  </Thumb>
+                </Track.Thumb>
+              </Track>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter TargetName="SliderFocus" Property="Opacity" Value="1"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
   </controls:AppWindow.Resources>
+
+  <!-- The constrained center column trims long names without pushing caption buttons away. -->
+  <controls:AppWindow.TitleBarCenter>
+    <TextBlock x:Name="MediaCaption" Text="{Binding FileName}"
+               FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+               VerticalAlignment="Center" ToolTip="{Binding FileName}"/>
+  </controls:AppWindow.TitleBarCenter>
+
   <Grid Background="{DynamicResource WindowBackgroundBrush}">
     <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <Grid Grid.Row="0" Margin="18,10,18,10">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" MinWidth="0"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
-      <TextBlock Grid.Column="0" Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
-                 FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
-                 VerticalAlignment="Center" ToolTip="{Binding FileName}"/>
-      <TextBlock Grid.Column="1" x:Name="KindLabelLabel" Text="{Binding KindLabel}" Margin="14,0,0,0"
-                 Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
-    </Grid>
-
-    <Grid x:Name="MediaSurface" Grid.Row="1" ClipToBounds="True"
+    <!-- Video takes the available space. Audio displays a compact file identity in the same surface. -->
+    <Grid x:Name="MediaSurface" Grid.Row="0" ClipToBounds="True"
           Background="{DynamicResource SurfaceMutedBrush}"
           MouseLeftButtonDown="MediaSurface_MouseLeftButtonDown">
       <MediaElement x:Name="Player" LoadedBehavior="Manual" UnloadedBehavior="Close"
@@ -45,70 +112,90 @@
                     MediaOpened="Player_MediaOpened"
                     MediaEnded="Player_MediaEnded"
                     MediaFailed="Player_MediaFailed"/>
-      <StackPanel x:Name="AudioArtwork" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconAudio}"
-              Width="84" Height="84" Stretch="Uniform" StrokeThickness="1.15"
-              Stroke="{DynamicResource AccentBrush}" IsHitTestVisible="False"/>
-        <TextBlock Text="{Binding Texts[Media_KindAudio]}" TextAlignment="Center"
-                   FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}"
-                   Margin="0,18,0,0"/>
-      </StackPanel>
-
-      <preview:PreviewFeedbackView x:Name="Feedback" Panel.ZIndex="2"/>
+      <Grid x:Name="AudioArtwork" Visibility="Collapsed" MaxWidth="700"
+            HorizontalAlignment="Stretch" VerticalAlignment="Center"
+            Margin="20,12">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="56"/>
+          <ColumnDefinition Width="*" MinWidth="0"/>
+        </Grid.ColumnDefinitions>
+        <Border Width="56" Height="56" CornerRadius="{DynamicResource RadiusMedium}"
+                Background="{DynamicResource SubtleAccentBrush}">
+          <Path Data="{StaticResource IconAudio}" Style="{StaticResource IconGlyph}"
+                Width="28" Height="28" Stretch="Uniform"
+                Stroke="{DynamicResource AccentTextBrush}"/>
+        </Border>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
+          <TextBlock Text="{Binding FileName}" FontSize="{DynamicResource FontSizeTitle}"
+                     FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                     ToolTip="{Binding FileName}"/>
+          <TextBlock Text="{Binding Texts[Media_KindAudio]}" Margin="0,5,0,0"
+                     Foreground="{DynamicResource MutedTextBrush}"/>
+        </StackPanel>
+      </Grid>
     </Grid>
 
-    <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}"
+    <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
-            Padding="14,10">
-      <StackPanel>
-        <Slider x:Name="SeekSlider" Minimum="0" Maximum="1" Value="0"
-                Margin="6,0,6,8" IsEnabled="False"
+            Padding="16,8,16,12">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Slider Grid.Row="0" x:Name="SeekSlider" Minimum="0" Maximum="1" Value="0"
+                Margin="0" IsEnabled="False" Style="{StaticResource MediaSliderStyle}"
                 ValueChanged="SeekSlider_ValueChanged"
                 AutomationProperties.Name="{Binding Texts[Media_Seek]}"/>
-        <Grid>
+        <TextBlock Grid.Row="1" x:Name="TimeLabel" Text="00:00 / 00:00"
+                   HorizontalAlignment="Right" Margin="0,-1,0,6"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   FontSize="{DynamicResource FontSizeSmall}"/>
+        <Grid Grid.Row="2">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
           </Grid.ColumnDefinitions>
-          <StackPanel Grid.Column="0" Orientation="Horizontal">
-            <Button x:Name="PlayPauseButton" Style="{StaticResource MediaControlButton}"
+          <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button x:Name="PlayPauseButton" Style="{StaticResource MediaPrimaryButton}"
                     IsEnabled="False" Click="PlayPause_Click"
-                    AutomationProperties.Name="{Binding Texts[Media_Play]}"/>
-            <Button Style="{StaticResource MediaControlButton}" IsEnabled="False"
-                    x:Name="BackButton" Click="Back_Click"
+                    AutomationProperties.Name="{Binding Texts[Media_Play]}">
+              <Path x:Name="PlayPauseGlyph" Style="{StaticResource IconGlyph}"
+                    Data="{StaticResource IconMediaPlay}"/>
+            </Button>
+            <Button x:Name="BackButton" Style="{StaticResource MediaIconButton}"
+                    IsEnabled="False" Click="Back_Click"
                     ToolTip="{Binding Texts[Media_SkipBackward]}"
                     AutomationProperties.Name="{Binding Texts[Media_SkipBackward]}">
-              <TextBlock Text="−5s"/>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconMediaBackward}"/>
             </Button>
-            <Button Style="{StaticResource MediaControlButton}" IsEnabled="False"
-                    x:Name="ForwardButton" Click="Forward_Click"
+            <Button x:Name="ForwardButton" Style="{StaticResource MediaIconButton}"
+                    IsEnabled="False" Click="Forward_Click"
                     ToolTip="{Binding Texts[Media_SkipForward]}"
                     AutomationProperties.Name="{Binding Texts[Media_SkipForward]}">
-              <TextBlock Text="+5s"/>
+              <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconMediaForward}"/>
             </Button>
-            <TextBlock x:Name="TimeLabel" Text="00:00 / 00:00"
-                       Margin="14,0,0,0" VerticalAlignment="Center"
-                       Foreground="{DynamicResource MutedTextBrush}"
-                       FontWeight="Medium"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button x:Name="MuteButton" Style="{StaticResource MediaControlButton}"
-                    Content="{Binding Texts[Media_Mute]}"
-                    Click="Mute_Click"
-                    ToolTip="{Binding Texts[Media_Mute]}"
-                    AutomationProperties.Name="{Binding Texts[Media_Mute]}"/>
+            <Button x:Name="MuteButton" Style="{StaticResource MediaIconButton}"
+                    Click="Mute_Click" Margin="0,0,2,0"
+                    AutomationProperties.Name="{Binding Texts[Media_Mute]}">
+              <Path x:Name="MuteGlyph" Style="{StaticResource IconGlyph}"
+                    Data="{StaticResource IconMediaVolume}"/>
+            </Button>
             <Slider x:Name="VolumeSlider" Minimum="0" Maximum="1" Value="0.8"
-                    Width="94" Margin="8,0,6,0" VerticalAlignment="Center"
+                    Style="{StaticResource MediaSliderStyle}"
+                    Width="84" Margin="0" VerticalAlignment="Center"
                     ValueChanged="VolumeSlider_ValueChanged"
                     AutomationProperties.Name="{Binding Texts[Media_Volume]}"/>
           </StackPanel>
         </Grid>
-        <TextBlock Grid.Row="1" Grid.Column="0" x:Name="HelpText"
-                   Text="{Binding Texts[Media_Hint]}" TextWrapping="Wrap"
-                   TextAlignment="Center" Foreground="{DynamicResource MutedTextBrush}"
-                   FontSize="{DynamicResource FontSizeSmall}" Margin="6,8,6,0"/>
-      </StackPanel>
+      </Grid>
     </Border>
+
+    <!-- Loading, cancellation and failure remain available across the full compact player. -->
+    <preview:PreviewFeedbackView x:Name="Feedback" Grid.RowSpan="2" Panel.ZIndex="2"/>
   </Grid>
 </controls:AppWindow>
