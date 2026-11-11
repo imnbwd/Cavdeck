@@ -34,6 +34,47 @@ public sealed class FileIconGeometryTests
     }
 
     [Fact]
+    public void Grid_file_glyph_uses_density_aware_dimensions_without_changing_list_glyphs()
+    {
+        var viewXml = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckExplorerView.xaml"));
+        var glyphStylesXml = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "FileGlyphStyles.xaml"));
+        XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
+
+        var gridStyle = viewXml.Descendants().Single(element =>
+            element.Name.LocalName == "Style" &&
+            (string?)element.Attribute(xaml + "Key") == "GridThumbnailFallbackGlyph");
+
+        Assert.Equal("{StaticResource ThumbnailFallbackGlyph}", (string?)gridStyle.Attribute("BasedOn"));
+
+        var setters = gridStyle.Elements()
+            .Where(element => element.Name.LocalName == "Setter")
+            .ToDictionary(element => (string)element.Attribute("Property")!);
+
+        const string densityBinding =
+            "{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}";
+        Assert.Equal(densityBinding, (string?)setters["Width"].Attribute("Value"));
+        Assert.Equal(densityBinding, (string?)setters["Height"].Attribute("Value"));
+
+        var iconList = viewXml.Descendants().Single(element =>
+            element.Name.LocalName == "ListBox" &&
+            (string?)element.Attribute(xaml + "Name") == "Icons");
+        var gridGlyph = iconList.Descendants().Single(element =>
+            element.Name.LocalName == "Path" &&
+            (string?)element.Attribute("Style") == "{StaticResource GridThumbnailFallbackGlyph}");
+        Assert.NotNull(gridGlyph);
+
+        // The shared fallback remains 16x16 so compact List View glyphs do not grow.
+        var sharedGlyphStyle = glyphStylesXml.Descendants().Single(element =>
+            element.Name.LocalName == "Style" &&
+            (string?)element.Attribute(xaml + "Key") == "FileGlyph");
+        var sharedSetters = sharedGlyphStyle.Elements()
+            .Where(element => element.Name.LocalName == "Setter")
+            .ToDictionary(element => (string)element.Attribute("Property")!);
+        Assert.Equal("16", (string?)sharedSetters["Width"].Attribute("Value"));
+        Assert.Equal("16", (string?)sharedSetters["Height"].Attribute("Value"));
+    }
+
+    [Fact]
     public void Unknown_file_fallback_has_folding_and_an_interior_mark()
     {
         var styleXml = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "FileGlyphStyles.xaml"));
