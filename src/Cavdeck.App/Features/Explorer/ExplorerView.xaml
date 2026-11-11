@@ -182,6 +182,12 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
+    <!-- Grid tiles scale with the selected density; the shared glyph style stays compact for list views. -->
+    <Style x:Key="GridThumbnailFallbackGlyph" TargetType="Path"
+           BasedOn="{StaticResource ThumbnailFallbackGlyph}">
+      <Setter Property="Width" Value="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+      <Setter Property="Height" Value="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+    </Style>
     <Style x:Key="ExplorerDropIconTile" TargetType="ListBoxItem" BasedOn="{StaticResource IconTile}">
       <Style.Triggers>
         <DataTrigger Binding="{Binding IsDropTarget}" Value="True">
@@ -1096,7 +1102,7 @@
                   <Grid Margin="0,0,0,10"
                         Width="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}"
                         Height="{Binding DataContext.Explorer.TileIconSize, RelativeSource={RelativeSource AncestorType=ListBox}}">
-                    <Path Style="{StaticResource ThumbnailFallbackGlyph}"
+                    <Path Style="{StaticResource GridThumbnailFallbackGlyph}"
                           StrokeThickness="{Binding DataContext.Explorer.TileIconStrokeThickness, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
                     <Image Source="{Binding Thumbnail}" Stretch="Uniform"
                            IsHitTestVisible="False"
