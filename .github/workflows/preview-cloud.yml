@@ -1,0 +1,76 @@
+name: Preview Cloud Acceptance
+
+# Manually run against dedicated remote test buckets; never expose secrets to PRs.
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: Backend to verify (all requires credentials for all three)
+        required: true
+        default: all
+        type: choice
+        options: [all, AWS, R2, MINIO]
+
+permissions:
+  contents: read
+
+jobs:
+  cloud-preview-and-cli:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      CAVDECK_CLI_TEST_AWS_ENABLED: ${{ (inputs.provider == 'all' || inputs.provider == 'AWS') && '1' || '0' }}
+      CAVDECK_CLI_TEST_AWS_ACCESS_KEY: ${{ secrets.CAVDECK_CLI_TEST_AWS_ACCESS_KEY }}
+      CAVDECK_CLI_TEST_AWS_SECRET_KEY: ${{ secrets.CAVDECK_CLI_TEST_AWS_SECRET_KEY }}
+      CAVDECK_CLI_TEST_AWS_BUCKET: ${{ secrets.CAVDECK_CLI_TEST_AWS_BUCKET }}
+      CAVDECK_CLI_TEST_AWS_PREFIX: ${{ secrets.CAVDECK_CLI_TEST_AWS_PREFIX }}
+      CAVDECK_CLI_TEST_AWS_ENDPOINT: ${{ secrets.CAVDECK_CLI_TEST_AWS_ENDPOINT }}
+      CAVDECK_CLI_TEST_AWS_REGION: ${{ secrets.CAVDECK_CLI_TEST_AWS_REGION }}
+      CAVDECK_CLI_TEST_R2_ENABLED: ${{ (inputs.provider == 'all' || inputs.provider == 'R2') && '1' || '0' }}
+      CAVDECK_CLI_TEST_R2_ACCESS_KEY: ${{ secrets.CAVDECK_CLI_TEST_R2_ACCESS_KEY }}
+      CAVDECK_CLI_TEST_R2_SECRET_KEY: ${{ secrets.CAVDECK_CLI_TEST_R2_SECRET_KEY }}
+      CAVDECK_CLI_TEST_R2_BUCKET: ${{ secrets.CAVDECK_CLI_TEST_R2_BUCKET }}
+      CAVDECK_CLI_TEST_R2_PREFIX: ${{ secrets.CAVDECK_CLI_TEST_R2_PREFIX }}
+      CAVDECK_CLI_TEST_R2_ENDPOINT: ${{ secrets.CAVDECK_CLI_TEST_R2_ENDPOINT }}
+      CAVDECK_CLI_TEST_R2_REGION: ${{ secrets.CAVDECK_CLI_TEST_R2_REGION }}
+      CAVDECK_CLI_TEST_MINIO_ENABLED: ${{ (inputs.provider == 'all' || inputs.provider == 'MINIO') && '1' || '0' }}
+      CAVDECK_CLI_TEST_MINIO_ACCESS_KEY: ${{ secrets.CAVDECK_CLI_TEST_MINIO_ACCESS_KEY }}
+      CAVDECK_CLI_TEST_MINIO_SECRET_KEY: ${{ secrets.CAVDECK_CLI_TEST_MINIO_SECRET_KEY }}
+      CAVDECK_CLI_TEST_MINIO_BUCKET: ${{ secrets.CAVDECK_CLI_TEST_MINIO_BUCKET }}
+      CAVDECK_CLI_TEST_MINIO_PREFIX: ${{ secrets.CAVDECK_CLI_TEST_MINIO_PREFIX }}
+      CAVDECK_CLI_TEST_MINIO_ENDPOINT: ${{ secrets.CAVDECK_CLI_TEST_MINIO_ENDPOINT }}
+      CAVDECK_CLI_TEST_MINIO_REGION: ${{ secrets.CAVDECK_CLI_TEST_MINIO_REGION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Validate configured credentials and isolated prefix
+        shell: pwsh
+        run: |
+          foreach ($backend in @('AWS', 'R2', 'MINIO')) {
+            $base = 'CAVDECK_CLI_TEST_' + $backend + '_'
+            if ([Environment]::GetEnvironmentVariable($base + 'ENABLED') -ne '1') {
+              continue
+            }
+            $required = @('ACCESS_KEY', 'SECRET_KEY', 'BUCKET', 'PREFIX')
+            if ($backend -ne 'AWS') { $required += 'ENDPOINT' }
+            foreach ($field in $required) {
+              $name = $base + $field
+              if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+                throw "Missing required test configuration $name (value not printed)."
+              }
+            }
+            $prefix = [Environment]::GetEnvironmentVariable($base + 'PREFIX')
+            if (-not $prefix.TrimEnd('/').StartsWith('cavdeck-cli-test/', [StringComparison]::Ordinal)) {
+              throw 'Test prefix must be inside cavdeck-cli-test/.'
+            }
+          }
+      - name: Restore CLI integration test project
+        run: dotnet restore tests/Cavdeck.Cli.Tests/Cavdeck.Cli.Tests.csproj
+      - name: Live preview plus v1.3 CLI compatibility tests
+        run: >
+          dotnet test tests/Cavdeck.Cli.Tests/Cavdeck.Cli.Tests.csproj
+          -c Release --no-restore
+          --filter "FullyQualifiedName~PreviewCloudTests|FullyQualifiedName~CloudStorageTests"
+          --logger "console;verbosity=normal"

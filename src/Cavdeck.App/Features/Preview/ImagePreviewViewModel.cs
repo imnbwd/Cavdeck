@@ -1,4 +1,5 @@
 using System.IO;
+using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Cavdeck.App.Controls;
@@ -21,7 +22,8 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
     private readonly PreviewSession _session = new();
     private bool _disposed;
     private bool _loading;
-    private string _error = "";
+    private string? _errorKey;
+    private string? _errorArgument;
     private BitmapSource? _image;
 
     public ImagePreviewViewModel(
@@ -37,6 +39,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         _bucket = bucket;
         _gallery = gallery;
         Texts = texts;
+        Texts.PropertyChanged += Texts_PropertyChanged;
         _image = initialImage;
         PreviousCommand = new RelayCommand(_ => Move(-1));
         NextCommand = new RelayCommand(_ => Move(1));
@@ -50,8 +53,11 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
     public BitmapSource? Image => _image;
     public bool HasImage => _image is not null;
     public bool IsLoading => _loading;
-    public bool ShowError => !_loading && _error.Length > 0;
-    public string Error => _error;
+    public bool ShowError => !_loading && _errorKey is not null;
+    public bool ShowFeedback => _loading || ShowError;
+    public string FeedbackTitle => Texts[_loading ? "Preview_Loading" : "Preview_FeedbackErrorTitle"];
+    public string Error => _errorKey is null ? "" : _errorArgument is null
+        ? Texts[_errorKey] : string.Format(Texts[_errorKey], _errorArgument);
     public string Title => _gallery.Current.Name;
     public string PositionLabel => $"{_gallery.Position} / {_gallery.Count}";
     public string PixelSize => _image is null ? "" : $"{_image.PixelWidth} × {_image.PixelHeight}";
@@ -83,7 +89,8 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         var current = _gallery.Current;
         var operation = _session.Begin(new PreviewObjectId(_connection.Id, _bucket, current.Key));
         _image = null;
-        _error = "";
+        _errorKey = null;
+        _errorArgument = null;
         _loading = true;
         PublishState();
 
@@ -102,13 +109,13 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
                 if (decoded is not null)
                     _image = decoded;
                 else
-                    _error = Texts["Preview_ImageFailed"];
+                    SetError("Preview_ImageFailed");
             }
             else if (loaded.Kind == PreviewLoadKind.TooLarge)
-                _error = string.Format(Texts["Preview_TooLarge"],
+                SetError("Preview_TooLarge",
                     Explorer.ExplorerText.FormatBytes(loaded.Head?.SizeBytes ?? 0));
             else
-                _error = Texts["Preview_ImageFailed"];
+                SetError("Preview_ImageFailed");
         }
         catch (OperationCanceledException)
         {
@@ -117,7 +124,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         catch (Exception)
         {
             if (_session.IsCurrent(operation))
-                _error = Texts["Preview_OpenFailed"];
+                SetError("Preview_OpenFailed");
         }
         finally
         {
@@ -129,12 +136,28 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         }
     }
 
+    private void SetError(string key, string? argument = null)
+    {
+        _errorKey = key;
+        _errorArgument = argument;
+    }
+
+    private void Texts_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_disposed)
+            return;
+        OnPropertyChanged(nameof(FeedbackTitle));
+        OnPropertyChanged(nameof(Error));
+    }
+
     private void PublishState()
     {
         OnPropertyChanged(nameof(Image));
         OnPropertyChanged(nameof(HasImage));
         OnPropertyChanged(nameof(IsLoading));
         OnPropertyChanged(nameof(ShowError));
+        OnPropertyChanged(nameof(ShowFeedback));
+        OnPropertyChanged(nameof(FeedbackTitle));
         OnPropertyChanged(nameof(Error));
         OnPropertyChanged(nameof(PixelSize));
     }
@@ -178,6 +201,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         if (_disposed)
             return;
         _disposed = true;
+        Texts.PropertyChanged -= Texts_PropertyChanged;
         _session.Dispose();
         _image = null;
     }

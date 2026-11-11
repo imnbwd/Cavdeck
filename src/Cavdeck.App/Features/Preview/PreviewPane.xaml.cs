@@ -17,16 +17,41 @@ public partial class PreviewPane : UserControl
     {
         InitializeComponent();
         DataContextChanged += (_, _) => Hook();
+        Loaded += (_, _) => Hook();
+        Unloaded += (_, _) => Unhook();
     }
 
     private void Hook()
     {
         if (_model is not null)
             _model.PropertyChanged -= OnModelChanged;
-        _model = DataContext as PreviewPaneViewModel;
+        _model = IsLoaded ? DataContext as PreviewPaneViewModel : null;
         if (_model is not null)
             _model.PropertyChanged += OnModelChanged;
         _ = NavigatePdfAsync();
+    }
+
+    private void Unhook()
+    {
+        if (_model is not null)
+            _model.PropertyChanged -= OnModelChanged;
+        _model = null;
+        ClearPdfNavigation();
+    }
+
+    private void ClearPdfNavigation()
+    {
+        _navigationVersion++;
+        _allowedPdfUri = null;
+        // Release PDF decoder file handles when the tab is hidden/recycled.
+        try
+        {
+            PdfBrowser.CoreWebView2?.Navigate("about:blank");
+        }
+        catch (InvalidOperationException)
+        {
+            // The browser may already have been disposed during window close.
+        }
     }
 
     private void OnModelChanged(object? sender, PropertyChangedEventArgs e)
@@ -53,9 +78,7 @@ public partial class PreviewPane : UserControl
         var path = model?.ShowPdf == true ? model.PdfPath : null;
         if (path is null)
         {
-            _allowedPdfUri = null;
-            if (PdfBrowser.CoreWebView2 is not null)
-                PdfBrowser.CoreWebView2.Navigate("about:blank");
+            ClearPdfNavigation();
             return;
         }
 

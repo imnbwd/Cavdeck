@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Cavdeck.App.Controls;
+using Cavdeck.App.ViewModels;
 using Cavdeck.App.Features.Explorer;
 using Cavdeck.App.Localization;
 using Cavdeck.Application.Preview;
@@ -37,6 +38,8 @@ public partial class MediaPreviewWindow : AppWindow
     private bool _muted;
     private readonly bool _isVideo;
     private TimeSpan _duration;
+    private string _feedbackKey = "Media_Loading";
+    private long _downloadedBytes;
 
     public MediaPreviewWindow(PreviewService preview, StorageConnection connection, string bucket,
         string key, string name, long size, PreviewFileType type, LocalizationService texts)
@@ -73,6 +76,11 @@ public partial class MediaPreviewWindow : AppWindow
         }
 
         Player.Volume = VolumeSlider.Value;
+        Feedback.PrimaryCommand = new RelayCommand(_ => Close());
+        Feedback.ShowPrimaryButton = true;
+        Feedback.IsIndeterminate = true;
+        Feedback.ShowProgress = true;
+        KindLabelLabel.Text = KindLabel;
         UpdatePlaybackLabels();
         _timer.Tick += Timer_Tick;
         SeekSlider.AddHandler(Thumb.DragStartedEvent,
@@ -95,13 +103,15 @@ public partial class MediaPreviewWindow : AppWindow
     private async Task LoadAsync()
     {
         var token = _lifetime.Token;
-        StatusPanel.Visibility = Visibility.Visible;
-        StatusMessage.Text = Texts["Media_Loading"];
-        CancelButton.Visibility = Visibility.Visible;
-        DownloadProgress.Visibility = Visibility.Visible;
-        DownloadDetails.Visibility = Visibility.Visible;
-        DownloadProgress.Value = 0;
-        DownloadDetails.Text = "";
+        Feedback.Visibility = Visibility.Visible;
+        _feedbackKey = "Media_Loading";
+        Feedback.Headline = Texts[_feedbackKey];
+        Feedback.PrimaryButtonText = Texts["Media_Cancel"];
+        Feedback.ShowProgress = true;
+        Feedback.IsIndeterminate = false;
+        Feedback.ProgressValue = 0;
+        _downloadedBytes = 0;
+        Feedback.ProgressDescription = "";
         PreviewFileLease? pending = null;
         try
         {
@@ -109,8 +119,9 @@ public partial class MediaPreviewWindow : AppWindow
             {
                 if (_disposed || token.IsCancellationRequested)
                     return;
-                DownloadProgress.Value = _size > 0 ? Math.Clamp(read * 100.0 / _size, 0, 100) : 0;
-                DownloadDetails.Text = string.Format(Texts["Media_Progress"],
+                _downloadedBytes = read;
+                Feedback.ProgressValue = _size > 0 ? Math.Clamp(read * 100.0 / _size, 0, 100) : 0;
+                Feedback.ProgressDescription = string.Format(Texts["Media_Progress"],
                     ExplorerText.FormatBytes(read), ExplorerText.FormatBytes(_size));
             });
 
@@ -123,9 +134,11 @@ public partial class MediaPreviewWindow : AppWindow
 
             _lease = pending;
             pending = null;
-            StatusMessage.Text = Texts["Media_Opening"];
-            DownloadProgress.Visibility = Visibility.Collapsed;
-            DownloadDetails.Visibility = Visibility.Collapsed;
+            _feedbackKey = "Media_Opening";
+            Feedback.Headline = Texts[_feedbackKey];
+            Feedback.ShowProgress = true;
+            Feedback.IsIndeterminate = true;
+            Feedback.ProgressDescription = "";
             Player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
             // LoadedBehavior=Manual requires an explicit Play call to start
             // opening the local source on all supported WPF media backends.
@@ -159,7 +172,7 @@ public partial class MediaPreviewWindow : AppWindow
         PlayPauseButton.IsEnabled = true;
         BackButton.IsEnabled = _duration > TimeSpan.Zero;
         ForwardButton.IsEnabled = _duration > TimeSpan.Zero;
-        StatusPanel.Visibility = Visibility.Collapsed;
+        Feedback.Visibility = Visibility.Collapsed;
         UpdateTimeLabel();
         Player.Play();
         _playing = true;
@@ -197,12 +210,14 @@ public partial class MediaPreviewWindow : AppWindow
     {
         if (_disposed)
             return;
-        StatusPanel.Visibility = Visibility.Visible;
-        StatusMessage.Text = Texts[key];
-        DownloadProgress.Visibility = Visibility.Collapsed;
-        DownloadDetails.Visibility = Visibility.Collapsed;
-        CancelButton.Visibility = Visibility.Visible;
-        CancelButton.Content = Texts["Media_Close"];
+        _feedbackKey = key;
+        Feedback.Visibility = Visibility.Visible;
+        Feedback.Headline = Texts[key];
+        Feedback.ShowProgress = false;
+        Feedback.IsIndeterminate = false;
+        Feedback.ProgressDescription = "";
+        Feedback.PrimaryButtonText = Texts["Media_Close"];
+        Feedback.ShowPrimaryButton = true;
     }
 
     private void TogglePlayback()
@@ -240,6 +255,13 @@ public partial class MediaPreviewWindow : AppWindow
         if (_disposed)
             return;
         UpdatePlaybackLabels();
+        KindLabelLabel.Text = Texts[_isVideo ? "Media_KindVideo" : "Media_KindAudio"];
+        Feedback.Headline = Texts[_feedbackKey];
+        Feedback.PrimaryButtonText = Texts[_feedbackKey is "Media_Unsupported" or "Media_DownloadFailed"
+            ? "Media_Close" : "Media_Cancel"];
+        if (Feedback.ShowProgress && !Feedback.IsIndeterminate && _size > 0)
+            Feedback.ProgressDescription = string.Format(Texts["Media_Progress"],
+                ExplorerText.FormatBytes(_downloadedBytes), ExplorerText.FormatBytes(_size));
     }
 
     private void Timer_Tick(object? sender, EventArgs e)
@@ -323,8 +345,6 @@ public partial class MediaPreviewWindow : AppWindow
         }
     }
 
-    private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
-
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
@@ -372,6 +392,7 @@ public partial class MediaPreviewWindow : AppWindow
         _disposed = true;
         _lifetime.Cancel();
         _timer.Stop();
+        _timer.Tick -= Timer_Tick;
         Texts.PropertyChanged -= Texts_PropertyChanged;
         try
         {

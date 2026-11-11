@@ -870,4 +870,6 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="Media_SkipBackward" xml:space="preserve"><value>5 Sekunden zurück</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>5 Sekunden vor</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} von {1}</value></data>
+  <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Vorschau konnte nicht geöffnet werden</value></data>
 </root>

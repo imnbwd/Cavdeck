@@ -874,4 +874,6 @@
   <data name="Media_SkipBackward" xml:space="preserve"><value>后退 5 秒</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>前进 5 秒</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>已下载 {0} / {1}</value></data>
+  <data name="Preview_FeedbackTitle" xml:space="preserve"><value>文件预览</value></data>
+  <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>无法打开预览</value></data>
 </root>

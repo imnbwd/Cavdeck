@@ -105,31 +105,16 @@ public sealed class PreviewPaneLayoutTests
     }
 
     [Fact]
-    public void Preview_notices_are_centered_with_a_theme_aware_file_icon_and_retry()
+    public void Preview_notices_share_a_theme_aware_feedback_surface_with_retry()
     {
-        var notice = View().Descendants(Wpf + "StackPanel").Single(element =>
-            ((string?)element.Attribute("Visibility"))?.Contains("ShowNotice") == true);
-
-        Assert.Contains("PageEmptyHost", (string?)notice.Attribute("Style"));
-        Assert.Equal("Center", (string?)notice.Attribute("TextBlock.TextAlignment"));
-
-        var icon = notice.Elements(Wpf + "Path").Single();
-        Assert.Contains("PageEmptyGlyph", (string?)icon.Attribute("Style"));
-        Assert.Contains("IconGenericFile", (string?)icon.Attribute("Data"));
-        Assert.Contains("MutedTextBrush", (string?)icon.Attribute("Stroke"));
-
-        var message = notice.Elements(Wpf + "TextBlock").Single();
-        Assert.Contains("Notice", (string?)message.Attribute("Text"));
-        Assert.Equal("Wrap", (string?)message.Attribute("TextWrapping"));
-
-        var play = notice.Elements(Wpf + "Button").First(button =>
-            ((string?)button.Attribute("Command"))?.Contains("MediaViewerCommand") == true);
-        Assert.Contains("ShowMediaViewer", (string?)play.Attribute("Visibility"));
-        var retry = notice.Elements(Wpf + "Button").Single(button =>
-            ((string?)button.Attribute("Command"))?.Contains("RetryCommand") == true);
-        Assert.Equal("Center", (string?)retry.Attribute("HorizontalAlignment"));
-        Assert.Contains("RetryCommand", (string?)retry.Attribute("Command"));
-        Assert.Contains("ShowRetry", (string?)retry.Attribute("Visibility"));
+        var notice = View().Descendants().Single(element =>
+            element.Name.LocalName == "PreviewFeedbackView");
+        Assert.Contains("ShowNotice", (string?)notice.Attribute("Visibility"));
+        Assert.Contains("Notice", (string?)notice.Attribute("Description"));
+        Assert.Contains("MediaViewerCommand", (string?)notice.Attribute("PrimaryCommand"));
+        Assert.Contains("ShowMediaViewer", (string?)notice.Attribute("ShowPrimaryButton"));
+        Assert.Contains("RetryCommand", (string?)notice.Attribute("SecondaryCommand"));
+        Assert.Contains("ShowRetry", (string?)notice.Attribute("ShowSecondaryButton"));
     }
 
     [Fact]
