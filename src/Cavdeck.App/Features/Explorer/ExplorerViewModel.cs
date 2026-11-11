@@ -101,6 +101,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private bool _toolbarSearchOpen;
     private readonly PreviewPaneViewModel _preview;
     private readonly PreviewService _imagePreviewService;
+    private readonly ThumbnailPipeline _thumbnails;
     private ImagePreviewWindow? _imageViewer;
     private Func<Task>? _afterLeave;
     private bool _showPreviewForClose;
@@ -134,6 +135,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _places.Changed += OnPlacesChanged;
         _linkSigner = linkSigner;
         _storage = storage;
+        _thumbnails = new ThumbnailPipeline(storage);
         _clipboard = clipboard;
         _clipboard.Changed += OnClipboardChanged;
         _clipboard.StorageChanged += OnStorageChanged;
@@ -212,6 +214,14 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
 
     public LocalizationService Texts => _texts;
     public ResettableCollection<ExplorerRow> Rows { get; } = [];
+
+    /// <summary>Called only for realized image elements, never for an entire object listing.</summary>
+    public Task<BitmapSource?> LoadThumbnailAsync(ExplorerRow row, CancellationToken token)
+    {
+        if (_disposed || _connection is null || _bucket is null || !Rows.Contains(row))
+            return Task.FromResult<BitmapSource?>(null);
+        return _thumbnails.GetAsync(_connection, _bucket, row.Entry, token);
+    }
     public ResettableCollection<BucketRow> BucketRows { get; } = [];
     public ObservableCollection<CrumbViewModel> Crumbs { get; } = [];
     public string PathText { get; private set; } = "";
@@ -616,6 +626,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _imageViewer = null;
         _preview.ImageViewerRequested -= OnImageViewerRequested;
         _preview.Dispose();
+        _thumbnails.Dispose();
     }
 
     public void MarkConnectionUnavailable()
