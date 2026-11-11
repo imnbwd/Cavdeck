@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Cavdeck.App.Controls;
+using Cavdeck.App.ViewModels;
 using Cavdeck.App.Features.Explorer;
 using Cavdeck.App.Localization;
 using Cavdeck.Application.Preview;
