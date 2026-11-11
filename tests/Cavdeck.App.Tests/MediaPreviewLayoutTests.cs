@@ -84,6 +84,28 @@ public sealed class MediaPreviewLayoutTests
     }
 
     [Fact]
+    public void Video_has_fullscreen_controls_and_speed_choices_without_second_media_element()
+    {
+        var view = Window();
+        var fullscreen = Assert.Single(view.Descendants(Wpf + "Button").Where(button =>
+            (string?)button.Attribute(Xaml + "Name") == "FullscreenButton"));
+        Assert.Equal("Fullscreen_Click", (string?)fullscreen.Attribute("Click"));
+        Assert.NotNull(fullscreen.Attribute("AutomationProperties.Name"));
+        var speeds = Assert.Single(view.Descendants(Wpf + "ComboBox").Where(box =>
+            (string?)box.Attribute(Xaml + "Name") == "SpeedSelector"));
+        Assert.Equal("SpeedSelector_SelectionChanged", (string?)speeds.Attribute("SelectionChanged"));
+        Assert.Equal(new[] { "0.75", "1", "1.25", "1.5", "2" },
+            speeds.Elements(Wpf + "ComboBoxItem").Select(option => (string?)option.Attribute("Tag")).ToArray());
+        Assert.Single(view.Descendants(Wpf + "MediaElement"));
+        Assert.Contains(view.Descendants(Wpf + "ToolTip"), tip =>
+            (string?)tip.Attribute(Xaml + "Name") == "SeekPreviewTip");
+        Assert.Equal("PlaybackRoot_PreviewMouseMove", (string?)Assert.Single(
+            view.Descendants(Wpf + "Grid").Where(element =>
+                (string?)element.Attribute(Xaml + "Name") == "PlaybackRoot"))
+            .Attribute("PreviewMouseMove"));
+    }
+
+    [Fact]
     public void Playback_has_icon_buttons_and_themed_seek_and_volume_controls()
     {
         var view = Window();
