@@ -127,6 +127,9 @@ public partial class MediaPreviewWindow : AppWindow
             DownloadProgress.Visibility = Visibility.Collapsed;
             DownloadDetails.Visibility = Visibility.Collapsed;
             Player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
+            // LoadedBehavior=Manual requires an explicit Play call to start
+            // opening the local source on all supported WPF media backends.
+            Player.Play();
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -337,6 +340,7 @@ public partial class MediaPreviewWindow : AppWindow
         }
         else if (e.Key == Key.Space && !SeekSlider.IsKeyboardFocusWithin
                  && !VolumeSlider.IsKeyboardFocusWithin
+                 && Keyboard.FocusedElement is not ButtonBase
                  && Keyboard.Modifiers == ModifierKeys.None)
         {
             TogglePlayback();
