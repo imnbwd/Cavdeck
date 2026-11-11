@@ -251,6 +251,24 @@ public partial class ImagePreviewWindow : AppWindow
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
     {
         base.OnDpiChanged(oldDpi, newDpi);
-        Dispatcher.BeginInvoke(ShowCurrentImage, DispatcherPriority.Loaded);
+        // A monitor move changes the DIP size of each image pixel. Preserve
+        // the user's zoom and pan unless the view was explicitly in fit mode.
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_model.Image is not BitmapSource image)
+                return;
+            _imageWidth = image.PixelWidth / newDpi.DpiScaleX;
+            _imageHeight = image.PixelHeight / newDpi.DpiScaleY;
+            CanvasImage.Width = _imageWidth;
+            CanvasImage.Height = _imageHeight;
+            if (_fitMode)
+                FitToWindow();
+            else
+            {
+                _view = ImageViewportMath.CenterOrClamp(_view,
+                    _imageWidth, _imageHeight, Viewport.ActualWidth, Viewport.ActualHeight);
+                RenderView();
+            }
+        }, DispatcherPriority.Loaded);
     }
 }

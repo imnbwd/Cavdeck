@@ -36,8 +36,8 @@ public sealed class MediaPreviewLayoutTests
             button.Attribute("AutomationProperties.Name") is not null);
         Assert.Contains(buttons, button => (string?)button.Attribute(Xaml + "Name") == "MuteButton" &&
             button.Attribute("AutomationProperties.Name") is not null);
-        Assert.Contains(buttons, button => (string?)button.Attribute(Xaml + "Name") == "CancelButton" &&
-            button.Attribute("AutomationProperties.Name") is not null);
+        // Cancel/close lives in the shared feedback view rather than duplicating
+        // a private button in each media window.
 
         var sliders = view.Descendants(Wpf + "Slider").ToArray();
         Assert.Contains(sliders, slider => (string?)slider.Attribute(Xaml + "Name") == "SeekSlider" &&
@@ -46,10 +46,9 @@ public sealed class MediaPreviewLayoutTests
         Assert.Contains(sliders, slider => (string?)slider.Attribute(Xaml + "Name") == "VolumeSlider" &&
             slider.Attribute("AutomationProperties.Name") is not null);
 
-        Assert.Contains(view.Descendants(Wpf + "ProgressBar"), bar =>
-            (string?)bar.Attribute(Xaml + "Name") == "DownloadProgress");
-        Assert.Contains(view.Descendants(Wpf + "TextBlock"), label =>
-            (string?)label.Attribute(Xaml + "Name") == "StatusMessage");
+        Assert.Contains(view.Descendants(), feedback =>
+            feedback.Name.LocalName == "PreviewFeedbackView" &&
+            (string?)feedback.Attribute(Xaml + "Name") == "Feedback");
     }
 
     [Fact]

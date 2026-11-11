@@ -870,4 +870,6 @@
   <data name="Media_SkipBackward" xml:space="preserve"><value>5 秒戻る</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>5 秒進む</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} / {1}</value></data>
+  <data name="Preview_FeedbackTitle" xml:space="preserve"><value>プレビュー</value></data>
+  <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>プレビューを開けません</value></data>
 </root>

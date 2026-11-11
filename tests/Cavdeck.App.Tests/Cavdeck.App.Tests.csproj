@@ -24,6 +24,8 @@
     <Content Include="..\..\src\Cavdeck.App\Views\ShellWindow.xaml" Link="CavdeckShellWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\src\Cavdeck.App\Features\Explorer\ExplorerView.xaml" Link="CavdeckExplorerView.xaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\src\Cavdeck.App\Features\Preview\PreviewPane.xaml" Link="CavdeckPreviewPane.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Preview\ImagePreviewWindow.xaml" Link="CavdeckImagePreviewWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\src\Cavdeck.App\Features\Preview\PreviewFeedbackView.xaml" Link="CavdeckPreviewFeedbackView.xaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\src\Cavdeck.App\Features\Preview\MediaPreviewWindow.xaml" Link="CavdeckMediaPreviewWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\src\Cavdeck.App\Features\Preview\PreviewProgressView.xaml" Link="CavdeckPreviewProgressView.xaml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\src\Cavdeck.App\Controls\ToastHost.xaml" Link="CavdeckToastHost.xaml" CopyToOutputDirectory="PreserveNewest" />

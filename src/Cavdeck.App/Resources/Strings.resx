@@ -874,4 +874,6 @@ Repair the file and retry before changing connections.</value></data>
   <data name="Media_SkipBackward" xml:space="preserve"><value>Back 5 seconds</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>Forward 5 seconds</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} of {1}</value></data>
+  <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Preview</value></data>
+  <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Couldn't open this preview</value></data>
 </root>
