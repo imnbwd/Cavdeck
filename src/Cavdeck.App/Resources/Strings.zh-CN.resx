@@ -870,9 +870,15 @@
   <data name="Media_DownloadFailed" xml:space="preserve"><value>无法准备媒体文件，请检查连接后重试。</value></data>
   <data name="Media_KindAudio" xml:space="preserve"><value>音频</value></data>
   <data name="Media_KindVideo" xml:space="preserve"><value>视频</value></data>
-  <data name="Media_Hint" xml:space="preserve"><value>空格：播放/暂停 · ← →：前后跳转 5 秒 · M：静音 · Esc：关闭 · F11：最大化视频</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>空格：播放/暂停 · ← →：前后跳转 5 秒 · M：静音 · Esc：退出全屏/关闭 · F11：全屏</value></data>
   <data name="Media_SkipBackward" xml:space="preserve"><value>后退 5 秒</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>前进 5 秒</value></data>
+  <data name="Media_Speed" xml:space="preserve"><value>播放速度</value></data>
+  <data name="Media_SpeedUnsupported" xml:space="preserve"><value>当前 Windows 编解码器无法调整播放速度。</value></data>
+  <data name="Media_EnterFullscreen" xml:space="preserve"><value>进入全屏 (F11)</value></data>
+  <data name="Media_ExitFullscreen" xml:space="preserve"><value>退出全屏 (Esc)</value></data>
+  <data name="Media_Replay" xml:space="preserve"><value>重新播放</value></data>
+  <data name="Media_SeekPreview" xml:space="preserve"><value>跳转到 {0}</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>已下载 {0} / {1}</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>文件预览</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>无法打开预览</value></data>

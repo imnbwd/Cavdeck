@@ -50,6 +50,10 @@ public class AppWindow : Window
         DependencyProperty.Register(nameof(ShowBrandName), typeof(bool), typeof(AppWindow),
             new PropertyMetadata(true));
 
+    public static readonly DependencyProperty IsImmersiveFullScreenProperty =
+        DependencyProperty.Register(nameof(IsImmersiveFullScreen), typeof(bool), typeof(AppWindow),
+            new PropertyMetadata(false, (d, _) => ((AppWindow)d).UpdateChromeMetrics()));
+
     public static readonly DependencyProperty MaximizedPaddingProperty =
         DependencyProperty.Register(
             nameof(MaximizedPadding),
@@ -98,6 +102,12 @@ public class AppWindow : Window
     {
         get => (bool)GetValue(ShowBrandNameProperty);
         set => SetValue(ShowBrandNameProperty, value);
+    }
+
+    public bool IsImmersiveFullScreen
+    {
+        get => (bool)GetValue(IsImmersiveFullScreenProperty);
+        set => SetValue(IsImmersiveFullScreenProperty, value);
     }
 
     public Thickness MaximizedPadding
@@ -199,6 +209,14 @@ public class AppWindow : Window
 
     private void UpdateChromeMetrics()
     {
+        if (IsImmersiveFullScreen)
+        {
+            MaximizedPadding = new Thickness(0);
+            _chrome.CaptionHeight = 0;
+            _chrome.ResizeBorderThickness = new Thickness(0);
+            return;
+        }
+
         if (WindowState == WindowState.Maximized)
         {
             MaximizedPadding = GetMaximizedInset();

@@ -866,9 +866,15 @@
   <data name="Media_DownloadFailed" xml:space="preserve"><value>メディアを準備できませんでした。接続を確認してください。</value></data>
   <data name="Media_KindAudio" xml:space="preserve"><value>音声</value></data>
   <data name="Media_KindVideo" xml:space="preserve"><value>動画</value></data>
-  <data name="Media_Hint" xml:space="preserve"><value>スペース：再生/停止 · ← →：5秒移動 · M：ミュート · Esc：閉じる · F11：動画を最大化</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>スペース：再生/一時停止 · ← →：5秒移動 · M：ミュート · Esc：全画面終了/閉じる · F11：全画面</value></data>
   <data name="Media_SkipBackward" xml:space="preserve"><value>5 秒戻る</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>5 秒進む</value></data>
+  <data name="Media_Speed" xml:space="preserve"><value>再生速度</value></data>
+  <data name="Media_SpeedUnsupported" xml:space="preserve"><value>この Windows コーデックでは再生速度を変更できません。</value></data>
+  <data name="Media_EnterFullscreen" xml:space="preserve"><value>全画面表示 (F11)</value></data>
+  <data name="Media_ExitFullscreen" xml:space="preserve"><value>全画面を終了 (Esc)</value></data>
+  <data name="Media_Replay" xml:space="preserve"><value>もう一度再生</value></data>
+  <data name="Media_SeekPreview" xml:space="preserve"><value>{0} に移動</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} / {1}</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>プレビュー</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>プレビューを開けません</value></data>

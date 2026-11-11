@@ -866,9 +866,15 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="Media_DownloadFailed" xml:space="preserve"><value>Das Medium konnte nicht vorbereitet werden. Bitte Verbindung prüfen.</value></data>
   <data name="Media_KindAudio" xml:space="preserve"><value>Audio</value></data>
   <data name="Media_KindVideo" xml:space="preserve"><value>Video</value></data>
-  <data name="Media_Hint" xml:space="preserve"><value>Leertaste: Pause · ← →: 5 s springen · M: Stumm · Esc: Schließen · F11: Video maximieren</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>Leertaste: Pause · ← →: 5 s springen · M: Stumm · Esc: Vollbild schließen/Fenster schließen · F11: Vollbild</value></data>
   <data name="Media_SkipBackward" xml:space="preserve"><value>5 Sekunden zurück</value></data>
   <data name="Media_SkipForward" xml:space="preserve"><value>5 Sekunden vor</value></data>
+  <data name="Media_Speed" xml:space="preserve"><value>Wiedergabegeschwindigkeit</value></data>
+  <data name="Media_SpeedUnsupported" xml:space="preserve"><value>Dieser Windows-Codec kann die Wiedergabegeschwindigkeit nicht ändern.</value></data>
+  <data name="Media_EnterFullscreen" xml:space="preserve"><value>Vollbild öffnen (F11)</value></data>
+  <data name="Media_ExitFullscreen" xml:space="preserve"><value>Vollbild verlassen (Esc)</value></data>
+  <data name="Media_Replay" xml:space="preserve"><value>Erneut abspielen</value></data>
+  <data name="Media_SeekPreview" xml:space="preserve"><value>Zu {0} springen</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} von {1}</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Vorschau</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Vorschau konnte nicht geöffnet werden</value></data>
