@@ -57,7 +57,7 @@ public sealed class FileIconGeometryTests
 
         var iconList = viewXml.Descendants().Single(element =>
             element.Name.LocalName == "ListBox" &&
-            (string?)element.Attribute(xaml + "Name") == "Icons");
+            (string?)element.Attribute(xaml + "Name") == "ObjectsIcons");
         var gridGlyph = iconList.Descendants().Single(element =>
             element.Name.LocalName == "Path" &&
             (string?)element.Attribute("Style") == "{StaticResource GridThumbnailFallbackGlyph}");
