@@ -1,0 +1,132 @@
+<controls:AppWindow x:Class="Cavdeck.App.Features.Preview.MediaPreviewWindow"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cavdeck.App.Controls"
+                    Title="{Binding FileName}"
+                    Style="{StaticResource AppWindowStyle}"
+                    Width="1060" Height="720"
+                    MinWidth="520" MinHeight="320"
+                    WindowStartupLocation="CenterOwner"
+                    PreviewKeyDown="Window_PreviewKeyDown">
+  <controls:AppWindow.Resources>
+    <Style x:Key="MediaControlButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="MinWidth" Value="38"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="Margin" Value="3,0"/>
+    </Style>
+  </controls:AppWindow.Resources>
+  <Grid Background="{DynamicResource WindowBackgroundBrush}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0" Margin="18,10,18,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MinWidth="0"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
+                 FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                 VerticalAlignment="Center" ToolTip="{Binding FileName}"/>
+      <TextBlock Grid.Column="1" Text="{Binding KindLabel}" Margin="14,0,0,0"
+                 Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/>
+    </Grid>
+
+    <Grid x:Name="MediaSurface" Grid.Row="1" ClipToBounds="True"
+          Background="{DynamicResource SurfaceMutedBrush}"
+          MouseLeftButtonDown="MediaSurface_MouseLeftButtonDown">
+      <MediaElement x:Name="Player" LoadedBehavior="Manual" UnloadedBehavior="Close"
+                    ScrubbingEnabled="True" Stretch="Uniform" IsHitTestVisible="False"
+                    MediaOpened="Player_MediaOpened"
+                    MediaEnded="Player_MediaEnded"
+                    MediaFailed="Player_MediaFailed"/>
+      <StackPanel x:Name="AudioArtwork" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconAudio}"
+              Width="84" Height="84" Stretch="Uniform" StrokeThickness="1.15"
+              Stroke="{DynamicResource AccentBrush}" IsHitTestVisible="False"/>
+        <TextBlock Text="{Binding Texts[Media_KindAudio]}" TextAlignment="Center"
+                   FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="0,18,0,0"/>
+      </StackPanel>
+
+      <Border x:Name="StatusPanel" HorizontalAlignment="Center" VerticalAlignment="Center"
+              Background="{DynamicResource SurfaceBrush}"
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusMedium}"
+              MaxWidth="460" Padding="24" Margin="16">
+        <StackPanel>
+          <TextBlock x:Name="StatusMessage" TextAlignment="Center" TextWrapping="Wrap"
+                     Foreground="{DynamicResource PrimaryTextBrush}" LineHeight="22"/>
+          <ProgressBar x:Name="DownloadProgress" Height="6" Minimum="0" Maximum="100"
+                       Margin="0,16,0,0" Style="{StaticResource ThemedProgressBar}"
+                       AutomationProperties.Name="{Binding Texts[Media_Loading]}"/>
+          <TextBlock x:Name="DownloadDetails" TextAlignment="Center"
+                     Foreground="{DynamicResource MutedTextBrush}"
+                     Margin="0,8,0,0"/>
+          <Button x:Name="CancelButton" Content="{Binding Texts[Media_Cancel]}"
+                  Style="{StaticResource SecondaryButton}" Margin="0,16,0,0"
+                  HorizontalAlignment="Center" Padding="18,0" Height="34"
+                  Click="Cancel_Click"
+                  AutomationProperties.Name="{Binding Texts[Media_Cancel]}"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0"
+            Padding="14,10">
+      <StackPanel>
+        <Slider x:Name="SeekSlider" Minimum="0" Maximum="1" Value="0"
+                Margin="6,0,6,8" IsEnabled="False"
+                ValueChanged="SeekSlider_ValueChanged"
+                AutomationProperties.Name="{Binding Texts[Media_Seek]}"/>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Orientation="Horizontal">
+            <Button x:Name="PlayPauseButton" Style="{StaticResource MediaControlButton}"
+                    IsEnabled="False" Click="PlayPause_Click"
+                    AutomationProperties.Name="{Binding Texts[Media_Play]}"/>
+            <Button Style="{StaticResource MediaControlButton}" IsEnabled="False"
+                    x:Name="BackButton" Click="Back_Click"
+                    ToolTip="{Binding Texts[Media_SkipBackward]}"
+                    AutomationProperties.Name="{Binding Texts[Media_SkipBackward]}">
+              <TextBlock Text="−5s"/>
+            </Button>
+            <Button Style="{StaticResource MediaControlButton}" IsEnabled="False"
+                    x:Name="ForwardButton" Click="Forward_Click"
+                    ToolTip="{Binding Texts[Media_SkipForward]}"
+                    AutomationProperties.Name="{Binding Texts[Media_SkipForward]}">
+              <TextBlock Text="+5s"/>
+            </Button>
+            <TextBlock x:Name="TimeLabel" Text="00:00 / 00:00"
+                       Margin="14,0,0,0" VerticalAlignment="Center"
+                       Foreground="{DynamicResource MutedTextBrush}"
+                       FontWeight="Medium"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button x:Name="MuteButton" Style="{StaticResource MediaControlButton}"
+                    Content="{Binding Texts[Media_Mute]}"
+                    Click="Mute_Click"
+                    ToolTip="{Binding Texts[Media_Mute]}"
+                    AutomationProperties.Name="{Binding Texts[Media_Mute]}"/>
+            <Slider x:Name="VolumeSlider" Minimum="0" Maximum="1" Value="0.8"
+                    Width="94" Margin="8,0,6,0" VerticalAlignment="Center"
+                    ValueChanged="VolumeSlider_ValueChanged"
+                    AutomationProperties.Name="{Binding Texts[Media_Volume]}"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Grid.Row="1" Grid.Column="0" x:Name="HelpText"
+                   Text="{Binding Texts[Media_Hint]}" TextWrapping="Wrap"
+                   TextAlignment="Center" Foreground="{DynamicResource MutedTextBrush}"
+                   FontSize="{DynamicResource FontSizeSmall}" Margin="6,8,6,0"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</controls:AppWindow>

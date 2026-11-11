@@ -154,6 +154,13 @@
           <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconImage}"/>
         </Button>
         <Button Style="{StaticResource PreviewIconAction}"
+                Command="{Binding MediaViewerCommand}"
+                Visibility="{Binding ShowMediaViewer, Converter={StaticResource BoolVis}}"
+                ToolTip="{Binding Texts[Media_Open]}"
+                AutomationProperties.Name="{Binding Texts[Media_Open]}">
+          <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconVideo}"/>
+        </Button>
+        <Button Style="{StaticResource PreviewIconAction}"
                 Command="{Binding ToggleExpandedCommand}"
                 ToolTip="{Binding ExpandLabel}"
                 AutomationProperties.Name="{Binding ExpandLabel}">
@@ -281,6 +288,11 @@
               IsHitTestVisible="False"/>
         <TextBlock Text="{Binding Notice}" MaxWidth="380" TextWrapping="Wrap" LineHeight="20"
                    Foreground="{DynamicResource MutedTextBrush}"/>
+        <Button Content="{Binding Texts[Media_PlayHere]}" Style="{StaticResource PrimaryButton}"
+                HorizontalAlignment="Center" Margin="0,14,0,0" Height="36" Padding="18,0"
+                Command="{Binding MediaViewerCommand}"
+                Visibility="{Binding ShowMediaViewer, Converter={StaticResource BoolVis}}"
+                AutomationProperties.Name="{Binding Texts[Media_Open]}"/>
         <Button Content="{Binding Texts[Preview_Retry]}" Style="{StaticResource SecondaryButton}"
                 HorizontalAlignment="Center" Margin="0,12,0,0" Height="32" Padding="12,0"
                 Command="{Binding RetryCommand}"

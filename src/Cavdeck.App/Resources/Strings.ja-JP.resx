@@ -849,4 +849,25 @@
   <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
   <data name="ImageViewer_ActualTip" xml:space="preserve"><value>表示ピクセルで 1:1 にする (Ctrl+1)</value></data>
   <data name="ImageViewer_Hint" xml:space="preserve"><value>ホイールで拡大縮小 · ドラッグで移動 · ← → で切替 · Esc で閉じる · F11 で最大化</value></data>
+  <data name="Media_Ready" xml:space="preserve"><value>再生できます。再生前に一時コピーをダウンロードします。</value></data>
+  <data name="Media_Open" xml:space="preserve"><value>メディアプレーヤーを開く</value></data>
+  <data name="Media_PlayHere" xml:space="preserve"><value>Cavdeck で再生</value></data>
+  <data name="Media_Loading" xml:space="preserve"><value>メディアを準備しています…</value></data>
+  <data name="Media_Opening" xml:space="preserve"><value>メディアを開いています…</value></data>
+  <data name="Media_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Media_Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Media_Play" xml:space="preserve"><value>再生</value></data>
+  <data name="Media_Pause" xml:space="preserve"><value>一時停止</value></data>
+  <data name="Media_Mute" xml:space="preserve"><value>ミュート</value></data>
+  <data name="Media_Unmute" xml:space="preserve"><value>ミュート解除</value></data>
+  <data name="Media_Seek" xml:space="preserve"><value>再生位置</value></data>
+  <data name="Media_Volume" xml:space="preserve"><value>音量</value></data>
+  <data name="Media_Unsupported" xml:space="preserve"><value>Windows でこの形式を再生できません。ダウンロードするか、外部プレーヤーをお試しください。</value></data>
+  <data name="Media_DownloadFailed" xml:space="preserve"><value>メディアを準備できませんでした。接続を確認してください。</value></data>
+  <data name="Media_KindAudio" xml:space="preserve"><value>音声</value></data>
+  <data name="Media_KindVideo" xml:space="preserve"><value>動画</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>スペース：再生/停止 · ← →：5秒移動 · M：ミュート · Esc：閉じる · F11：動画を最大化</value></data>
+  <data name="Media_SkipBackward" xml:space="preserve"><value>5 秒戻る</value></data>
+  <data name="Media_SkipForward" xml:space="preserve"><value>5 秒進む</value></data>
+  <data name="Media_Progress" xml:space="preserve"><value>{0} / {1}</value></data>
 </root>

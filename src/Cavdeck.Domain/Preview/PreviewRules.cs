@@ -6,6 +6,7 @@ public enum PreviewKind
     Image,
     Pdf,
     Text,
+    Media,
     TooLarge,
     External
 }
@@ -29,6 +30,8 @@ public static class PreviewRules
     // Explicitly opened images have a higher bounded-read budget than the side pane.
     public const long MaxImmersiveImageBytes = 67_108_864;
     public const long MaxPdfBytes = 104_857_600;
+    // User-initiated playback downloads a bounded temporary copy, never a stream to memory.
+    public const long MaxMediaBytes = 268_435_456;
     public const long MaxShellBytes = 104_857_600;
 
     private static readonly HashSet<string> ImageExtensions = new(StringComparer.Ordinal)
@@ -110,8 +113,8 @@ public static class PreviewRules
             PreviewFileType.Image => Sized(sizeBytes, MaxImageBytes, PreviewKind.Image),
             PreviewFileType.Pdf => Sized(sizeBytes, MaxPdfBytes, PreviewKind.Pdf),
             PreviewFileType.Text => Sized(sizeBytes, MaxTextBytes, PreviewKind.Text),
-            // Audio and video are recognized for future viewers but remain external
-            // in this foundation change, preserving current UI behavior.
+            PreviewFileType.Audio or PreviewFileType.Video =>
+                Sized(sizeBytes, MaxMediaBytes, PreviewKind.Media),
             _ => new PreviewDecision(PreviewKind.External)
         };
     }

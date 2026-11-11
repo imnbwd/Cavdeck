@@ -17,7 +17,8 @@ public sealed class PreviewRulesTests
     [InlineData("index.html", false, 20, PreviewKind.Text)]
     [InlineData("icon.svg", false, 20, PreviewKind.Text)]
     [InlineData("Program.cs", false, 20, PreviewKind.Text)]
-    [InlineData("clip.mp4", false, 20, PreviewKind.External)]
+    [InlineData("clip.mp4", false, 20, PreviewKind.Media)]
+    [InlineData("music.mp3", false, 20, PreviewKind.Media)]
     [InlineData("REPORT.PDF", false, 20, PreviewKind.Pdf)]
     [InlineData("pack.zip", false, 20, PreviewKind.External)]
     [InlineData("scan.tif", false, 20, PreviewKind.External)]
@@ -45,12 +46,15 @@ public sealed class PreviewRulesTests
         Assert.Equal(expected, PreviewRules.Classify(name, contentType));
 
     [Fact]
-    public void Audio_and_video_are_recognized_but_remain_external_until_a_viewer_exists()
+    public void Audio_and_video_require_a_bounded_explicit_playback_download()
     {
-        Assert.Equal(PreviewKind.External, PreviewRules.Decide("track.mp3", false, 100).Kind);
-        Assert.Equal(PreviewKind.External, PreviewRules.Decide("clip.mp4", false, 100).Kind);
-        Assert.Equal(PreviewKind.External, PreviewRules.Decide("movie.mkv", false, 100).Kind);
-        Assert.Equal(PreviewKind.External, PreviewRules.Decide("album.flac", false, 100).Kind);
+        Assert.Equal(PreviewKind.Media, PreviewRules.Decide("track.mp3", false, 100).Kind);
+        Assert.Equal(PreviewKind.Media, PreviewRules.Decide("clip.mp4", false, 100).Kind);
+        Assert.Equal(PreviewKind.Media, PreviewRules.Decide("movie.mkv", false, 100).Kind);
+        Assert.Equal(PreviewKind.Media, PreviewRules.Decide("album.flac", false, 100).Kind);
+        Assert.Equal(PreviewKind.Media, PreviewRules.Decide("clip.mp4", false, PreviewRules.MaxMediaBytes).Kind);
+        Assert.Equal(PreviewKind.TooLarge, PreviewRules.Decide("clip.mp4", false, PreviewRules.MaxMediaBytes + 1).Kind);
+        Assert.Equal(PreviewKind.TooLarge, PreviewRules.Decide("track.mp3", false, -1).Kind);
     }
 
     [Fact]

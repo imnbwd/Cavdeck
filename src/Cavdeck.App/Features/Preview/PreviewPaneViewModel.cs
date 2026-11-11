@@ -33,6 +33,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     private long _size;
     private bool _isText;
     private bool _isImage;
+    private bool _mediaReady;
     private bool _shellAllowed;
     private bool _downloadSuggested;
     private bool _failed;
@@ -92,6 +93,11 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
             if (ShowImageViewer)
                 ImageViewerRequested?.Invoke(this, EventArgs.Empty);
         });
+        MediaViewerCommand = new RelayCommand(_ =>
+        {
+            if (ShowMediaViewer)
+                MediaViewerRequested?.Invoke(this, EventArgs.Empty);
+        });
     }
 
     private AsyncRelayCommand CreateAsyncCommand(Func<object?, Task> action) =>
@@ -105,6 +111,8 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public event EventHandler? LeaveCancelled;
     public event EventHandler? DownloadRequested;
     public event EventHandler? ImageViewerRequested;
+    public event EventHandler? MediaViewerRequested;
+    public event EventHandler? MediaContextChanged;
     public event EventHandler? StateChanged;
     public event EventHandler<ObjectHead>? Saved;
 
@@ -126,6 +134,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public ICommand PreviewCommand { get; }
     public ICommand ToggleExpandedCommand { get; }
     public ICommand ImageViewerCommand { get; }
+    public ICommand MediaViewerCommand { get; }
 
     public string Key => _key;
     public long Size => _size;
@@ -179,6 +188,9 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public bool ShowImageViewer => _open && !_loading && _size >= 0
         && _size <= PreviewRules.MaxImmersiveImageBytes
         && (_isImage || PreviewRules.Classify(_name, _contentType) == PreviewFileType.Image);
+    public bool ShowMediaViewer => _open && !_loading && !_failed && _mediaReady
+        && _size >= 0 && _size <= PreviewRules.MaxMediaBytes;
+    public PreviewFileType MediaType => PreviewRules.Classify(_name, _contentType);
     public bool ShowNotice => _notice.Length > 0 && !_isText && !_isImage;
     public bool ShowLoading => _loading;
     public bool ShowLeaveBar => _leavePending && !_conflictPending;
@@ -216,6 +228,8 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void InvalidateContext()
     {
+        MediaContextChanged?.Invoke(this, EventArgs.Empty);
+        _mediaReady = false;
         _session.Reset();
         _loading = false;
         _preparingFile = false;
@@ -319,6 +333,8 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public async Task OpenAsync(
         StorageConnection connection, string bucket, string name, string key, bool writable)
     {
+        if (_connection?.Id != connection.Id || _bucket != bucket || _key != key)
+            MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _connection = connection;
         _bucket = bucket;
         _name = name;
@@ -336,6 +352,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void Close()
     {
+        MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _session.Reset();
         SetPdfLease(null);
         _loading = false;
@@ -350,6 +367,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         _requiresOverwrite = false;
         _isText = false;
         _isImage = false;
+        _mediaReady = false;
         _shellAllowed = false;
         _downloadSuggested = false;
         _failed = false;
@@ -426,6 +444,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         _requiresOverwrite = false;
         _isText = false;
         _isImage = false;
+        _mediaReady = false;
         SetNotice(null);
         SetSaveError("");
         OnPropertyChanged(nameof(IsLoading));
@@ -571,6 +590,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
             (!_shellAllowed && loaded.Kind is PreviewLoadKind.External or PreviewLoadKind.TooLarge or PreviewLoadKind.NotText);
         _failed = loaded.Kind == PreviewLoadKind.Failed;
         _isText = loaded.Kind == PreviewLoadKind.Text;
+        _mediaReady = loaded.Kind == PreviewLoadKind.Media;
         _isImage = false;
         _image = null;
         _saved = false;
@@ -589,6 +609,10 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
                 break;
             case PreviewLoadKind.Pdf:
                 SetNotice(null);
+                break;
+            case PreviewLoadKind.Media:
+                SetNotice("Media_Ready");
+                _downloadSuggested = !_shellAllowed;
                 break;
             case PreviewLoadKind.Image:
                 _image = decodedImage;
@@ -856,6 +880,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(ShowEditor));
         OnPropertyChanged(nameof(ShowImage));
         OnPropertyChanged(nameof(ShowImageViewer));
+        OnPropertyChanged(nameof(ShowMediaViewer));
         OnPropertyChanged(nameof(ShowPdf));
         OnPropertyChanged(nameof(ShowPreviewDownload));
         OnPropertyChanged(nameof(ShowLoadingSpinner));

@@ -52,6 +52,7 @@ public partial class ExplorerView : UserControl
         {
             if (!IsVisible)
             {
+                _explorer?.CloseMediaViewer();
                 ThumbnailLoader.CancelVisible(this);
                 _explorer?.CancelGoToPath();
                 ClearDropFeedback();
