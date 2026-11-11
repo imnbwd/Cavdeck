@@ -103,6 +103,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private readonly PreviewService _imagePreviewService;
     private readonly ThumbnailPipeline _thumbnails;
     private ImagePreviewWindow? _imageViewer;
+    private MediaPreviewWindow? _mediaViewer;
     private Func<Task>? _afterLeave;
     private bool _showPreviewForClose;
     private int _leaveConfirmationId;
@@ -142,6 +143,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _preview = new PreviewPaneViewModel(preview, storage, texts, toasts);
         _imagePreviewService = preview;
         _preview.ImageViewerRequested += OnImageViewerRequested;
+        _preview.MediaViewerRequested += OnMediaViewerRequested;
+        _preview.MediaContextChanged += OnMediaContextChanged;
         _preview.LeaveResolved += (_, _) => ResumeAfterLeave();
         _preview.LeaveCancelled += (_, _) => _afterLeave = null;
         _preview.Saved += (_, head) => ApplySavedObject(head);
@@ -624,6 +627,9 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         CancelHeaderLoad();
         _imageViewer?.Close();
         _imageViewer = null;
+        OnMediaContextChanged(this, EventArgs.Empty);
+        _preview.MediaViewerRequested -= OnMediaViewerRequested;
+        _preview.MediaContextChanged -= OnMediaContextChanged;
         _preview.ImageViewerRequested -= OnImageViewerRequested;
         _preview.Dispose();
         _thumbnails.Dispose();
@@ -976,6 +982,46 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         }
 
         return _preview.OpenAsync(_connection, _bucket, row.Name, row.Entry.Key, CanWrite);
+    }
+
+    private void OnMediaContextChanged(object? sender, EventArgs e)
+    {
+        _mediaViewer?.Close();
+        _mediaViewer = null;
+    }
+
+    public void CloseMediaViewer() => OnMediaContextChanged(this, EventArgs.Empty);
+
+    private void OnMediaViewerRequested(object? sender, EventArgs e)
+    {
+        if (_disposed || _connection is null || _bucket is null || !_preview.ShowMediaViewer)
+            return;
+
+        // The user explicitly starts playback. Selecting a media file only fetches HEAD.
+        CloseMediaViewer();
+        var window = new MediaPreviewWindow(
+            _imagePreviewService, _connection, _bucket, _preview.Key, _preview.Title,
+            _preview.Size, _preview.MediaType, _texts)
+        {
+            Owner = System.Windows.Application.Current?.MainWindow
+        };
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_mediaViewer, window))
+                _mediaViewer = null;
+        };
+        _mediaViewer = window;
+        try
+        {
+            window.Show();
+            window.Activate();
+        }
+        catch (Exception exception)
+        {
+            _mediaViewer = null;
+            window.Close();
+            ReportUnexpectedUiError(exception);
+        }
     }
 
     private void OnImageViewerRequested(object? sender, EventArgs e)

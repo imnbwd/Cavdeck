@@ -849,4 +849,25 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
   <data name="ImageViewer_ActualTip" xml:space="preserve"><value>1:1-Anzeige der Bildpixel (Strg+1)</value></data>
   <data name="ImageViewer_Hint" xml:space="preserve"><value>Mausrad: Zoom · Ziehen: Verschieben · ← →: Bilder wechseln · Esc: Schließen · F11: Maximieren</value></data>
+  <data name="Media_Ready" xml:space="preserve"><value>Bereit zur Wiedergabe. Cavdeck lädt vorher eine temporäre Kopie herunter.</value></data>
+  <data name="Media_Open" xml:space="preserve"><value>Medienplayer öffnen</value></data>
+  <data name="Media_PlayHere" xml:space="preserve"><value>In Cavdeck abspielen</value></data>
+  <data name="Media_Loading" xml:space="preserve"><value>Medium wird vorbereitet…</value></data>
+  <data name="Media_Opening" xml:space="preserve"><value>Medium wird geöffnet…</value></data>
+  <data name="Media_Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Media_Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Media_Play" xml:space="preserve"><value>Abspielen</value></data>
+  <data name="Media_Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="Media_Mute" xml:space="preserve"><value>Stummschalten</value></data>
+  <data name="Media_Unmute" xml:space="preserve"><value>Ton einschalten</value></data>
+  <data name="Media_Seek" xml:space="preserve"><value>Wiedergabeposition</value></data>
+  <data name="Media_Volume" xml:space="preserve"><value>Lautstärke</value></data>
+  <data name="Media_Unsupported" xml:space="preserve"><value>Windows kann dieses Format nicht abspielen. Lade die Datei herunter oder öffne sie in einem anderen Player.</value></data>
+  <data name="Media_DownloadFailed" xml:space="preserve"><value>Das Medium konnte nicht vorbereitet werden. Bitte Verbindung prüfen.</value></data>
+  <data name="Media_KindAudio" xml:space="preserve"><value>Audio</value></data>
+  <data name="Media_KindVideo" xml:space="preserve"><value>Video</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>Leertaste: Pause · ← →: 5 s springen · M: Stumm · Esc: Schließen · F11: Video maximieren</value></data>
+  <data name="Media_SkipBackward" xml:space="preserve"><value>5 Sekunden zurück</value></data>
+  <data name="Media_SkipForward" xml:space="preserve"><value>5 Sekunden vor</value></data>
+  <data name="Media_Progress" xml:space="preserve"><value>{0} von {1}</value></data>
 </root>

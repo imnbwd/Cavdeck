@@ -57,12 +57,14 @@ public sealed class PreviewPaneLayoutTests
 
         Assert.Equal("Horizontal", (string?)actions.Attribute("Orientation"));
         var buttons = actions.Elements(Wpf + "Button").ToArray();
-        Assert.Equal(4, buttons.Length);
+        Assert.Equal(5, buttons.Length);
         Assert.Contains("ShellCommand", (string?)buttons[0].Attribute("Command"));
         Assert.Contains("DownloadCommand", (string?)buttons[1].Attribute("Command"));
         Assert.Contains("ImageViewerCommand", (string?)buttons[2].Attribute("Command"));
         Assert.Contains("ShowImageViewer", (string?)buttons[2].Attribute("Visibility"));
-        Assert.Contains("ToggleExpandedCommand", (string?)buttons[3].Attribute("Command"));
+        Assert.Contains("MediaViewerCommand", (string?)buttons[3].Attribute("Command"));
+        Assert.Contains("ShowMediaViewer", (string?)buttons[3].Attribute("Visibility"));
+        Assert.Contains("ToggleExpandedCommand", (string?)buttons[4].Attribute("Command"));
         Assert.All(buttons, button =>
         {
             Assert.NotNull(button.Attribute("ToolTip"));
@@ -91,6 +93,7 @@ public sealed class PreviewPaneLayoutTests
         var buttons = View().Descendants(Wpf + "Button").ToArray();
         foreach (var command in new[] {
                      "PreviewCommand", "EditCommand", "ToggleExpandedCommand", "ImageViewerCommand",
+                     "MediaViewerCommand",
                      "ShellCommand", "DownloadCommand", "SaveCommand",
                      "RevertCommand", "DiscardLeaveCommand", "StayCommand" })
             Assert.Contains(buttons, button =>
@@ -119,7 +122,11 @@ public sealed class PreviewPaneLayoutTests
         Assert.Contains("Notice", (string?)message.Attribute("Text"));
         Assert.Equal("Wrap", (string?)message.Attribute("TextWrapping"));
 
-        var retry = notice.Elements(Wpf + "Button").Single();
+        var play = notice.Elements(Wpf + "Button").First(button =>
+            ((string?)button.Attribute("Command"))?.Contains("MediaViewerCommand") == true);
+        Assert.Contains("ShowMediaViewer", (string?)play.Attribute("Visibility"));
+        var retry = notice.Elements(Wpf + "Button").Single(button =>
+            ((string?)button.Attribute("Command"))?.Contains("RetryCommand") == true);
         Assert.Equal("Center", (string?)retry.Attribute("HorizontalAlignment"));
         Assert.Contains("RetryCommand", (string?)retry.Attribute("Command"));
         Assert.Contains("ShowRetry", (string?)retry.Attribute("Visibility"));

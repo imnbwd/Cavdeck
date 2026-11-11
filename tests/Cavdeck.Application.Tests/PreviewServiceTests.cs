@@ -83,6 +83,33 @@ public sealed class PreviewServiceTests
         Assert.Equal(0, store.Reads);
     }
 
+    [Theory]
+    [InlineData("song.mp3", "audio/mpeg")]
+    [InlineData("clip.mp4", "video/mp4")]
+    public async Task Selecting_media_returns_metadata_without_downloading(string file, string contentType)
+    {
+        var store = new PreviewStore { Head = Head(50_000_000, "\"media\"", contentType) };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", file, file, CancellationToken.None);
+
+        Assert.Equal(PreviewLoadKind.Media, opened.Kind);
+        Assert.Equal(0, store.Reads);
+        Assert.Null(opened.Image);
+    }
+
+    [Fact]
+    public async Task Oversized_media_is_rejected_before_reading()
+    {
+        var store = new PreviewStore
+        {
+            Head = Head(PreviewRules.MaxMediaBytes + 1, "\"large\"", "video/mp4")
+        };
+        var opened = await new PreviewService(new SingleFactory(store)).OpenAsync(
+            Connection(), "assets", "huge.mp4", "huge.mp4", CancellationToken.None);
+        Assert.Equal(PreviewLoadKind.TooLarge, opened.Kind);
+        Assert.Equal(0, store.Reads);
+    }
+
     [Fact]
     public async Task Pdf_returns_metadata_without_buffering_body()
     {

@@ -9,6 +9,7 @@ public enum PreviewLoadKind
     Text,
     Image,
     Pdf,
+    Media,
     TooLarge,
     External,
     NotText,
@@ -97,9 +98,12 @@ public sealed class PreviewService
             if (decision.Kind is PreviewKind.TooLarge or PreviewKind.External or PreviewKind.Folder)
                 return Closed(decision.Kind, head);
 
-            // PDFs use a bounded temporary file so the UI can report download progress.
+            // PDF/media return metadata only. Playing media must be explicitly
+            // requested, so selecting a file never starts a large download.
             if (decision.Kind == PreviewKind.Pdf)
                 return new PreviewLoad(PreviewLoadKind.Pdf, head, null, TextCharset.Utf8, false, null, null);
+            if (decision.Kind == PreviewKind.Media)
+                return new PreviewLoad(PreviewLoadKind.Media, head, null, TextCharset.Utf8, false, null, null);
 
             var max = decision.Kind == PreviewKind.Image
                 ? (int)maxImageBytes

@@ -853,4 +853,25 @@
   <data name="ImageViewer_ActualSize" xml:space="preserve"><value>1:1</value></data>
   <data name="ImageViewer_ActualTip" xml:space="preserve"><value>按显示像素 1:1 查看 (Ctrl+1)</value></data>
   <data name="ImageViewer_Hint" xml:space="preserve"><value>滚轮缩放 · 拖拽平移 · ← → 切换图片 · Esc 关闭 · F11 最大化</value></data>
+  <data name="Media_Ready" xml:space="preserve"><value>可以播放。Cavdeck 会先下载临时副本，然后在本机播放。</value></data>
+  <data name="Media_Open" xml:space="preserve"><value>打开媒体播放器</value></data>
+  <data name="Media_PlayHere" xml:space="preserve"><value>使用 Cavdeck 播放</value></data>
+  <data name="Media_Loading" xml:space="preserve"><value>正在准备媒体文件…</value></data>
+  <data name="Media_Opening" xml:space="preserve"><value>正在打开媒体…</value></data>
+  <data name="Media_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Media_Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Media_Play" xml:space="preserve"><value>播放</value></data>
+  <data name="Media_Pause" xml:space="preserve"><value>暂停</value></data>
+  <data name="Media_Mute" xml:space="preserve"><value>静音</value></data>
+  <data name="Media_Unmute" xml:space="preserve"><value>取消静音</value></data>
+  <data name="Media_Seek" xml:space="preserve"><value>播放进度</value></data>
+  <data name="Media_Volume" xml:space="preserve"><value>音量</value></data>
+  <data name="Media_Unsupported" xml:space="preserve"><value>Windows 无法播放此格式。可以下载文件，或使用其他播放器打开。</value></data>
+  <data name="Media_DownloadFailed" xml:space="preserve"><value>无法准备媒体文件，请检查连接后重试。</value></data>
+  <data name="Media_KindAudio" xml:space="preserve"><value>音频</value></data>
+  <data name="Media_KindVideo" xml:space="preserve"><value>视频</value></data>
+  <data name="Media_Hint" xml:space="preserve"><value>空格：播放/暂停 · ← →：前后跳转 5 秒 · M：静音 · Esc：关闭 · F11：最大化视频</value></data>
+  <data name="Media_SkipBackward" xml:space="preserve"><value>后退 5 秒</value></data>
+  <data name="Media_SkipForward" xml:space="preserve"><value>前进 5 秒</value></data>
+  <data name="Media_Progress" xml:space="preserve"><value>已下载 {0} / {1}</value></data>
 </root>
