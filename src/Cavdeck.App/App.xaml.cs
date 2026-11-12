@@ -111,7 +111,6 @@ public partial class App : System.Windows.Application
 #else
             RegisterServices();
 #endif
-            StartPreviewCacheCleanup();
             ReconcileUpdateActivity();
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -226,6 +225,8 @@ public partial class App : System.Windows.Application
             ShowConfigurationRecoveryNotice(window, settingsStore, connectionCatalog, connections);
             _services.GetRequiredService<UpdateNoticeService>().Start();
             _ = _services.GetRequiredService<UpdateCoordinator>().CheckOnStartupAsync();
+            // Defer non-critical disk maintenance until the main window is visible and startup work is complete.
+            StartPreviewCacheCleanup();
         }
         catch (Exception ex)
         {
