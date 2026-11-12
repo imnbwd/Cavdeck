@@ -85,7 +85,8 @@ public partial class MediaPreviewWindow : AppWindow
         FullscreenButton.Visibility = _isVideo ? Visibility.Visible : Visibility.Collapsed;
         _surfaceClickTimer.Interval = TimeSpan.FromMilliseconds(GetDoubleClickTime());
         _surfaceClickTimer.Tick += SurfaceClickTimer_Tick;
-        // Do not cover other applications while the full-screen viewer is inactive.
+        // Activation only controls fullscreen z-order. Losing focus is not a close
+        // request: keep the playback session and its temporary file lease alive.
         Activated += (_, _) =>
         {
             if (_fullScreen)
