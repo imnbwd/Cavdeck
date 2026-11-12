@@ -63,8 +63,9 @@
                 Stroke="{DynamicResource AccentTextBrush}"/>
         </Border>
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-          <TextBlock Text="{Binding Texts[Media_KindAudio]}" Margin="0,5,0,0"
-                     Foreground="{DynamicResource MutedTextBrush}"/>
+          <TextBlock Text="{Binding Texts[Media_KindAudio]}"
+                     FontSize="{DynamicResource FontSizeTitle}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource PrimaryTextBrush}"/>
           <TextBlock Text="{Binding MediaSummary}" Margin="0,3,0,0"
                      FontSize="{DynamicResource FontSizeSmall}"
                      Foreground="{DynamicResource MutedTextBrush}"/>
