@@ -61,6 +61,33 @@ public sealed class ExplorerNameSortedPageTests
         Assert.Equal(expected.Select(x => x.Key), rows.Select(x => x.Entry.Key));
     }
 
+    [Fact]
+    public void Appended_numeric_names_follow_the_same_natural_order_as_full_sort()
+    {
+        var texts = new LocalizationService();
+        var first = new[]
+        {
+            Entry(ObjectEntryKind.File, "file10.txt")
+        };
+        var next = new[]
+        {
+            Entry(ObjectEntryKind.File, "file2.txt"),
+            Entry(ObjectEntryKind.File, "file1.txt"),
+            Entry(ObjectEntryKind.File, "file20.txt")
+        };
+        var rows = new ResettableCollection<ExplorerRow>();
+        rows.ReplaceWith(ObjectLayout.Sort(first, ListingSort.Name, descending: false)
+            .Select(item => new ExplorerRow(item, texts)));
+
+        ExplorerNameSortedPage.Append(rows, next, texts);
+
+        var expected = ObjectLayout.Sort(first.Concat(next).ToArray(), ListingSort.Name, descending: false);
+        Assert.Equal(expected.Select(item => item.Key), rows.Select(row => row.Entry.Key));
+        Assert.Equal(
+            ["file1.txt", "file2.txt", "file10.txt", "file20.txt"],
+            rows.Select(row => row.Name).ToArray());
+    }
+
     private static ObjectEntry Entry(ObjectEntryKind kind, string name) =>
         new(kind, name, name + (kind == ObjectEntryKind.Folder ? "/" : ""), 0, null, null);
 }
