@@ -1,4 +1,3 @@
-using System.IO;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -14,7 +13,6 @@ namespace Cavdeck.App.Features.Preview;
 /// <summary>Loads one gallery image at a time; visual zoom and pan belong to the Window.</summary>
 public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
 {
-    private const int MaximumDecodeSide = 6144;
     private readonly PreviewService _preview;
     private readonly StorageConnection _connection;
     private readonly string _bucket;
@@ -103,7 +101,7 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
 
             if (loaded.Kind == PreviewLoadKind.Image && loaded.Image is { Length: > 0 } bytes)
             {
-                var decoded = await Task.Run(() => Decode(bytes), operation.Token);
+                var decoded = await Task.Run(() => PreviewImageDecoder.Decode(bytes), operation.Token);
                 if (!_session.IsCurrent(operation))
                     return;
                 if (decoded is not null)
@@ -160,40 +158,6 @@ public sealed class ImagePreviewViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(FeedbackTitle));
         OnPropertyChanged(nameof(Error));
         OnPropertyChanged(nameof(PixelSize));
-    }
-
-    private static BitmapSource? Decode(byte[] bytes)
-    {
-        try
-        {
-            using var stream = new MemoryStream(bytes, writable: false);
-            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
-            if (decoder.Frames.Count == 0)
-                return null;
-
-            var frame = decoder.Frames[0];
-            var maxSide = Math.Max(frame.PixelWidth, frame.PixelHeight);
-            var width = maxSide > MaximumDecodeSide
-                ? Math.Max(1, (int)Math.Round((double)frame.PixelWidth * MaximumDecodeSide / maxSide))
-                : 0;
-
-            stream.Position = 0;
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.StreamSource = stream;
-            if (width > 0)
-                bitmap.DecodePixelWidth = width;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            return bitmap;
-        }
-        catch (Exception ex) when (ex is ArgumentException or IOException or NotSupportedException
-            or InvalidOperationException or FileFormatException
-            or System.Runtime.InteropServices.COMException)
-        {
-            return null;
-        }
     }
 
     public void Dispose()
