@@ -74,7 +74,7 @@ public partial class MediaPreviewWindow : AppWindow
         if (type == PreviewFileType.Audio)
         {
             Width = 640;
-            Height = 380;
+            Height = 405;
             MinWidth = 440;
             MinHeight = 360;
             // File identity lives in the audio panel, not in two stacked headers.
