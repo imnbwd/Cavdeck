@@ -11,6 +11,9 @@ public sealed class MediaPreviewLayoutTests
     private static XDocument Window() =>
         XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckMediaPreviewWindow.xaml"));
 
+    private static XDocument Inputs() =>
+        XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckInputs.xaml"));
+
     [Fact]
     public void Playback_uses_a_dedicated_host_for_fresh_media_elements_per_attempt()
     {
@@ -138,9 +141,16 @@ public sealed class MediaPreviewLayoutTests
             Assert.Equal("{StaticResource MediaSliderStyle}", (string?)slider.Attribute("Style"));
         }
 
-        var mediaSliderStyle = Assert.Single(view.Descendants(Wpf + "Style").Where(element =>
+        var seekSlider = Assert.Single(view.Descendants(Wpf + "Slider").Where(element =>
+            (string?)element.Attribute(Xaml + "Name") == "SeekSlider"));
+        Assert.Equal("True", (string?)seekSlider.Attribute("IsMoveToPointEnabled"));
+
+        var inputs = Inputs();
+        var mediaSliderStyle = Assert.Single(inputs.Descendants(Wpf + "Style").Where(element =>
             (string?)element.Attribute(Xaml + "Key") == "MediaSliderStyle"));
         Assert.Contains(mediaSliderStyle.Descendants(Wpf + "Track"), track =>
             (string?)track.Attribute(Xaml + "Name") == "PART_Track");
+        Assert.DoesNotContain(view.Descendants(Wpf + "Style"), element =>
+            (string?)element.Attribute(Xaml + "Key") == "MediaSliderStyle");
     }
 }
