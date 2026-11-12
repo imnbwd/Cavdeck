@@ -291,9 +291,9 @@ public partial class MediaPreviewWindow : AppWindow
 
         try
         {
-            player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
             _openAttemptActive = true;
             _openTimeoutTimer.Start();
+            player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
             DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaSourceAssigned");
             player.Play();
             DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaPlayRequested");
@@ -345,7 +345,7 @@ public partial class MediaPreviewWindow : AppWindow
         }
 
         DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaRetryExhausted");
-        ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
+        ShowFailure("Media_OpenTimedOut", "Media_OpenTimeoutDescription");
     }
 
     private void RetryPlayback()
