@@ -19,6 +19,9 @@ public static class MediaPlaybackMath
     public static bool ShouldRetryAfterOpenTimeout(int automaticRetryCount) =>
         automaticRetryCount < AutomaticOpenRetryLimit;
 
+    public static bool IsCurrentAttempt(int activeAttempt, int callbackAttempt) =>
+        activeAttempt == callbackAttempt;
+
     public static bool IsSupportedSpeed(double ratio) =>
         ratio is 0.75 or 1.0 or 1.25 or 1.5 or 2.0;
 
