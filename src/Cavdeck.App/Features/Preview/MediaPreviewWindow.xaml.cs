@@ -262,7 +262,8 @@ public partial class MediaPreviewWindow : AppWindow
     }
 
     private bool IsCurrentPlayer(object sender, int attempt) =>
-        !_disposed && attempt == _playbackAttempt && ReferenceEquals(sender, _player);
+        !_disposed && MediaPlaybackMath.IsCurrentAttempt(_playbackAttempt, attempt)
+        && ReferenceEquals(sender, _player);
 
     private void StartMediaOpen()
     {
@@ -440,6 +441,11 @@ public partial class MediaPreviewWindow : AppWindow
         _openTimeoutTimer.Stop();
         _openAttemptActive = false;
         _timer.Stop();
+
+        // Invalidate callbacks before releasing the native player. A late MediaOpened
+        // event must not dismiss the failure UI or start playback after a timeout.
+        _playbackAttempt++;
+        ReleasePlayer();
         ResetPlaybackControls();
         Feedback.Visibility = Visibility.Visible;
         SetFeedback(headlineKey, "Preview_Retry", descriptionKey, showSecondary: true);
