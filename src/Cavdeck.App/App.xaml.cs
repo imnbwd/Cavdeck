@@ -18,6 +18,7 @@ using Cavdeck.Application.Explorer;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Application.Settings;
 using Cavdeck.Application.Places;
+using Cavdeck.Application.Preview;
 using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.Configuration;
 using Cavdeck.Infrastructure.S3;
@@ -110,6 +111,7 @@ public partial class App : System.Windows.Application
 #else
             RegisterServices();
 #endif
+            StartPreviewCacheCleanup();
             ReconcileUpdateActivity();
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -241,6 +243,23 @@ public partial class App : System.Windows.Application
                 ShutdownMode = ShutdownMode.OnMainWindowClose;
 #endif
         }
+    }
+
+    private void StartPreviewCacheCleanup()
+    {
+        var previewReader = Services.GetRequiredService<ProviderPreviewContentReader>();
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                previewReader.CleanupStaleFiles();
+            }
+            catch (Exception exception)
+            {
+                // Cache maintenance is non-critical and must never affect application startup.
+                DiagnosticLog.Current.Queue("preview-cache-cleanup", exception);
+            }
+        });
     }
 
     private void ReconcileUpdateActivity()
