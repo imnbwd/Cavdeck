@@ -101,8 +101,12 @@ public partial class ImagePreviewWindow : AppWindow
 
     private void RenderView()
     {
+        // The Image is centered by WPF layout. Convert the viewport-relative
+        // position calculated by ImageViewportMath into a local transform offset.
+        var layoutX = (Viewport.ActualWidth - _imageWidth) / 2;
+        var layoutY = (Viewport.ActualHeight - _imageHeight) / 2;
         CanvasImage.RenderTransform = new MatrixTransform(
-            _view.Scale, 0, 0, _view.Scale, _view.X, _view.Y);
+            _view.Scale, 0, 0, _view.Scale, _view.X - layoutX, _view.Y - layoutY);
         ZoomText.Text = $"{Math.Round(_view.Scale * 100):0}%";
         Viewport.Cursor = _dragging ? Cursors.SizeAll :
             IsPannable ? Cursors.Hand : Cursors.Arrow;

@@ -38,7 +38,7 @@
           LostMouseCapture="Viewport_LostMouseCapture"
           ToolTip="{Binding Texts[ImageViewer_Hint]}">
       <Image x:Name="CanvasImage" Source="{Binding Image}"
-             HorizontalAlignment="Left" VerticalAlignment="Top"
+             HorizontalAlignment="Center" VerticalAlignment="Center"
              Stretch="Fill" IsHitTestVisible="False"
              RenderOptions.BitmapScalingMode="HighQuality"
              SnapsToDevicePixels="True">
