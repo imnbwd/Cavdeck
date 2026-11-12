@@ -153,6 +153,13 @@ public sealed class MediaPreviewLayoutTests
             (string?)element.Attribute(Xaml + "Name") == "SeekSlider"));
         Assert.Equal("True", (string?)seekSlider.Attribute("IsMoveToPointEnabled"));
 
+        var volumeSlider = Assert.Single(view.Descendants(Wpf + "Slider").Where(element =>
+            (string?)element.Attribute(Xaml + "Name") == "VolumeSlider"));
+        Assert.Equal("True", (string?)volumeSlider.Attribute("IsMoveToPointEnabled"));
+        Assert.Equal("False", (string?)volumeSlider.Attribute(
+            XName.Get("InputAssist.ShowFocusIndicator", "clr-namespace:Cavdeck.App.Controls")));
+        Assert.Null(volumeSlider.Attribute("Focusable"));
+
         var inputs = Inputs();
         var mediaSliderStyle = Assert.Single(inputs.Descendants(Wpf + "Style").Where(element =>
             (string?)element.Attribute(Xaml + "Key") == "MediaSliderStyle"));
