@@ -1,9 +1,9 @@
-using System.Reflection;
 using System.IO;
-using Cavdeck.Domain.Transfers;
-using Cavdeck.Domain.Storage;
-using Cavdeck.Infrastructure.Configuration;
+using System.Reflection;
 using System.Text;
+using Cavdeck.Domain.Storage;
+using Cavdeck.Domain.Transfers;
+using Cavdeck.Infrastructure.Configuration;
 
 namespace Cavdeck.App.Features.Diagnostics;
 
@@ -17,16 +17,13 @@ public sealed class DiagnosticLog
     private const int KeepDays = 7;
     private static readonly HashSet<string> Areas =
         ["startup", "process", "background-task", "ui", "async-command", "window-close", "tray", "instance-activation", "copy-diagnostic", "open-logs", "update-check", "connection-test", "config-recovery", "transfer", "media-playback", "other"];
-    private static readonly HashSet<string> Categories =
-        ["Storage", "IO", "Access", "Network", "Cancellation", "InvalidState", "Argument", "Other",
-         "MediaDownloadCompleted", "MediaDownloadFailed", "MediaSourceAssigned", "MediaPlayRequested",
-         "MediaOpened", "MediaFailed", "MediaOpenTimeout", "MediaAutoRetry", "MediaManualRetry",
-         "MediaRetryExhausted", "MediaOpenStartFailed", "MediaReleaseFailed",
-         .. Enum.GetNames<TransferFailureKind>()];
     private static readonly HashSet<string> MediaEvents =
         ["MediaDownloadCompleted", "MediaDownloadFailed", "MediaSourceAssigned", "MediaPlayRequested",
          "MediaOpened", "MediaFailed", "MediaOpenTimeout", "MediaAutoRetry", "MediaManualRetry",
          "MediaRetryExhausted", "MediaOpenStartFailed", "MediaReleaseFailed"];
+    private static readonly HashSet<string> Categories =
+        ["Storage", "IO", "Access", "Network", "Cancellation", "InvalidState", "Argument", "Other",
+         .. MediaEvents, .. Enum.GetNames<TransferFailureKind>()];
 
     public static DiagnosticLog Current { get; } = new();
     public string DirectoryPath => _directory;

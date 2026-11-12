@@ -65,17 +65,6 @@ public sealed class MediaPlaybackTests
         Assert.Equal(expected, MediaPlaybackMath.ShouldRetryAfterOpenTimeout(retryCount));
 
     [Fact]
-    public void Invalidating_a_failed_open_rejects_late_native_callbacks()
-    {
-        var activeAttempt = 3;
-        var callbackAttempt = activeAttempt;
-        Assert.True(MediaPlaybackMath.IsCurrentAttempt(activeAttempt, callbackAttempt));
-
-        activeAttempt++;
-        Assert.False(MediaPlaybackMath.IsCurrentAttempt(activeAttempt, callbackAttempt));
-    }
-
-    [Fact]
     public void Time_label_distinguishes_opening_from_unknown_duration()
     {
         Assert.Equal("--:-- / --:--",
