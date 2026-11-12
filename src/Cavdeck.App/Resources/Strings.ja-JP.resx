@@ -876,6 +876,8 @@
   <data name="Media_Replay" xml:space="preserve"><value>もう一度再生</value></data>
   <data name="Media_SeekPreview" xml:space="preserve"><value>{0} に移動</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} / {1}</value></data>
+  <data name="Media_OpenTimedOut" xml:space="preserve"><value>メディアを開くのに時間がかかっています。</value></data>
+  <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck は一度自動的に再試行しました。もう一度試すか、プレーヤーを閉じてください。</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>プレビュー</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>プレビューを開けません</value></data>
 </root>
