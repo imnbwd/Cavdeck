@@ -27,8 +27,8 @@ public partial class MediaPreviewWindow : AppWindow
     private readonly string _bucket;
     private readonly string _key;
     private readonly long _size;
+    private readonly bool _isVideo;
     private readonly CancellationTokenSource _lifetime = new();
-
     private readonly DispatcherTimer _openTimeoutTimer = new() { Interval = MediaPlaybackMath.OpenTimeout };
 
     private PreviewFileLease? _lease;
@@ -37,16 +37,13 @@ public partial class MediaPreviewWindow : AppWindow
     private int _automaticRetryCount;
     private bool _downloadInProgress;
     private bool _openAttemptActive;
+    private bool _disposed;
+    private string _feedbackKey = "Media_Loading";
     private string _feedbackDescriptionKey = "";
     private string _feedbackPrimaryKey = "Media_Cancel";
     private bool _feedbackShowSecondary;
-    private bool _disposed;
-
-    private readonly bool _isVideo;
-
-    private TimeSpan _duration;
-    private string _feedbackKey = "Media_Loading";
     private long _downloadedBytes;
+    private TimeSpan _duration;
 
     private MediaElement Player => _player ?? throw new InvalidOperationException("The media player is not initialized.");
 
