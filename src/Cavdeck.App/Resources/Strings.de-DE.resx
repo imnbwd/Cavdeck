@@ -876,6 +876,8 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="Media_Replay" xml:space="preserve"><value>Erneut abspielen</value></data>
   <data name="Media_SeekPreview" xml:space="preserve"><value>Zu {0} springen</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} von {1}</value></data>
+  <data name="Media_OpenTimedOut" xml:space="preserve"><value>Das Medium wird ungewöhnlich langsam geöffnet.</value></data>
+  <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck hat es einmal automatisch erneut versucht. Versuche es noch einmal oder schließe den Player.</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Vorschau</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Vorschau konnte nicht geöffnet werden</value></data>
 </root>
