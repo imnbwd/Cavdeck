@@ -943,6 +943,4 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         SetProperty(ref _saveError, value, nameof(SaveError));
         UpdateStatus();
     }
-
-
 }
