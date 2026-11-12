@@ -118,7 +118,6 @@ public partial class MediaPreviewWindow : AppWindow
                 Topmost = false;
         };
         Feedback.PrimaryCommand = new RelayCommand(_ => Close());
-        Feedback.PrimaryCommand = new RelayCommand(_ => Close());
         Feedback.SecondaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;
         Feedback.ShowSecondaryButton = false;
@@ -364,14 +363,19 @@ public partial class MediaPreviewWindow : AppWindow
         StartMediaOpen();
     }
 
-    private void SetFeedback(string headlineKey, string primaryKey, string? descriptionKey = null)
+    private void SetFeedback(string headlineKey, string primaryKey,
+        string? descriptionKey = null, bool showSecondary = false)
     {
         _feedbackKey = headlineKey;
         _feedbackPrimaryKey = primaryKey;
         _feedbackDescriptionKey = descriptionKey ?? "";
+        _feedbackShowSecondary = showSecondary;
         Feedback.Headline = Texts[headlineKey];
         Feedback.Description = descriptionKey is null ? "" : Texts[descriptionKey];
         Feedback.PrimaryButtonText = Texts[primaryKey];
+        Feedback.ShowSecondaryButton = showSecondary;
+        if (showSecondary)
+            Feedback.SecondaryButtonText = Texts["Media_Close"];
     }
 
     private void Player_MediaOpened(object sender, RoutedEventArgs e, int attempt)
@@ -393,28 +397,6 @@ public partial class MediaPreviewWindow : AppWindow
         ForwardButton.IsEnabled = _duration > TimeSpan.Zero;
         Feedback.Visibility = Visibility.Collapsed;
         Feedback.ShowSecondaryButton = false;
-        ApplyPlaybackSpeed();
-        UpdateTimeLabel();
-        Player.Play();
-        _playing = true;
-        _timer.Start();
-        UpdatePlaybackLabels();
-    }
-
-    private void Player_MediaOpened(object sender, RoutedEventArgs e)
-    {
-        if (_disposed)
-            return;
-        _ready = true;
-        _ended = false;
-        _duration = Player.NaturalDuration.HasTimeSpan
-            ? Player.NaturalDuration.TimeSpan : TimeSpan.Zero;
-        SeekSlider.IsEnabled = _duration > TimeSpan.Zero;
-        SeekSlider.Maximum = Math.Max(1, _duration.TotalSeconds);
-        PlayPauseButton.IsEnabled = true;
-        BackButton.IsEnabled = _duration > TimeSpan.Zero;
-        ForwardButton.IsEnabled = _duration > TimeSpan.Zero;
-        Feedback.Visibility = Visibility.Collapsed;
         ApplyPlaybackSpeed();
         UpdateTimeLabel();
         Player.Play();
@@ -460,16 +442,13 @@ public partial class MediaPreviewWindow : AppWindow
         _timer.Stop();
         ResetPlaybackControls();
         Feedback.Visibility = Visibility.Visible;
-        SetFeedback(headlineKey, "Preview_Retry", descriptionKey);
+        SetFeedback(headlineKey, "Preview_Retry", descriptionKey, showSecondary: true);
         Feedback.ShowProgress = false;
         Feedback.IsIndeterminate = false;
         Feedback.ProgressDescription = "";
         Feedback.PrimaryCommand = new RelayCommand(_ => RetryPlayback());
-        Feedback.SecondaryButtonText = Texts["Media_Close"];
         Feedback.SecondaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;
-        Feedback.ShowSecondaryButton = true;
-        _feedbackShowSecondary = true;
     }
 
     private void TogglePlayback()
@@ -529,7 +508,8 @@ public partial class MediaPreviewWindow : AppWindow
         if (!_isVideo)
             MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
         SetFeedback(_feedbackKey, _feedbackPrimaryKey,
-            _feedbackDescriptionKey.Length == 0 ? null : _feedbackDescriptionKey);
+            _feedbackDescriptionKey.Length == 0 ? null : _feedbackDescriptionKey,
+            _feedbackShowSecondary);
         if (_feedbackShowSecondary)
             Feedback.SecondaryButtonText = Texts["Media_Close"];
         UpdatePlaybackLabels();
