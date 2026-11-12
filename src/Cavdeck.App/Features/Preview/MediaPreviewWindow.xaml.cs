@@ -42,20 +42,7 @@ public partial class MediaPreviewWindow : AppWindow
     private bool _feedbackShowSecondary;
     private bool _disposed;
 
-
-
-
-
-
-
-
-
     private readonly bool _isVideo;
-
-
-
-
-
 
     private TimeSpan _duration;
     private string _feedbackKey = "Media_Loading";
@@ -257,8 +244,7 @@ public partial class MediaPreviewWindow : AppWindow
     }
 
     private bool IsCurrentPlayer(object sender, int attempt) =>
-        !_disposed && MediaPlaybackMath.IsCurrentAttempt(_playbackAttempt, attempt)
-        && ReferenceEquals(sender, _player);
+        !_disposed && attempt == _playbackAttempt && ReferenceEquals(sender, _player);
 
     private void StartMediaOpen()
     {
@@ -302,8 +288,6 @@ public partial class MediaPreviewWindow : AppWindow
             ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
         }
 
-        UpdatePlaybackLabels();
-        UpdateTimeLabel();
     }
 
     private void ResetPlaybackControls()
@@ -425,7 +409,6 @@ public partial class MediaPreviewWindow : AppWindow
         _timer.Stop();
         ShowFullscreenControls();
         ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
-        UpdatePlaybackLabels();
     }
 
     private void ShowFailure(string headlineKey, string descriptionKey)
@@ -481,6 +464,4 @@ public partial class MediaPreviewWindow : AppWindow
             _lifetime.Dispose();
         }
     }
-
-
 }
