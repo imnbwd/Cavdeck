@@ -95,8 +95,10 @@ public sealed class MediaPreviewLayoutTests
         var audioLabels = artwork.Descendants(Wpf + "TextBlock").ToArray();
         Assert.DoesNotContain(audioLabels, label =>
             (string?)label.Attribute("Text") == "{Binding FileName}");
-        Assert.Contains(audioLabels, label =>
+        var audioTypeLabel = Assert.Single(audioLabels, label =>
             ((string?)label.Attribute("Text"))?.Contains("Media_KindAudio") == true);
+        Assert.Equal("{DynamicResource FontSizeTitle}", (string?)audioTypeLabel.Attribute("FontSize"));
+        Assert.Equal("SemiBold", (string?)audioTypeLabel.Attribute("FontWeight"));
         Assert.Contains(audioLabels, label =>
             (string?)label.Attribute("Text") == "{Binding MediaSummary}");
         Assert.Equal("0", (string?)Assert.Single(view.Descendants().Where(element =>
