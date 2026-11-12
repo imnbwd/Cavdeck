@@ -247,12 +247,12 @@ public partial class App : System.Windows.Application
 
     private void StartPreviewCacheCleanup()
     {
-        var previewReader = Services.GetRequiredService<ProviderPreviewContentReader>();
+        var services = Services;
         _ = Task.Run(() =>
         {
             try
             {
-                previewReader.CleanupStaleFiles();
+                services.GetRequiredService<ProviderPreviewContentReader>().CleanupStaleFiles();
             }
             catch (Exception exception)
             {
