@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Cavdeck.App.Controls;
 using Cavdeck.App.Features.Explorer;
 using Cavdeck.App.Localization;
@@ -457,7 +456,7 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
                 return;
 
             var image = loaded.Kind == PreviewLoadKind.Image
-                ? await Task.Run(() => DecodeImage(loaded.Image), token)
+                ? await Task.Run(() => PreviewImageDecoder.Decode(loaded.Image), token)
                 : null;
 
             if (loaded.Kind == PreviewLoadKind.Pdf && loaded.Head is not null)
@@ -944,31 +943,4 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
         SetProperty(ref _saveError, value, nameof(SaveError));
         UpdateStatus();
     }
-
-    private static ImageSource? DecodeImage(byte[]? bytes)
-    {
-        if (bytes is null || bytes.Length == 0)
-            return null;
-        try
-        {
-            var image = new BitmapImage();
-            using var stream = new MemoryStream(bytes);
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.StreamSource = stream;
-            image.EndInit();
-            image.Freeze();
-            return image;
-        }
-        catch (Exception exception) when (exception is NotSupportedException
-            or FileFormatException
-            or ArgumentException
-            or IOException
-            or InvalidOperationException
-            or System.Runtime.InteropServices.COMException)
-        {
-            return null;
-        }
-    }
-
 }

@@ -76,8 +76,6 @@ public partial class MediaPreviewWindow
     {
         if (_disposed)
             return;
-        if (!_isVideo)
-            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
         SetFeedback(_feedbackKey, _feedbackPrimaryKey,
             _feedbackDescriptionKey.Length == 0 ? null : _feedbackDescriptionKey,
             _feedbackShowSecondary);

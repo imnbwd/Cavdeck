@@ -107,6 +107,19 @@ public sealed class MediaPreviewLayoutTests
     }
 
     [Fact]
+    public void Language_refresh_does_not_override_the_filename_caption_binding()
+    {
+        // A direct Text assignment during language changes clears the XAML Binding.
+        // Keep this source-level guard alongside the title-bar XAML contract test.
+        var playback = File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "CavdeckMediaPreviewWindow.Playback.cs"));
+        var begin = playback.IndexOf("private void Texts_PropertyChanged(", StringComparison.Ordinal);
+        var end = playback.IndexOf("private void Timer_Tick(", begin, StringComparison.Ordinal);
+        Assert.True(begin >= 0 && end > begin);
+        Assert.DoesNotContain("MediaCaption.Text =", playback[begin..end]);
+    }
+
+    [Fact]
     public void Video_has_fullscreen_controls_and_speed_choices_with_dynamic_media_host()
     {
         var view = Window();
