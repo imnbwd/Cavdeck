@@ -96,7 +96,7 @@ public sealed class MediaPreviewLayoutTests
     }
 
     [Fact]
-    public void Video_has_fullscreen_controls_and_speed_choices_without_second_media_element()
+    public void Video_has_fullscreen_controls_and_speed_choices_with_dynamic_media_host()
     {
         var view = Window();
         var fullscreen = Assert.Single(view.Descendants(Wpf + "Button").Where(button =>
@@ -108,7 +108,9 @@ public sealed class MediaPreviewLayoutTests
         Assert.Equal("SpeedSelector_SelectionChanged", (string?)speeds.Attribute("SelectionChanged"));
         Assert.Equal(new[] { "0.75", "1", "1.25", "1.5", "2" },
             speeds.Elements(Wpf + "ComboBoxItem").Select(option => (string?)option.Attribute("Tag")).ToArray());
-        Assert.Single(view.Descendants(Wpf + "MediaElement"));
+        Assert.Empty(view.Descendants(Wpf + "MediaElement"));
+        Assert.Single(view.Descendants(Wpf + "Grid"), grid =>
+            (string?)grid.Attribute(Xaml + "Name") == "MediaHost");
         Assert.Contains(view.Descendants(Wpf + "ToolTip"), tip =>
             (string?)tip.Attribute(Xaml + "Name") == "SeekPreviewTip");
         Assert.Equal("PlaybackRoot_PreviewMouseMove", (string?)Assert.Single(
