@@ -112,7 +112,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public event EventHandler? DownloadRequested;
     public event EventHandler? ImageViewerRequested;
     public event EventHandler? MediaViewerRequested;
-    public event EventHandler? MediaContextChanged;
     public event EventHandler? StateChanged;
     public event EventHandler<ObjectHead>? Saved;
 
@@ -228,7 +227,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void InvalidateContext()
     {
-        MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _mediaReady = false;
         _session.Reset();
         _loading = false;
@@ -333,8 +331,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
     public async Task OpenAsync(
         StorageConnection connection, string bucket, string name, string key, bool writable)
     {
-        if (_connection?.Id != connection.Id || _bucket != bucket || _key != key)
-            MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _connection = connection;
         _bucket = bucket;
         _name = name;
@@ -352,7 +348,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void Close()
     {
-        MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _session.Reset();
         SetPdfLease(null);
         _loading = false;

@@ -144,7 +144,6 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         _imagePreviewService = preview;
         _preview.ImageViewerRequested += OnImageViewerRequested;
         _preview.MediaViewerRequested += OnMediaViewerRequested;
-        _preview.MediaContextChanged += OnMediaContextChanged;
         _preview.LeaveResolved += (_, _) => ResumeAfterLeave();
         _preview.LeaveCancelled += (_, _) => _afterLeave = null;
         _preview.Saved += (_, head) => ApplySavedObject(head);
@@ -627,9 +626,8 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         CancelHeaderLoad();
         _imageViewer?.Close();
         _imageViewer = null;
-        OnMediaContextChanged(this, EventArgs.Empty);
+        CloseMediaViewer();
         _preview.MediaViewerRequested -= OnMediaViewerRequested;
-        _preview.MediaContextChanged -= OnMediaContextChanged;
         _preview.ImageViewerRequested -= OnImageViewerRequested;
         _preview.Dispose();
         _thumbnails.Dispose();
@@ -657,6 +655,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         BucketRows.Clear();
         Crumbs.Clear();
         SetBusy(false, more: false);
+        CloseMediaViewer();
         _preview.InvalidateContext();
         _afterLeave = null;
 
@@ -708,6 +707,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
             BucketRows.Clear();
             Crumbs.Clear();
             SetBusy(false, more: false);
+            CloseMediaViewer();
             _preview.InvalidateContext();
             SetError(_texts["Connection_ReconnectPending"]);
         }
@@ -984,13 +984,16 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         return _preview.OpenAsync(_connection, _bucket, row.Name, row.Entry.Key, CanWrite);
     }
 
-    private void OnMediaContextChanged(object? sender, EventArgs e)
+    /// <summary>
+    /// Closes the independent media player at an explicit lifecycle boundary.
+    /// Explorer selection and preview-pane changes must not interrupt playback.
+    /// </summary>
+    public void CloseMediaViewer()
     {
-        _mediaViewer?.Close();
+        var viewer = _mediaViewer;
         _mediaViewer = null;
+        viewer?.Close();
     }
-
-    public void CloseMediaViewer() => OnMediaContextChanged(this, EventArgs.Empty);
 
     private void OnMediaViewerRequested(object? sender, EventArgs e)
     {
