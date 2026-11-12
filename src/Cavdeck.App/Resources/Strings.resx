@@ -880,6 +880,8 @@ Repair the file and retry before changing connections.</value></data>
   <data name="Media_Replay" xml:space="preserve"><value>Replay</value></data>
   <data name="Media_SeekPreview" xml:space="preserve"><value>Seek to {0}</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>{0} of {1}</value></data>
+  <data name="Media_OpenTimedOut" xml:space="preserve"><value>Media is taking too long to open.</value></data>
+  <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck retried once. Try again, or close the player.</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Preview</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Couldn't open this preview</value></data>
 </root>
