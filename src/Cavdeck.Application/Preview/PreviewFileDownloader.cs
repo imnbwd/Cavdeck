@@ -9,6 +9,7 @@ namespace Cavdeck.Application.Preview;
 /// </summary>
 public sealed class PreviewFileDownloader
 {
+    private static readonly TimeSpan StaleFileRetention = TimeSpan.FromHours(48);
     private readonly IObjectStorageProviderFactory _providers;
     private readonly string _directory;
     private readonly object _activeGate = new();
@@ -36,7 +37,7 @@ public sealed class PreviewFileDownloader
         await Task.Run(() =>
         {
             Directory.CreateDirectory(_directory);
-            PruneOldCopies();
+            CleanupStaleFiles();
         }, token);
 
         var path = Path.Combine(_directory, Guid.NewGuid().ToString("N") + "-" + SafeName(name));
@@ -112,24 +113,56 @@ public sealed class PreviewFileDownloader
         }
     }
 
-    private void PruneOldCopies()
+    /// <summary>
+    /// Best-effort cleanup of expired preview copies. Only files created by this downloader
+    /// are eligible; active leases and files that cannot be accessed are left untouched.
+    /// </summary>
+    public void CleanupStaleFiles()
     {
-        var cutoff = DateTime.UtcNow.AddDays(-2);
+        if (!Directory.Exists(_directory))
+            return;
+
         HashSet<string> active;
         lock (_activeGate)
             active = new HashSet<string>(_activeCopies, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var path in Directory.EnumerateFiles(_directory))
+        var cutoff = DateTime.UtcNow - StaleFileRetention;
+        try
         {
-            try
+            foreach (var path in Directory.EnumerateFiles(_directory, "*", SearchOption.TopDirectoryOnly))
             {
-                if (!active.Contains(Path.GetFullPath(path))
-                    && File.GetLastWriteTimeUtc(path) < cutoff)
-                    File.Delete(path);
+                try
+                {
+                    var fullPath = Path.GetFullPath(path);
+                    if (active.Contains(fullPath) || !IsManagedCopy(fullPath))
+                        continue;
+
+                    if (File.GetLastWriteTimeUtc(fullPath) < cutoff)
+                        File.Delete(fullPath);
+                }
+                catch (Exception ex) when (IsExpectedFileSystemException(ex)) { }
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        }
+        catch (Exception ex) when (IsExpectedFileSystemException(ex))
+        {
+            // Cache cleanup is best-effort and must never interrupt preview or startup.
         }
     }
+
+    private static bool IsManagedCopy(string path)
+    {
+        var name = Path.GetFileName(path);
+        return name.Length > 33
+            && name[32] == '-'
+            && Guid.TryParseExact(name.AsSpan(0, 32), "N", out _);
+    }
+
+    private static bool IsExpectedFileSystemException(Exception exception) =>
+        exception is IOException
+            or UnauthorizedAccessException
+            or System.Security.SecurityException
+            or ArgumentException
+            or NotSupportedException;
 
     private static string SafeName(string name)
     {

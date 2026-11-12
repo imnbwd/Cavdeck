@@ -27,7 +27,9 @@ public static class CavdeckCoreRegistration
         services.AddSingleton<S3ClientLeasePool>();
         services.AddSingleton<IDownloadLinkSigner, S3DownloadLinkSigner>();
         services.AddSingleton<IObjectStorageProviderFactory, S3ProviderFactory>();
-        services.AddSingleton<IPreviewContentReader, ProviderPreviewContentReader>();
+        services.AddSingleton<ProviderPreviewContentReader>();
+        services.AddSingleton<IPreviewContentReader>(sp =>
+            sp.GetRequiredService<ProviderPreviewContentReader>());
         services.AddSingleton<ConnectionService>();
         services.AddSingleton<ExplorerService>();
         services.AddSingleton<ITransferJournal>(_ =>

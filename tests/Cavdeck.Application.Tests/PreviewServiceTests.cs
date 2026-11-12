@@ -222,6 +222,116 @@ public sealed class PreviewServiceTests
     }
 
     [Fact]
+    public void Cleanup_stale_files_removes_only_expired_managed_copies()
+    {
+        var root = TempDirectory();
+        try
+        {
+            var stale = CreatePreviewCopy(root, "stale.pdf", DateTime.UtcNow.AddHours(-49));
+            var recent = CreatePreviewCopy(root, "recent.pdf", DateTime.UtcNow.AddHours(-24));
+            var unrelated = Path.Combine(root, "notes.txt");
+            File.WriteAllText(unrelated, "keep");
+            File.SetLastWriteTimeUtc(unrelated, DateTime.UtcNow.AddDays(-7));
+
+            var downloader = new PreviewFileDownloader(new SingleFactory(new PreviewStore()), root);
+            downloader.CleanupStaleFiles();
+
+            Assert.False(File.Exists(stale));
+            Assert.True(File.Exists(recent));
+            Assert.True(File.Exists(unrelated));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public void Cleanup_stale_files_does_not_create_a_missing_directory()
+    {
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(new PreviewStore()), root);
+
+            reader.CleanupStaleFiles();
+
+            Assert.False(Directory.Exists(root));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Cleanup_stale_files_preserves_active_leases()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(store), root);
+            var lease = await reader.PrepareFileAsync(
+                Connection(), "assets", "active.pdf", "active.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+            try
+            {
+                File.SetLastWriteTimeUtc(lease.FilePath, DateTime.UtcNow.AddHours(-49));
+
+                reader.CleanupStaleFiles();
+
+                Assert.True(File.Exists(lease.FilePath));
+            }
+            finally
+            {
+                await lease.DisposeAsync();
+            }
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public async Task Cleanup_stale_files_removes_expired_detached_copies()
+    {
+        var store = new PreviewStore { Body = "%PDF-1.7"u8.ToArray() };
+        var root = TempDirectory();
+        try
+        {
+            var reader = new ProviderPreviewContentReader(new SingleFactory(store), root);
+            var lease = await reader.PrepareFileAsync(
+                Connection(), "assets", "external.pdf", "external.pdf",
+                store.Body.Length, PreviewRules.MaxPdfBytes, null, CancellationToken.None);
+            var path = lease.Detach();
+            await lease.DisposeAsync();
+            File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddHours(-49));
+
+            reader.CleanupStaleFiles();
+
+            Assert.False(File.Exists(path));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
+    public void Cleanup_stale_files_skips_locked_files_and_retries_later()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        var root = TempDirectory();
+        try
+        {
+            var stale = CreatePreviewCopy(root, "locked.pdf", DateTime.UtcNow.AddHours(-49));
+            var downloader = new PreviewFileDownloader(new SingleFactory(new PreviewStore()), root);
+
+            using (new FileStream(stale, FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                downloader.CleanupStaleFiles();
+                Assert.True(File.Exists(stale));
+            }
+
+            downloader.CleanupStaleFiles();
+            Assert.False(File.Exists(stale));
+        }
+        finally { RemoveDirectory(root); }
+    }
+
+    [Fact]
     public async Task Bounded_preparation_blocks_large_objects_before_network_io()
     {
         var store = new PreviewStore { Body = new byte[4] };
@@ -308,6 +418,15 @@ public sealed class PreviewServiceTests
             Assert.Empty(Directory.GetFiles(root));
         }
         finally { RemoveDirectory(root); }
+    }
+
+    private static string CreatePreviewCopy(string directory, string name, DateTime lastWriteUtc)
+    {
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, $"{Guid.NewGuid():N}-{name}");
+        File.WriteAllText(path, "preview");
+        File.SetLastWriteTimeUtc(path, lastWriteUtc);
+        return path;
     }
 
     private static string TempDirectory() =>

@@ -15,6 +15,9 @@ public sealed class ProviderPreviewContentReader : IPreviewContentReader
         _files = new PreviewFileDownloader(providers, temporaryDirectory);
     }
 
+    /// <summary>Runs best-effort cleanup of expired temporary preview files.</summary>
+    public void CleanupStaleFiles() => _files.CleanupStaleFiles();
+
     public Task<ObjectHead> HeadAsync(
         StorageConnection connection, string bucket, string key, CancellationToken cancellationToken)
     {

@@ -18,6 +18,7 @@ using Cavdeck.Application.Explorer;
 using Cavdeck.Application.Transfers;
 using Cavdeck.Application.Settings;
 using Cavdeck.Application.Places;
+using Cavdeck.Application.Preview;
 using Cavdeck.Infrastructure.Connections;
 using Cavdeck.Infrastructure.Configuration;
 using Cavdeck.Infrastructure.S3;
@@ -224,6 +225,8 @@ public partial class App : System.Windows.Application
             ShowConfigurationRecoveryNotice(window, settingsStore, connectionCatalog, connections);
             _services.GetRequiredService<UpdateNoticeService>().Start();
             _ = _services.GetRequiredService<UpdateCoordinator>().CheckOnStartupAsync();
+            // Defer non-critical disk maintenance until the main window is visible and startup work is complete.
+            StartPreviewCacheCleanup();
         }
         catch (Exception ex)
         {
@@ -241,6 +244,23 @@ public partial class App : System.Windows.Application
                 ShutdownMode = ShutdownMode.OnMainWindowClose;
 #endif
         }
+    }
+
+    private void StartPreviewCacheCleanup()
+    {
+        var services = Services;
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                services.GetRequiredService<ProviderPreviewContentReader>().CleanupStaleFiles();
+            }
+            catch (Exception exception)
+            {
+                // Cache maintenance is non-critical and must never affect application startup.
+                DiagnosticLog.Current.Queue("preview-cache-cleanup", exception);
+            }
+        });
     }
 
     private void ReconcileUpdateActivity()
