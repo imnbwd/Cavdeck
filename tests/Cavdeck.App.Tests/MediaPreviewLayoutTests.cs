@@ -12,18 +12,28 @@ public sealed class MediaPreviewLayoutTests
         XDocument.Load(Path.Combine(AppContext.BaseDirectory, "CavdeckMediaPreviewWindow.xaml"));
 
     [Fact]
-    public void Playback_uses_manual_media_element_and_releases_its_source_on_close()
+    public void Playback_uses_a_dedicated_host_for_fresh_media_elements_per_attempt()
     {
         var view = Window();
-        var player = Assert.Single(view.Descendants(Wpf + "MediaElement"));
-        Assert.Equal("Manual", (string?)player.Attribute("LoadedBehavior"));
-        Assert.Equal("Close", (string?)player.Attribute("UnloadedBehavior"));
-        Assert.Equal("True", (string?)player.Attribute("ScrubbingEnabled"));
-        Assert.Equal("Uniform", (string?)player.Attribute("Stretch"));
-        Assert.NotNull(player.Attribute("MediaOpened"));
-        Assert.NotNull(player.Attribute("MediaEnded"));
-        Assert.NotNull(player.Attribute("MediaFailed"));
-        Assert.Null(player.Attribute("Source"));
+        var host = Assert.Single(view.Descendants(Wpf + "Grid").Where(grid =>
+            (string?)grid.Attribute(Xaml + "Name") == "MediaHost"));
+        Assert.Equal("False", (string?)host.Attribute("IsHitTestVisible"));
+        Assert.Empty(view.Descendants(Wpf + "MediaElement"));
+    }
+
+    [Fact]
+    public void Loading_feedback_stays_inside_the_media_surface_and_does_not_cover_controls()
+    {
+        var view = Window();
+        var feedback = Assert.Single(view.Descendants().Where(element =>
+            element.Name.LocalName == "PreviewFeedbackView" &&
+            (string?)element.Attribute(Xaml + "Name") == "Feedback"));
+        Assert.Equal("0", (string?)feedback.Attribute("Grid.Row"));
+        Assert.Null(feedback.Attribute("Grid.RowSpan"));
+
+        var controls = Assert.Single(view.Descendants(Wpf + "Border").Where(border =>
+            (string?)border.Attribute(Xaml + "Name") == "ControlsBar"));
+        Assert.Equal("1", (string?)controls.Attribute("Grid.Row"));
     }
 
     [Fact]
@@ -78,13 +88,15 @@ public sealed class MediaPreviewLayoutTests
             (string?)grid.Attribute(Xaml + "Name") == "AudioArtwork"));
         Assert.Contains(artwork.Descendants(Wpf + "TextBlock"), label =>
             (string?)label.Attribute("Text") == "{Binding FileName}");
-        Assert.Equal("2", (string?)Assert.Single(view.Descendants().Where(element =>
+        Assert.Contains(artwork.Descendants(Wpf + "TextBlock"), label =>
+            (string?)label.Attribute("Text") == "{Binding MediaSummary}");
+        Assert.Equal("0", (string?)Assert.Single(view.Descendants().Where(element =>
             (string?)element.Attribute(Xaml + "Name") == "Feedback"))
-            .Attribute("Grid.RowSpan"));
+            .Attribute("Grid.Row"));
     }
 
     [Fact]
-    public void Video_has_fullscreen_controls_and_speed_choices_without_second_media_element()
+    public void Video_has_fullscreen_controls_and_speed_choices_with_dynamic_media_host()
     {
         var view = Window();
         var fullscreen = Assert.Single(view.Descendants(Wpf + "Button").Where(button =>
@@ -96,7 +108,9 @@ public sealed class MediaPreviewLayoutTests
         Assert.Equal("SpeedSelector_SelectionChanged", (string?)speeds.Attribute("SelectionChanged"));
         Assert.Equal(new[] { "0.75", "1", "1.25", "1.5", "2" },
             speeds.Elements(Wpf + "ComboBoxItem").Select(option => (string?)option.Attribute("Tag")).ToArray());
-        Assert.Single(view.Descendants(Wpf + "MediaElement"));
+        Assert.Empty(view.Descendants(Wpf + "MediaElement"));
+        Assert.Single(view.Descendants(Wpf + "Grid"), grid =>
+            (string?)grid.Attribute(Xaml + "Name") == "MediaHost");
         Assert.Contains(view.Descendants(Wpf + "ToolTip"), tip =>
             (string?)tip.Attribute(Xaml + "Name") == "SeekPreviewTip");
         Assert.Equal("PlaybackRoot_PreviewMouseMove", (string?)Assert.Single(

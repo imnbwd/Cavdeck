@@ -880,6 +880,8 @@
   <data name="Media_Replay" xml:space="preserve"><value>重新播放</value></data>
   <data name="Media_SeekPreview" xml:space="preserve"><value>跳转到 {0}</value></data>
   <data name="Media_Progress" xml:space="preserve"><value>已下载 {0} / {1}</value></data>
+  <data name="Media_OpenTimedOut" xml:space="preserve"><value>媒体打开时间过长。</value></data>
+  <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck 已自动重试一次。你可以再次重试，或关闭播放器。</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>文件预览</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>无法打开预览</value></data>
 </root>

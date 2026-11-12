@@ -108,11 +108,7 @@
     <Grid x:Name="MediaSurface" Grid.Row="0" ClipToBounds="True" Focusable="True"
           Background="{DynamicResource SurfaceMutedBrush}"
           MouseLeftButtonDown="MediaSurface_MouseLeftButtonDown">
-      <MediaElement x:Name="Player" LoadedBehavior="Manual" UnloadedBehavior="Close"
-                    ScrubbingEnabled="True" Stretch="Uniform" IsHitTestVisible="False"
-                    MediaOpened="Player_MediaOpened"
-                    MediaEnded="Player_MediaEnded"
-                    MediaFailed="Player_MediaFailed"/>
+      <Grid x:Name="MediaHost" IsHitTestVisible="False"/>
       <Grid x:Name="AudioArtwork" Visibility="Collapsed" MaxWidth="700"
             HorizontalAlignment="Stretch" VerticalAlignment="Center"
             Margin="20,12">
@@ -131,6 +127,9 @@
                      FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
                      ToolTip="{Binding FileName}"/>
           <TextBlock Text="{Binding Texts[Media_KindAudio]}" Margin="0,5,0,0"
+                     Foreground="{DynamicResource MutedTextBrush}"/>
+          <TextBlock Text="{Binding MediaSummary}" Margin="0,3,0,0"
+                     FontSize="{DynamicResource FontSizeSmall}"
                      Foreground="{DynamicResource MutedTextBrush}"/>
         </StackPanel>
       </Grid>
@@ -159,7 +158,7 @@
             </ToolTip>
           </Slider.ToolTip>
         </Slider>
-        <TextBlock Grid.Row="1" x:Name="TimeLabel" Text="00:00 / 00:00"
+        <TextBlock Grid.Row="1" x:Name="TimeLabel" Text="--:-- / --:--"
                    HorizontalAlignment="Right" Margin="0,-1,0,6"
                    Foreground="{DynamicResource MutedTextBrush}"
                    FontSize="{DynamicResource FontSizeSmall}"/>
@@ -226,6 +225,6 @@
     </Border>
 
     <!-- Loading, cancellation and failure remain available across the full compact player. -->
-    <preview:PreviewFeedbackView x:Name="Feedback" Grid.RowSpan="2" Panel.ZIndex="2"/>
+    <preview:PreviewFeedbackView x:Name="Feedback" Grid.Row="0" Panel.ZIndex="2"/>
   </Grid>
 </controls:AppWindow>

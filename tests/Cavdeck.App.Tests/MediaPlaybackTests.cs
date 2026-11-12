@@ -56,4 +56,33 @@ public sealed class MediaPlaybackTests
         Assert.Equal(position, MediaPlaybackMath.Seek(position, 5, TimeSpan.Zero));
         Assert.Equal(position, MediaPlaybackMath.Seek(position, double.NaN, TimeSpan.FromMinutes(1)));
     }
+
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, false)]
+    public void Open_timeout_allows_only_one_automatic_retry(int retryCount, bool expected) =>
+        Assert.Equal(expected, MediaPlaybackMath.ShouldRetryAfterOpenTimeout(retryCount));
+
+    [Fact]
+    public void Invalidating_a_failed_open_rejects_late_native_callbacks()
+    {
+        var activeAttempt = 3;
+        var callbackAttempt = activeAttempt;
+        Assert.True(MediaPlaybackMath.IsCurrentAttempt(activeAttempt, callbackAttempt));
+
+        activeAttempt++;
+        Assert.False(MediaPlaybackMath.IsCurrentAttempt(activeAttempt, callbackAttempt));
+    }
+
+    [Fact]
+    public void Time_label_distinguishes_opening_from_unknown_duration()
+    {
+        Assert.Equal("--:-- / --:--",
+            MediaPlaybackMath.TimeLabel(TimeSpan.Zero, TimeSpan.Zero, ready: false));
+        Assert.Equal("00:00 / --:--",
+            MediaPlaybackMath.TimeLabel(TimeSpan.Zero, TimeSpan.Zero, ready: true));
+        Assert.Equal("00:12 / 05:56",
+            MediaPlaybackMath.TimeLabel(TimeSpan.FromSeconds(12), TimeSpan.FromSeconds(356), ready: true));
+    }
 }

@@ -16,10 +16,17 @@ public sealed class DiagnosticLog
     private const long MaxFileBytes = 1024 * 1024;
     private const int KeepDays = 7;
     private static readonly HashSet<string> Areas =
-        ["startup", "process", "background-task", "ui", "async-command", "window-close", "tray", "instance-activation", "copy-diagnostic", "open-logs", "update-check", "connection-test", "config-recovery", "transfer", "other"];
+        ["startup", "process", "background-task", "ui", "async-command", "window-close", "tray", "instance-activation", "copy-diagnostic", "open-logs", "update-check", "connection-test", "config-recovery", "transfer", "media-playback", "other"];
     private static readonly HashSet<string> Categories =
         ["Storage", "IO", "Access", "Network", "Cancellation", "InvalidState", "Argument", "Other",
+         "MediaDownloadCompleted", "MediaDownloadFailed", "MediaSourceAssigned", "MediaPlayRequested",
+         "MediaOpened", "MediaFailed", "MediaOpenTimeout", "MediaAutoRetry", "MediaManualRetry",
+         "MediaRetryExhausted", "MediaOpenStartFailed", "MediaReleaseFailed",
          .. Enum.GetNames<TransferFailureKind>()];
+    private static readonly HashSet<string> MediaEvents =
+        ["MediaDownloadCompleted", "MediaDownloadFailed", "MediaSourceAssigned", "MediaPlayRequested",
+         "MediaOpened", "MediaFailed", "MediaOpenTimeout", "MediaAutoRetry", "MediaManualRetry",
+         "MediaRetryExhausted", "MediaOpenStartFailed", "MediaReleaseFailed"];
 
     public static DiagnosticLog Current { get; } = new();
     public string DirectoryPath => _directory;
@@ -38,6 +45,13 @@ public sealed class DiagnosticLog
     public string RecordTransferFailure(TransferFailureKind kind) =>
         Write("transfer", kind.ToString());
 
+    public string RecordMediaPlaybackEvent(string eventName, Exception? exception = null)
+    {
+        var category = MediaEvents.Contains(eventName) ? eventName : "Other";
+        var hresult = exception is null ? null : $"0x{unchecked((uint)exception.HResult):X8}";
+        return Write("media-playback", category, hresult);
+    }
+
     // Routine diagnostics should never make the dispatcher wait for a busy disk.
     // Fatal handlers still call Record directly so their entry is flushed before exit.
     public void Queue(string area, Exception exception) =>
@@ -46,10 +60,12 @@ public sealed class DiagnosticLog
     public void QueueTransferFailure(TransferFailureKind kind) =>
         _ = Task.Run(() => RecordTransferFailure(kind));
 
-    private string Write(string area, string category)
+    private string Write(string area, string category, string? detail = null)
     {
         var id = Guid.NewGuid().ToString("N")[..12].ToUpperInvariant();
         var line = $"{DateTimeOffset.UtcNow:O} | {id} | {(Areas.Contains(area) ? area : "other")} | {category}";
+        if (detail is not null)
+            line += $" | {detail}";
         lock (_gate)
         {
             try
@@ -77,7 +93,7 @@ public sealed class DiagnosticLog
             $"Version: {version}",
             $"OS: Windows {Environment.OSVersion.Version}",
             $"Runtime: {Environment.Version}",
-            "Events (UTC | ID | area | category):"
+            "Events (UTC | ID | area | category | optional HRESULT):"
         };
         lock (_gate)
         {
@@ -122,8 +138,10 @@ public sealed class DiagnosticLog
     private static bool IsSafeLine(string line)
     {
         var parts = line.Split(" | ");
-        return parts.Length == 4 && DateTimeOffset.TryParse(parts[0], out _)
+        return (parts.Length == 4 || parts.Length == 5) && DateTimeOffset.TryParse(parts[0], out _)
             && parts[1].Length == 12 && parts[1].All(char.IsAsciiHexDigit)
-            && Areas.Contains(parts[2]) && Categories.Contains(parts[3]);
+            && Areas.Contains(parts[2]) && Categories.Contains(parts[3])
+            && (parts.Length == 4 || parts[4].Length == 10 && parts[4].StartsWith("0x", StringComparison.Ordinal)
+                && parts[4].AsSpan(2).ToArray().All(char.IsAsciiHexDigit));
     }
 }

@@ -17,6 +17,29 @@ public sealed class DiagnosticLogTests
     }
 
     [Fact]
+    public void Media_playback_events_include_only_allowlisted_state_and_numeric_hresult()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "cavdeck-media-diagnostic-test-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var log = new DiagnosticLog(directory);
+            const string secret = "signed-url private-object-key local-temp-path";
+            log.RecordMediaPlaybackEvent("MediaFailed", new InvalidOperationException(secret));
+            log.RecordMediaPlaybackEvent("MediaOpenTimeout");
+            log.RecordMediaPlaybackEvent(secret);
+
+            var report = log.CreateReport();
+            Assert.Contains("media-playback | MediaFailed | 0x80131509", report);
+            Assert.Contains("media-playback | MediaOpenTimeout", report);
+            Assert.DoesNotContain(secret, report);
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void ReportOmitsExceptionTextAndRejectsTamperedLogLines()
     {
         var directory = Path.Combine(Path.GetTempPath(), "cavdeck-diagnostic-test-" + Guid.NewGuid().ToString("N"));
