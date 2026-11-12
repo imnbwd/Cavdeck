@@ -156,6 +156,7 @@ public sealed class MediaPreviewLayoutTests
         var volumeSlider = Assert.Single(view.Descendants(Wpf + "Slider").Where(element =>
             (string?)element.Attribute(Xaml + "Name") == "VolumeSlider"));
         Assert.Equal("True", (string?)volumeSlider.Attribute("IsMoveToPointEnabled"));
+        Assert.Equal("{x:Null}", (string?)volumeSlider.Attribute("FocusVisualStyle"));
         Assert.Equal("False", (string?)volumeSlider.Attribute(
             XName.Get("InputAssist.ShowFocusIndicator", "clr-namespace:Cavdeck.App.Controls")));
 
