@@ -77,21 +77,29 @@ public sealed class MediaPreviewLayoutTests
     }
 
     [Fact]
-    public void Audio_is_compact_and_keeps_file_identity_out_of_the_video_header()
+    public void Audio_and_video_share_the_file_name_titlebar_without_duplicate_audio_identity()
     {
         var view = Window();
         Assert.Equal("1060", (string?)view.Root?.Attribute("Width"));
+        Assert.Equal("{Binding FileName}", (string?)view.Root?.Attribute("Title"));
         Assert.Equal("False", (string?)view.Root?.Attribute("ShowBrandName"));
+
         var caption = Assert.Single(view.Descendants(Wpf + "TextBlock").Where(label =>
             (string?)label.Attribute(Xaml + "Name") == "MediaCaption"));
+        Assert.Equal("{Binding FileName}", (string?)caption.Attribute("Text"));
         Assert.Equal("CharacterEllipsis", (string?)caption.Attribute("TextTrimming"));
-        Assert.DoesNotContain(view.Descendants(Wpf + "TextBlock"), label =>
-            (string?)label.Attribute(Xaml + "Name") == "KindLabelLabel");
+        Assert.Equal("{Binding FileName}", (string?)caption.Attribute("ToolTip"));
+
         var artwork = Assert.Single(view.Descendants(Wpf + "Grid").Where(grid =>
             (string?)grid.Attribute(Xaml + "Name") == "AudioArtwork"));
-        Assert.Contains(artwork.Descendants(Wpf + "TextBlock"), label =>
+        var audioLabels = artwork.Descendants(Wpf + "TextBlock").ToArray();
+        Assert.DoesNotContain(audioLabels, label =>
             (string?)label.Attribute("Text") == "{Binding FileName}");
-        Assert.Contains(artwork.Descendants(Wpf + "TextBlock"), label =>
+        var audioTypeLabel = Assert.Single(audioLabels, label =>
+            ((string?)label.Attribute("Text"))?.Contains("Media_KindAudio") == true);
+        Assert.Equal("{DynamicResource FontSizeTitle}", (string?)audioTypeLabel.Attribute("FontSize"));
+        Assert.Equal("SemiBold", (string?)audioTypeLabel.Attribute("FontWeight"));
+        Assert.Contains(audioLabels, label =>
             (string?)label.Attribute("Text") == "{Binding MediaSummary}");
         Assert.Equal("0", (string?)Assert.Single(view.Descendants().Where(element =>
             (string?)element.Attribute(Xaml + "Name") == "Feedback"))

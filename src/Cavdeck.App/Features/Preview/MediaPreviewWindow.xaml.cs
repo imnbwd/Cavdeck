@@ -77,8 +77,6 @@ public partial class MediaPreviewWindow : AppWindow
             Height = 405;
             MinWidth = 440;
             MinHeight = 360;
-            // File identity lives in the audio panel, not in two stacked headers.
-            MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
             // Audio artwork remains visible while the media surface stays unobtrusive.
         }
 
