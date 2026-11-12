@@ -237,9 +237,9 @@ public partial class MediaPreviewWindow : AppWindow
             Volume = VolumeSlider.Value,
             IsMuted = _muted
         };
-        player.MediaOpened += (sender, args) => Player_MediaOpened(sender, args, attempt);
-        player.MediaEnded += (sender, args) => Player_MediaEnded(sender, args, attempt);
-        player.MediaFailed += (sender, args) => Player_MediaFailed(sender, args, attempt);
+        player.MediaOpened += (sender, args) => Player_MediaOpened(sender!, args, attempt);
+        player.MediaEnded += (sender, args) => Player_MediaEnded(sender!, args, attempt);
+        player.MediaFailed += (sender, args) => Player_MediaFailed(sender!, args, attempt);
         MediaHost.Children.Add(player);
         _player = player;
         return player;
