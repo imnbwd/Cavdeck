@@ -348,7 +348,6 @@ public sealed class PreviewPaneViewModel : ViewModelBase, IDisposable
 
     public void Close()
     {
-        MediaContextChanged?.Invoke(this, EventArgs.Empty);
         _session.Reset();
         SetPdfLease(null);
         _loading = false;
