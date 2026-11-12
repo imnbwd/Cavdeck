@@ -147,6 +147,7 @@
             </Button>
             <Slider x:Name="VolumeSlider" Minimum="0" Maximum="1" Value="0.8"
                     IsMoveToPointEnabled="True"
+                    FocusVisualStyle="{x:Null}"
                     controls:InputAssist.ShowFocusIndicator="False"
                     Style="{StaticResource MediaSliderStyle}"
                     Width="84" Margin="0" VerticalAlignment="Center"
