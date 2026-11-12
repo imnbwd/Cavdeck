@@ -38,7 +38,7 @@ Browse buckets, drag and drop files, manage transfers, and preview content witho
 - **Browse and organize.** Explore buckets with tabs and breadcrumbs, switch between detailed lists and icon views, and quickly find objects with sorting and search. Create folders or text files, rename objects, and remove items with confirmation.
 - **Manage transfers.** Upload files or folders by dragging and dropping, and download individual objects or entire folders. Monitor concurrent transfers, including progress, pause, resume, retry, and failure details.
 - **Copy and move files.** Use familiar clipboard shortcuts or **Copy to…** to work within or across connections and buckets. Choose **Skip**, **Keep Both**, or **Overwrite** for conflicts, and track cross-connection operations in **Transfers**.
-- **Preview and edit.** Inspect supported text, images, and PDFs without first saving them manually. Edit text with overwrite safeguards, view object details, and create public or time-limited sharing links where supported.
+- **Preview and edit.** Preview text, images, PDFs, audio, and video in Cavdeck. Browse image thumbnails, zoom and pan photos, navigate between images, or play media with familiar controls. Edit text with overwrite safeguards, inspect object details, and create sharing links where supported.
 - **Work with confidence.** Configure read-only access or restrict a connection to a bucket or key prefix. Review confirmations before destructive operations, with additional verification for cross-connection moves.
 - **Quick access to your files.** Bookmark frequently used buckets and folders in **Favorites**, and revisit locations through **Recent**. Keep multiple storage locations open in tabs while you work.
 - **Work your way.** Switch between light, dark, and system themes and choose English, Simplified Chinese, Japanese, or German. Customize everyday settings, use keyboard shortcuts, and optionally minimize to the system tray.
@@ -110,7 +110,9 @@ Use least-privilege credentials and read-only mode when you do not need to modif
 
 ### Previews, editing, and links
 
-- **Preview:** Supported text files, images, and PDFs can be previewed in Cavdeck. PDF preview uses WebView2 and is subject to file-size limits.
+- **Text, images, and PDFs:** Preview supported text and images in the side pane. Open images in a larger viewer to zoom, pan, and move between images in the current Explorer results. PDF preview uses Microsoft Edge WebView2.
+- **Audio and video:** Open supported files in a separate player with play/pause, seeking, volume, and playback-speed controls. Video also supports fullscreen. Media is downloaded to a temporary local file for playback; codec support depends on Windows.
+- **Preview limits:** File-size limits apply to previews, and some formats may require an external application.
 - **Editing:** Text editing checks the remote version when supported and may request confirmation before overwriting.
 - **Public links:** Object details can provide a public HTTPS link when a public bucket URL is configured.
 - **Presigned links:** A time-limited download link may be available when supported by the provider. Creating a link does not change bucket permissions.
