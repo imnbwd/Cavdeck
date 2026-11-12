@@ -5,6 +5,19 @@ namespace Cavdeck.App.Controls;
 
 public static class InputAssist
 {
+    public static readonly DependencyProperty ShowFocusIndicatorProperty =
+        DependencyProperty.RegisterAttached(
+            "ShowFocusIndicator",
+            typeof(bool),
+            typeof(InputAssist),
+            new FrameworkPropertyMetadata(true));
+
+    public static bool GetShowFocusIndicator(DependencyObject element) =>
+        (bool)element.GetValue(ShowFocusIndicatorProperty);
+
+    public static void SetShowFocusIndicator(DependencyObject element, bool value) =>
+        element.SetValue(ShowFocusIndicatorProperty, value);
+
     public static readonly DependencyProperty PlaceholderProperty =
         DependencyProperty.RegisterAttached(
             "Placeholder",

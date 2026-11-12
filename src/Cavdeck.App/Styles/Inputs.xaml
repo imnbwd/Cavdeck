@@ -546,9 +546,13 @@
             </Track>
           </Grid>
           <ControlTemplate.Triggers>
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+            <MultiTrigger>
+              <MultiTrigger.Conditions>
+                <Condition Property="IsKeyboardFocusWithin" Value="True"/>
+                <Condition Property="controls:InputAssist.ShowFocusIndicator" Value="True"/>
+              </MultiTrigger.Conditions>
               <Setter TargetName="SliderFocus" Property="Opacity" Value="1"/>
-            </Trigger>
+            </MultiTrigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Opacity" Value="0.4"/>
             </Trigger>

@@ -153,9 +153,22 @@ public sealed class MediaPreviewLayoutTests
             (string?)element.Attribute(Xaml + "Name") == "SeekSlider"));
         Assert.Equal("True", (string?)seekSlider.Attribute("IsMoveToPointEnabled"));
 
+        var volumeSlider = Assert.Single(view.Descendants(Wpf + "Slider").Where(element =>
+            (string?)element.Attribute(Xaml + "Name") == "VolumeSlider"));
+        Assert.Equal("True", (string?)volumeSlider.Attribute("IsMoveToPointEnabled"));
+        Assert.Equal("{x:Null}", (string?)volumeSlider.Attribute("FocusVisualStyle"));
+        Assert.Equal("False", (string?)volumeSlider.Attribute(
+            XName.Get("InputAssist.ShowFocusIndicator", "clr-namespace:Cavdeck.App.Controls")));
+
         var inputs = Inputs();
         var mediaSliderStyle = Assert.Single(inputs.Descendants(Wpf + "Style").Where(element =>
             (string?)element.Attribute(Xaml + "Key") == "MediaSliderStyle"));
+        Assert.Contains(mediaSliderStyle.Elements(Wpf + "Setter"), setter =>
+            (string?)setter.Attribute("Property") == "Focusable" &&
+            (string?)setter.Attribute("Value") == "True");
+        Assert.Contains(mediaSliderStyle.Descendants(Wpf + "Condition"), condition =>
+            (string?)condition.Attribute("Property") == "controls:InputAssist.ShowFocusIndicator" &&
+            (string?)condition.Attribute("Value") == "True");
         Assert.Contains(mediaSliderStyle.Descendants(Wpf + "Track"), track =>
             (string?)track.Attribute(Xaml + "Name") == "PART_Track");
         Assert.DoesNotContain(view.Descendants(Wpf + "Style"), element =>
