@@ -28,66 +28,6 @@
       <Setter Property="Margin" Value="0,0,8,0"/>
       <Setter Property="controls:ChromeAssist.HoverBackground" Value="{DynamicResource AccentHoverBrush}"/>
     </Style>
-    <!-- Small branded track, with the normal WPF Track/Thumb semantics preserved. -->
-    <Style x:Key="MediaSliderStyle" TargetType="Slider">
-      <Setter Property="Height" Value="24"/>
-      <Setter Property="Focusable" Value="True"/>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate TargetType="Slider">
-            <Grid SnapsToDevicePixels="True">
-              <Border x:Name="SliderFocus" Height="22" CornerRadius="6" BorderThickness="1"
-                      BorderBrush="{DynamicResource FocusBorderBrush}"
-                      Opacity="0" IsHitTestVisible="False"/>
-              <Track x:Name="PART_Track" VerticalAlignment="Center" Height="20"
-                     Minimum="{TemplateBinding Minimum}"
-                     Maximum="{TemplateBinding Maximum}"
-                     Value="{TemplateBinding Value}"
-                     IsDirectionReversed="False">
-                <Track.DecreaseRepeatButton>
-                  <RepeatButton Command="Slider.DecreaseLarge" IsTabStop="False" Focusable="False">
-                    <RepeatButton.Template>
-                      <ControlTemplate TargetType="RepeatButton">
-                        <Border Height="4" Background="{DynamicResource AccentBrush}"
-                                VerticalAlignment="Center" CornerRadius="2"/>
-                      </ControlTemplate>
-                    </RepeatButton.Template>
-                  </RepeatButton>
-                </Track.DecreaseRepeatButton>
-                <Track.IncreaseRepeatButton>
-                  <RepeatButton Command="Slider.IncreaseLarge" IsTabStop="False" Focusable="False">
-                    <RepeatButton.Template>
-                      <ControlTemplate TargetType="RepeatButton">
-                        <Border Height="4" Background="{DynamicResource BorderStrongBrush}"
-                                VerticalAlignment="Center" CornerRadius="2"/>
-                      </ControlTemplate>
-                    </RepeatButton.Template>
-                  </RepeatButton>
-                </Track.IncreaseRepeatButton>
-                <Track.Thumb>
-                  <Thumb Width="12" Height="12" Focusable="False">
-                    <Thumb.Template>
-                      <ControlTemplate TargetType="Thumb">
-                        <Ellipse Fill="{DynamicResource AccentBrush}"
-                                 Stroke="{DynamicResource SurfaceBrush}" StrokeThickness="1"/>
-                      </ControlTemplate>
-                    </Thumb.Template>
-                  </Thumb>
-                </Track.Thumb>
-              </Track>
-            </Grid>
-            <ControlTemplate.Triggers>
-              <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter TargetName="SliderFocus" Property="Opacity" Value="1"/>
-              </Trigger>
-              <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.4"/>
-              </Trigger>
-            </ControlTemplate.Triggers>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
   </controls:AppWindow.Resources>
 
   <!-- The constrained center column trims long names without pushing caption buttons away. -->
@@ -146,6 +86,7 @@
           <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Slider Grid.Row="0" x:Name="SeekSlider" Minimum="0" Maximum="1" Value="0"
+                IsMoveToPointEnabled="True"
                 Margin="0" IsEnabled="False" Style="{StaticResource MediaSliderStyle}"
                 ValueChanged="SeekSlider_ValueChanged"
                 AutomationProperties.Name="{Binding Texts[Media_Seek]}"
