@@ -154,13 +154,6 @@
           <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconImage}"/>
         </Button>
         <Button Style="{StaticResource PreviewIconAction}"
-                Command="{Binding MediaViewerCommand}"
-                Visibility="{Binding ShowMediaViewer, Converter={StaticResource BoolVis}}"
-                ToolTip="{Binding Texts[Media_Open]}"
-                AutomationProperties.Name="{Binding Texts[Media_Open]}">
-          <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconVideo}"/>
-        </Button>
-        <Button Style="{StaticResource PreviewIconAction}"
                 Command="{Binding ToggleExpandedCommand}"
                 ToolTip="{Binding ExpandLabel}"
                 AutomationProperties.Name="{Binding ExpandLabel}">

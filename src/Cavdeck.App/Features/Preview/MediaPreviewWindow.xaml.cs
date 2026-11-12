@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using Cavdeck.App.Controls;
 using Cavdeck.App.ViewModels;
 using Cavdeck.App.Features.Explorer;
+using Cavdeck.App.Features.Diagnostics;
 using Cavdeck.App.Localization;
 using Cavdeck.Application.Preview;
 using Cavdeck.Domain.Preview;
@@ -33,8 +34,17 @@ public partial class MediaPreviewWindow : AppWindow
     private readonly long _size;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(250) };
+    private readonly DispatcherTimer _openTimeoutTimer = new() { Interval = MediaPlaybackMath.OpenTimeout };
     private readonly DispatcherTimer _surfaceClickTimer = new();
     private PreviewFileLease? _lease;
+    private MediaElement? _player;
+    private int _playbackAttempt;
+    private int _automaticRetryCount;
+    private bool _downloadInProgress;
+    private bool _openAttemptActive;
+    private string _feedbackDescriptionKey = "";
+    private string _feedbackPrimaryKey = "Media_Cancel";
+    private bool _feedbackShowSecondary;
     private bool _disposed;
     private bool _ready;
     private bool _playing;
@@ -55,6 +65,8 @@ public partial class MediaPreviewWindow : AppWindow
     private TimeSpan _duration;
     private string _feedbackKey = "Media_Loading";
     private long _downloadedBytes;
+
+    private MediaElement Player => _player ?? throw new InvalidOperationException("The media player is not initialized.");
 
     public MediaPreviewWindow(PreviewService preview, StorageConnection connection, string bucket,
         string key, string name, long size, PreviewFileType type, LocalizationService texts)
@@ -83,13 +95,12 @@ public partial class MediaPreviewWindow : AppWindow
         if (type == PreviewFileType.Audio)
         {
             Width = 640;
-            Height = 292;
+            Height = 380;
             MinWidth = 440;
-            MinHeight = 280;
+            MinHeight = 360;
             // File identity lives in the audio panel, not in two stacked headers.
             MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
-            // Keep the media element loaded for sound, but do not display a black frame.
-            Player.Opacity = 0;
+            // Audio artwork remains visible while the media surface stays unobtrusive.
         }
 
         FullscreenButton.Visibility = _isVideo ? Visibility.Visible : Visibility.Collapsed;
@@ -106,14 +117,17 @@ public partial class MediaPreviewWindow : AppWindow
             if (_fullScreen)
                 Topmost = false;
         };
-        Player.Volume = VolumeSlider.Value;
         Feedback.PrimaryCommand = new RelayCommand(_ => Close());
+        Feedback.PrimaryCommand = new RelayCommand(_ => Close());
+        Feedback.SecondaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;
+        Feedback.ShowSecondaryButton = false;
         Feedback.IsIndeterminate = true;
         Feedback.ShowProgress = true;
 
         UpdatePlaybackLabels();
         _timer.Tick += Timer_Tick;
+        _openTimeoutTimer.Tick += OpenTimeoutTimer_Tick;
         SeekSlider.AddHandler(Thumb.DragStartedEvent,
             new DragStartedEventHandler((_, _) =>
             {
@@ -141,14 +155,20 @@ public partial class MediaPreviewWindow : AppWindow
 
     public string FileName { get; }
     public LocalizationService Texts { get; }
+    public string MediaSummary =>
+        $"{Path.GetExtension(FileName).TrimStart('.').ToUpperInvariant()} · {ExplorerText.FormatBytes(_size)}";
 
     private async Task LoadAsync()
     {
+        if (_disposed || _downloadInProgress || _lease is not null)
+            return;
+
+        _downloadInProgress = true;
         var token = _lifetime.Token;
         Feedback.Visibility = Visibility.Visible;
-        _feedbackKey = "Media_Loading";
-        Feedback.Headline = Texts[_feedbackKey];
-        Feedback.PrimaryButtonText = Texts["Media_Cancel"];
+        SetFeedback("Media_Loading", "Media_Cancel");
+        Feedback.PrimaryCommand = new RelayCommand(_ => Close());
+        Feedback.ShowPrimaryButton = true;
         Feedback.ShowProgress = true;
         Feedback.IsIndeterminate = false;
         Feedback.ProgressValue = 0;
@@ -176,30 +196,209 @@ public partial class MediaPreviewWindow : AppWindow
 
             _lease = pending;
             pending = null;
-            _feedbackKey = "Media_Opening";
-            Feedback.Headline = Texts[_feedbackKey];
-            Feedback.ShowProgress = true;
-            Feedback.IsIndeterminate = true;
-            Feedback.ProgressDescription = "";
-            Player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
-            // LoadedBehavior=Manual requires an explicit Play call to start
-            // opening the local source on all supported WPF media backends.
-            Player.Play();
+            DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaDownloadCompleted");
+            StartMediaOpen();
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
             // Closing cancels the download; the downloader removes partial files.
         }
-        catch (Exception)
+        catch (Exception exception)
         {
             if (!_disposed)
-                ShowFailure("Media_DownloadFailed");
+            {
+                DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaDownloadFailed", exception);
+                ShowFailure("Preview_FeedbackErrorTitle", "Media_DownloadFailed");
+            }
         }
         finally
         {
-            if (pending is not null)
-                await pending.DisposeAsync();
+            try
+            {
+                if (pending is not null)
+                    await pending.DisposeAsync();
+            }
+            finally
+            {
+                _downloadInProgress = false;
+            }
         }
+    }
+
+    private MediaElement CreateMediaPlayer(int attempt)
+    {
+        var player = new MediaElement
+        {
+            LoadedBehavior = MediaState.Manual,
+            UnloadedBehavior = MediaState.Close,
+            ScrubbingEnabled = true,
+            Stretch = Stretch.Uniform,
+            IsHitTestVisible = false,
+            Opacity = _isVideo ? 1 : 0,
+            Volume = VolumeSlider.Value,
+            IsMuted = _muted
+        };
+        player.MediaOpened += (sender, args) => Player_MediaOpened(sender, args, attempt);
+        player.MediaEnded += (sender, args) => Player_MediaEnded(sender, args, attempt);
+        player.MediaFailed += (sender, args) => Player_MediaFailed(sender, args, attempt);
+        MediaHost.Children.Add(player);
+        _player = player;
+        return player;
+    }
+
+    private void ReleasePlayer()
+    {
+        var previous = _player;
+        _player = null;
+        if (previous is null)
+            return;
+
+        MediaHost.Children.Remove(previous);
+        try { previous.Stop(); }
+        catch (Exception exception) { DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaReleaseFailed", exception); }
+        try { previous.Close(); }
+        catch (Exception exception) { DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaReleaseFailed", exception); }
+        try { previous.Source = null; }
+        catch (Exception exception) { DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaReleaseFailed", exception); }
+    }
+
+    private bool IsCurrentPlayer(object sender, int attempt) =>
+        !_disposed && attempt == _playbackAttempt && ReferenceEquals(sender, _player);
+
+    private void StartMediaOpen()
+    {
+        if (_disposed || _lease is null)
+            return;
+
+        _openTimeoutTimer.Stop();
+        _openAttemptActive = false;
+        _timer.Stop();
+        ResetPlaybackControls();
+
+        // A retry gets a fresh MediaElement. Late native callbacks from the previous
+        // player are ignored by the attempt identity check.
+        _playbackAttempt++;
+        ReleasePlayer();
+        var player = CreateMediaPlayer(_playbackAttempt);
+
+        Feedback.Visibility = Visibility.Visible;
+        SetFeedback("Media_Opening", "Media_Cancel");
+        Feedback.PrimaryCommand = new RelayCommand(_ => Close());
+        Feedback.ShowPrimaryButton = true;
+        Feedback.ShowProgress = true;
+        Feedback.IsIndeterminate = true;
+        Feedback.ProgressValue = 0;
+        Feedback.ProgressDescription = "";
+
+        try
+        {
+            player.Source = new Uri(Path.GetFullPath(_lease.FilePath));
+            _openAttemptActive = true;
+            _openTimeoutTimer.Start();
+            DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaSourceAssigned");
+            player.Play();
+            DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaPlayRequested");
+        }
+        catch (Exception exception)
+        {
+            _openTimeoutTimer.Stop();
+            _openAttemptActive = false;
+            DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaOpenStartFailed", exception);
+            ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
+        }
+
+        UpdatePlaybackLabels();
+        UpdateTimeLabel();
+    }
+
+    private void ResetPlaybackControls()
+    {
+        _ready = false;
+        _playing = false;
+        _ended = false;
+        _duration = TimeSpan.Zero;
+        _settingSeek = true;
+        SeekSlider.Value = 0;
+        SeekSlider.Maximum = 1;
+        _settingSeek = false;
+        SeekSlider.IsEnabled = false;
+        PlayPauseButton.IsEnabled = false;
+        BackButton.IsEnabled = false;
+        ForwardButton.IsEnabled = false;
+        UpdatePlaybackLabels();
+        UpdateTimeLabel();
+    }
+
+    private void OpenTimeoutTimer_Tick(object? sender, EventArgs e)
+    {
+        _openTimeoutTimer.Stop();
+        if (_disposed || _ready || !_openAttemptActive)
+            return;
+
+        _openAttemptActive = false;
+        DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaOpenTimeout");
+        if (MediaPlaybackMath.ShouldRetryAfterOpenTimeout(_automaticRetryCount))
+        {
+            _automaticRetryCount++;
+            DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaAutoRetry");
+            StartMediaOpen();
+            return;
+        }
+
+        DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaRetryExhausted");
+        ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
+    }
+
+    private void RetryPlayback()
+    {
+        if (_disposed)
+            return;
+        if (_lease is null)
+        {
+            _ = LoadAsync();
+            return;
+        }
+
+        _automaticRetryCount = 0;
+        DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaManualRetry");
+        StartMediaOpen();
+    }
+
+    private void SetFeedback(string headlineKey, string primaryKey, string? descriptionKey = null)
+    {
+        _feedbackKey = headlineKey;
+        _feedbackPrimaryKey = primaryKey;
+        _feedbackDescriptionKey = descriptionKey ?? "";
+        Feedback.Headline = Texts[headlineKey];
+        Feedback.Description = descriptionKey is null ? "" : Texts[descriptionKey];
+        Feedback.PrimaryButtonText = Texts[primaryKey];
+    }
+
+    private void Player_MediaOpened(object sender, RoutedEventArgs e, int attempt)
+    {
+        if (!IsCurrentPlayer(sender, attempt))
+            return;
+
+        _openTimeoutTimer.Stop();
+        _openAttemptActive = false;
+        DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaOpened");
+        _ready = true;
+        _ended = false;
+        _duration = Player.NaturalDuration.HasTimeSpan
+            ? Player.NaturalDuration.TimeSpan : TimeSpan.Zero;
+        SeekSlider.IsEnabled = _duration > TimeSpan.Zero;
+        SeekSlider.Maximum = Math.Max(1, _duration.TotalSeconds);
+        PlayPauseButton.IsEnabled = true;
+        BackButton.IsEnabled = _duration > TimeSpan.Zero;
+        ForwardButton.IsEnabled = _duration > TimeSpan.Zero;
+        Feedback.Visibility = Visibility.Collapsed;
+        Feedback.ShowSecondaryButton = false;
+        ApplyPlaybackSpeed();
+        UpdateTimeLabel();
+        Player.Play();
+        _playing = true;
+        _timer.Start();
+        UpdatePlaybackLabels();
     }
 
     private void Player_MediaOpened(object sender, RoutedEventArgs e)
@@ -224,11 +423,10 @@ public partial class MediaPreviewWindow : AppWindow
         UpdatePlaybackLabels();
     }
 
-    private void Player_MediaEnded(object sender, RoutedEventArgs e)
+    private void Player_MediaEnded(object sender, RoutedEventArgs e, int attempt)
     {
-        if (_disposed)
+        if (!IsCurrentPlayer(sender, attempt))
             return;
-        // Keep the last frame/time visible and expose an explicit replay state.
         Player.Pause();
         _playing = false;
         _ended = true;
@@ -238,35 +436,40 @@ public partial class MediaPreviewWindow : AppWindow
         UpdatePlaybackLabels();
     }
 
-    private void Player_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+    private void Player_MediaFailed(object sender, ExceptionRoutedEventArgs e, int attempt)
     {
-        if (_disposed)
+        if (!IsCurrentPlayer(sender, attempt))
             return;
-        _ready = false;
-        _playing = false;
-        _ended = false;
+
+        _openTimeoutTimer.Stop();
+        _openAttemptActive = false;
+        DiagnosticLog.Current.RecordMediaPlaybackEvent("MediaFailed", e.ErrorException);
         _timer.Stop();
         ShowFullscreenControls();
-        PlayPauseButton.IsEnabled = false;
-        SeekSlider.IsEnabled = false;
-        BackButton.IsEnabled = false;
-        ForwardButton.IsEnabled = false;
-        ShowFailure("Media_Unsupported");
+        ShowFailure("Preview_FeedbackErrorTitle", "Media_Unsupported");
         UpdatePlaybackLabels();
     }
 
-    private void ShowFailure(string key)
+    private void ShowFailure(string headlineKey, string descriptionKey)
     {
         if (_disposed)
             return;
-        _feedbackKey = key;
+
+        _openTimeoutTimer.Stop();
+        _openAttemptActive = false;
+        _timer.Stop();
+        ResetPlaybackControls();
         Feedback.Visibility = Visibility.Visible;
-        Feedback.Headline = Texts[key];
+        SetFeedback(headlineKey, "Preview_Retry", descriptionKey);
         Feedback.ShowProgress = false;
         Feedback.IsIndeterminate = false;
         Feedback.ProgressDescription = "";
-        Feedback.PrimaryButtonText = Texts["Media_Close"];
+        Feedback.PrimaryCommand = new RelayCommand(_ => RetryPlayback());
+        Feedback.SecondaryButtonText = Texts["Media_Close"];
+        Feedback.SecondaryCommand = new RelayCommand(_ => Close());
         Feedback.ShowPrimaryButton = true;
+        Feedback.ShowSecondaryButton = true;
+        _feedbackShowSecondary = true;
     }
 
     private void TogglePlayback()
@@ -325,10 +528,11 @@ public partial class MediaPreviewWindow : AppWindow
             return;
         if (!_isVideo)
             MediaCaption.Text = $"{Texts["Media_KindAudio"]} — Cavdeck";
+        SetFeedback(_feedbackKey, _feedbackPrimaryKey,
+            _feedbackDescriptionKey.Length == 0 ? null : _feedbackDescriptionKey);
+        if (_feedbackShowSecondary)
+            Feedback.SecondaryButtonText = Texts["Media_Close"];
         UpdatePlaybackLabels();
-        Feedback.Headline = Texts[_feedbackKey];
-        Feedback.PrimaryButtonText = Texts[_feedbackKey is "Media_Unsupported" or "Media_DownloadFailed"
-            ? "Media_Close" : "Media_Cancel"];
         if (Feedback.ShowProgress && !Feedback.IsIndeterminate && _size > 0)
             Feedback.ProgressDescription = string.Format(Texts["Media_Progress"],
                 ExplorerText.FormatBytes(_downloadedBytes), ExplorerText.FormatBytes(_size));
@@ -353,8 +557,9 @@ public partial class MediaPreviewWindow : AppWindow
     private void UpdateTimeLabel()
     {
         var current = _dragging ? TimeSpan.FromSeconds(SeekSlider.Value)
-            : _ended ? _duration : Player.Position;
-        TimeLabel.Text = $"{MediaPlaybackMath.Clock(current)} / {MediaPlaybackMath.Clock(_duration)}";
+            : _ended ? _duration
+            : _ready && _player is not null ? Player.Position : TimeSpan.Zero;
+        TimeLabel.Text = MediaPlaybackMath.TimeLabel(current, _duration, _ready);
     }
 
     private void ApplySeek(double seconds)
@@ -382,7 +587,7 @@ public partial class MediaPreviewWindow : AppWindow
 
     private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        if (Player is null)
+        if (_player is null)
             return;
         Player.Volume = e.NewValue;
         if (_muted && e.NewValue > 0)
@@ -398,7 +603,8 @@ public partial class MediaPreviewWindow : AppWindow
     private void Mute_Click(object sender, RoutedEventArgs e)
     {
         _muted = !_muted;
-        Player.IsMuted = _muted;
+        if (_player is not null)
+            Player.IsMuted = _muted;
         UpdatePlaybackLabels();
     }
 
@@ -668,25 +874,24 @@ public partial class MediaPreviewWindow : AppWindow
         _lifetime.Cancel();
         _timer.Stop();
         _timer.Tick -= Timer_Tick;
+        _openTimeoutTimer.Stop();
+        _openTimeoutTimer.Tick -= OpenTimeoutTimer_Tick;
         _surfaceClickTimer.Stop();
         _surfaceClickTimer.Tick -= SurfaceClickTimer_Tick;
         SeekPreviewTip.IsOpen = false;
         Texts.PropertyChanged -= Texts_PropertyChanged;
+        _playbackAttempt++;
+        ReleasePlayer();
         try
         {
-            Player.Stop();
-            Player.Close();
-            Player.Source = null;
-        }
-        finally
-        {
-            // On some Windows codecs handles are released slightly after Close.
-            // PreviewFileDownloader also prunes stale temp files as a safety net.
             if (_lease is not null)
             {
                 _ = _lease.DisposeAsync();
                 _lease = null;
             }
+        }
+        finally
+        {
             _lifetime.Dispose();
         }
     }
