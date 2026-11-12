@@ -497,6 +497,68 @@
     </Setter>
   </Style>
 
+  <!-- Small branded track, with the normal WPF Track/Thumb semantics preserved. -->
+  <Style x:Key="MediaSliderStyle" TargetType="Slider">
+    <Setter Property="Height" Value="24"/>
+    <Setter Property="Focusable" Value="True"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Slider">
+          <Grid SnapsToDevicePixels="True">
+            <Border x:Name="SliderFocus" Height="22" CornerRadius="6" BorderThickness="1"
+                    BorderBrush="{DynamicResource FocusBorderBrush}"
+                    Opacity="0" IsHitTestVisible="False"/>
+            <Track x:Name="PART_Track" VerticalAlignment="Center" Height="20"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value}"
+                   IsDirectionReversed="False">
+              <Track.DecreaseRepeatButton>
+                <RepeatButton Command="Slider.DecreaseLarge" IsTabStop="False" Focusable="False">
+                  <RepeatButton.Template>
+                    <ControlTemplate TargetType="RepeatButton">
+                      <Border Height="4" Background="{DynamicResource AccentBrush}"
+                              VerticalAlignment="Center" CornerRadius="2"/>
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseRepeatButton>
+              <Track.IncreaseRepeatButton>
+                <RepeatButton Command="Slider.IncreaseLarge" IsTabStop="False" Focusable="False">
+                  <RepeatButton.Template>
+                    <ControlTemplate TargetType="RepeatButton">
+                      <Border Height="4" Background="{DynamicResource BorderStrongBrush}"
+                              VerticalAlignment="Center" CornerRadius="2"/>
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseRepeatButton>
+              <Track.Thumb>
+                <Thumb Width="12" Height="12" Focusable="False">
+                  <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                      <Ellipse Fill="{DynamicResource AccentBrush}"
+                               Stroke="{DynamicResource SurfaceBrush}" StrokeThickness="1"/>
+                    </ControlTemplate>
+                  </Thumb.Template>
+                </Thumb>
+              </Track.Thumb>
+            </Track>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+              <Setter TargetName="SliderFocus" Property="Opacity" Value="1"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.4"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
   <!-- Retain native determinate/indeterminate behavior but use palette colors. -->
   <Style x:Key="ThemedProgressBar" TargetType="ProgressBar">
     <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
