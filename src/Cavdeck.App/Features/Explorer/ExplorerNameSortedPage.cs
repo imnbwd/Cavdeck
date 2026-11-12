@@ -4,7 +4,7 @@ using Cavdeck.Domain.Storage;
 namespace Cavdeck.App.Features.Explorer;
 
 // Merge a new S3 page into the Name-ascending list without replacing existing rows.
-// Match ObjectLayout.Sort: folders first, then case-insensitive names.
+// Match ObjectLayout.Sort: folders first, then natural object-name order.
 public static class ExplorerNameSortedPage
 {
     public static void Append(IList<ExplorerRow> rows, IEnumerable<ObjectEntry> page, LocalizationService texts)
@@ -23,7 +23,7 @@ public static class ExplorerNameSortedPage
                 var current = rows[middle].Entry;
                 var comparison = current.Kind.CompareTo(entry.Kind);
                 if (comparison == 0)
-                    comparison = StringComparer.OrdinalIgnoreCase.Compare(current.Name, entry.Name);
+                    comparison = ObjectNameComparer.Instance.Compare(current.Name, entry.Name);
 
                 // Insert after equal names, preserving the existing order.
                 if (comparison <= 0)

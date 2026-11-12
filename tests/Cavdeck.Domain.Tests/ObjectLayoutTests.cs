@@ -37,6 +37,69 @@ public sealed class ObjectLayoutTests
         Assert.Equal(["a", "b.txt", "a.txt"], entries.Select(entry => entry.Name).ToArray());
     }
 
+    [Fact]
+    public void Sort_uses_natural_order_for_names_and_keeps_folders_first()
+    {
+        var entries = new[]
+        {
+            new ObjectEntry(ObjectEntryKind.File, "file10.txt", "file10.txt", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.Folder, "folder10", "folder10/", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.File, "file2.txt", "file2.txt", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.Folder, "folder2", "folder2/", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.File, "file1.txt", "file1.txt", 0, null, null)
+        };
+
+        var sorted = ObjectLayout.Sort(entries, ListingSort.Name, descending: false);
+
+        Assert.Equal(
+            ["folder2", "folder10", "file1.txt", "file2.txt", "file10.txt"],
+            sorted.Select(entry => entry.Name).ToArray());
+    }
+
+    [Fact]
+    public void Sort_uses_natural_order_for_descending_names_without_reversing_folder_priority()
+    {
+        var entries = new[]
+        {
+            new ObjectEntry(ObjectEntryKind.File, "file2.txt", "file2.txt", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.Folder, "folder2", "folder2/", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.File, "file10.txt", "file10.txt", 0, null, null),
+            new ObjectEntry(ObjectEntryKind.Folder, "folder10", "folder10/", 0, null, null)
+        };
+
+        var sorted = ObjectLayout.Sort(entries, ListingSort.Name, descending: true);
+
+        Assert.Equal(
+            ["folder10", "folder2", "file10.txt", "file2.txt"],
+            sorted.Select(entry => entry.Name).ToArray());
+    }
+
+    [Fact]
+    public void Sort_uses_natural_name_order_as_size_tiebreaker()
+    {
+        var entries = new[]
+        {
+            new ObjectEntry(ObjectEntryKind.File, "file10.txt", "file10.txt", 100, null, null),
+            new ObjectEntry(ObjectEntryKind.File, "file2.txt", "file2.txt", 100, null, null),
+            new ObjectEntry(ObjectEntryKind.File, "file1.txt", "file1.txt", 100, null, null)
+        };
+
+        var sorted = ObjectLayout.Sort(entries, ListingSort.Size, descending: false);
+
+        Assert.Equal(
+            ["file1.txt", "file2.txt", "file10.txt"],
+            sorted.Select(entry => entry.Name).ToArray());
+    }
+
+    [Fact]
+    public void Object_name_comparer_uses_ordinal_tiebreaker_for_case_only_differences()
+    {
+        var comparer = ObjectNameComparer.Instance;
+
+        Assert.True(comparer.Compare("File2.txt", "file2.txt") < 0);
+        Assert.True(comparer.Compare("file2.txt", "File2.txt") > 0);
+    }
+
     [Theory]
     [InlineData("", null)]
     [InlineData("images/", "")]

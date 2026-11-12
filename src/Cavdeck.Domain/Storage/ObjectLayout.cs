@@ -245,18 +245,19 @@ public static class ObjectLayout
     public static IReadOnlyList<ObjectEntry> Sort(
         IReadOnlyList<ObjectEntry> entries, ListingSort sort, bool descending)
     {
+        var nameComparer = ObjectNameComparer.Instance;
         IOrderedEnumerable<ObjectEntry> ordered = entries.OrderBy(entry => entry.Kind == ObjectEntryKind.Folder ? 0 : 1);
         ordered = sort switch
         {
             ListingSort.Size => descending
-                ? ordered.ThenByDescending(entry => entry.SizeBytes).ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
-                : ordered.ThenBy(entry => entry.SizeBytes).ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase),
+                ? ordered.ThenByDescending(entry => entry.SizeBytes).ThenBy(entry => entry.Name, nameComparer)
+                : ordered.ThenBy(entry => entry.SizeBytes).ThenBy(entry => entry.Name, nameComparer),
             ListingSort.Modified => descending
                 ? ordered.ThenByDescending(entry => entry.LastModified ?? DateTimeOffset.MinValue)
                 : ordered.ThenBy(entry => entry.LastModified ?? DateTimeOffset.MaxValue),
             _ => descending
-                ? ordered.ThenByDescending(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
-                : ordered.ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+                ? ordered.ThenByDescending(entry => entry.Name, nameComparer)
+                : ordered.ThenBy(entry => entry.Name, nameComparer)
         };
         return ordered.ToList();
     }
