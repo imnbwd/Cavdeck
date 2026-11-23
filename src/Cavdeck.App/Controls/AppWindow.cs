@@ -15,6 +15,8 @@ namespace Cavdeck.App.Controls;
 
 public class AppWindow : Window
 {
+    private const string NonFullscreenProperty = "NonRudeHWND";
+    private static readonly IntPtr NonFullscreenValue = new(1);
     private const int DwmwaWindowCornerPreference = 33;
     private const int DwmwcpDoNotRound = 1;
     private const int DwmwcpRound = 2;
@@ -25,6 +27,7 @@ public class AppWindow : Window
 
     private readonly WindowChrome _chrome;
     private HwndSource? _source;
+    private IntPtr _nonFullscreenWindow;
     private LocalizationService? _texts;
     private UIElement? _titleBar;
     private Button? _systemMenuButton;
@@ -58,6 +61,7 @@ public class AppWindow : Window
                 var window = (AppWindow)d;
                 window.UpdateChromeMetrics();
                 window.ApplyCornerPreference();
+                window.UpdateNonFullscreenProperty();
             }));
 
     public static readonly DependencyProperty MaximizedPaddingProperty =
@@ -166,12 +170,14 @@ public class AppWindow : Window
         base.OnSourceInitialized(e);
         _source = PresentationSource.FromVisual(this) as HwndSource;
         _source?.AddHook(WindowMessageHook);
+        UpdateNonFullscreenProperty();
         ApplyCornerPreference();
         UpdateChromeMetrics();
     }
 
     protected override void OnClosed(EventArgs e)
     {
+        RemoveNonFullscreenProperty();
         _source?.RemoveHook(WindowMessageHook);
         _source = null;
         if (_texts != null)
@@ -374,6 +380,36 @@ public class AppWindow : Window
             _closeButton.Click -= Close_Click;
     }
 
+    private void UpdateNonFullscreenProperty()
+    {
+        if (IsImmersiveFullScreen)
+        {
+            RemoveNonFullscreenProperty();
+            return;
+        }
+
+        // Prevent Windows Shell from treating maximized custom chrome as fullscreen.
+        // Register at handle creation, before the window is first shown.
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd != IntPtr.Zero && _nonFullscreenWindow == IntPtr.Zero &&
+            GetProp(hwnd, NonFullscreenProperty) == IntPtr.Zero &&
+            SetProp(hwnd, NonFullscreenProperty, NonFullscreenValue))
+        {
+            _nonFullscreenWindow = hwnd;
+        }
+    }
+
+    private void RemoveNonFullscreenProperty()
+    {
+        if (_nonFullscreenWindow == IntPtr.Zero)
+            return;
+
+        // Only remove the property if its value is still the one we installed.
+        if (GetProp(_nonFullscreenWindow, NonFullscreenProperty) == NonFullscreenValue)
+            _ = RemoveProp(_nonFullscreenWindow, NonFullscreenProperty);
+        _nonFullscreenWindow = IntPtr.Zero;
+    }
+
     private void ApplyCornerPreference()
     {
         var hwnd = new WindowInteropHelper(this).Handle;
@@ -417,6 +453,15 @@ public class AppWindow : Window
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int pvAttribute, int cbAttribute);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr GetProp(IntPtr hwnd, string name);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool SetProp(IntPtr hwnd, string name, IntPtr value);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr RemoveProp(IntPtr hwnd, string name);
 
     [DllImport("user32.dll")]
     private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
