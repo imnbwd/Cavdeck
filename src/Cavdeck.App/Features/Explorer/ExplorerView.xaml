@@ -55,6 +55,8 @@
                 IsEnabled="{Binding Explorer.CanFavorite}">
         <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconStar}"/></MenuItem.Icon>
       </MenuItem>
+      <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+      <MenuItem Header="{Binding Texts[FolderProperties_Title]}" Command="{Binding Explorer.FolderPropertiesCommand}" CommandParameter="Current"/>
     </ContextMenu>
     <Style x:Key="ExplorerToolbarButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
       <Setter Property="MinHeight" Value="32"/>
@@ -477,6 +479,7 @@
                 <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
                 <MenuItem Header="{Binding Texts[Explorer_CopyKey]}" Command="{Binding Explorer.CopyKeyCommand}"/>
                 <MenuItem Header="{Binding Texts[Explorer_CopyUri]}" Command="{Binding Explorer.CopyUriCommand}"/>
+                <MenuItem Header="{Binding Texts[FolderProperties_Title]}" Command="{Binding Explorer.FolderPropertiesCommand}"/>
                 <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
                 <MenuItem Header="{Binding Texts[Transfer_Upload]}" Click="UploadFiles_Click"
                           IsEnabled="{Binding Explorer.CanWrite}">
@@ -808,6 +811,9 @@
                       <MenuItem.Icon><Path Style="{StaticResource ContextMenuIconStyle}" Data="{StaticResource IconOpenNewTab}"/></MenuItem.Icon>
                     </MenuItem>
                     <Separator Style="{StaticResource ContextMenuSeparatorStyle}"/>
+                    <MenuItem Header="{Binding PlacementTarget.Tag.Texts[FolderProperties_Title], RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              Command="{Binding PlacementTarget.Tag.FolderPropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     <MenuItem Header="{Binding PlacementTarget.DataContext.FavoriteActionText, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                               Command="{Binding PlacementTarget.Tag.ToggleBucketFavoriteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                               CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -927,6 +933,7 @@
                 <MenuItem Header="{Binding Texts[Explorer_CopyUri]}"
                           Command="{Binding Explorer.CopyUriCommand}"
                           IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[FolderProperties_Title]}" Command="{Binding Explorer.FolderPropertiesCommand}"/>
                 <MenuItem Header="{Binding Texts[Share_Menu]}"
                           Command="{Binding Explorer.ShareLinkCommand}"
                           IsEnabled="{Binding Explorer.CanShareLink}">
@@ -1050,6 +1057,7 @@
                 <MenuItem Header="{Binding Texts[Explorer_CopyUri]}"
                           Command="{Binding Explorer.CopyUriCommand}"
                           IsEnabled="{Binding Explorer.CanCopyKey}"/>
+                <MenuItem Header="{Binding Texts[FolderProperties_Title]}" Command="{Binding Explorer.FolderPropertiesCommand}"/>
                 <MenuItem Header="{Binding Texts[Share_Menu]}"
                           Command="{Binding Explorer.ShareLinkCommand}"
                           IsEnabled="{Binding Explorer.CanShareLink}">

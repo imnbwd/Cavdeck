@@ -78,7 +78,7 @@ public sealed class ContextMenuStyleTests
             }
         }
 
-        Assert.Equal(15, total);
+        Assert.Equal(16, total);
     }
 
     private static XDocument Load(string filename) =>

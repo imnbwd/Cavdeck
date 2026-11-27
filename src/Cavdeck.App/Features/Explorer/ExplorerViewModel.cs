@@ -183,6 +183,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
         CopyNameCommand = new RelayCommand(_ => CopyName(), _ => _selected.Count == 1);
         CopyUriCommand = new RelayCommand(_ => CopyText(keys: false), _ => CanCopyKey);
         CopyDetailValueCommand = new RelayCommand(value => CopyDetailValue(value as string));
+        FolderPropertiesCommand = new RelayCommand(ShowFolderProperties, CanShowFolderProperties);
         ToggleFavoriteCommand = CreateAsyncCommand(_ => ToggleFavoriteAsync());
         ToggleBucketFavoriteCommand = CreateAsyncCommand(ToggleBucketFavoriteAsync);
         ToggleFolderFavoriteCommand = CreateAsyncCommand(_ => ToggleFolderFavoriteAsync());
@@ -253,6 +254,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     public ICommand CopyNameCommand { get; }
     public ICommand CopyUriCommand { get; }
     public ICommand CopyDetailValueCommand { get; }
+    public RelayCommand FolderPropertiesCommand { get; }
     public ICommand ToggleFavoriteCommand { get; }
     public ICommand ToggleBucketFavoriteCommand { get; }
     public ICommand ToggleFolderFavoriteCommand { get; }
@@ -1227,6 +1229,7 @@ public sealed partial class ExplorerViewModel : ViewModelBase, IDisposable
     private void RaiseCommands()
     {
         GoToPathCommand.RaiseCanExecuteChanged();
+        FolderPropertiesCommand.RaiseCanExecuteChanged();
         if (CopyCommand is RelayCommand copy)
             copy.RaiseCanExecuteChanged();
         if (CutCommand is RelayCommand cut)

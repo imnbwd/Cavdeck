@@ -1,0 +1,45 @@
+<UserControl x:Class="Cavdeck.App.Features.Explorer.FolderPropertiesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel>
+    <TextBlock Text="{Binding ScopeName}" FontSize="17" FontWeight="SemiBold"
+               Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap"/>
+    <TextBlock Text="{Binding ConnectionName}" Margin="0,4,0,0"
+               Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"/>
+    <TextBlock Text="{Binding Location}" Margin="0,2,0,16" TextWrapping="Wrap"
+               Foreground="{DynamicResource MutedTextBrush}"/>
+    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,1" Padding="0,12">
+      <StackPanel>
+        <TextBlock Text="{Binding Texts[FolderProperties_TotalSize]}" Foreground="{DynamicResource MutedTextBrush}"/>
+        <TextBlock x:Name="SizeText" Text="—" FontSize="24" FontWeight="SemiBold"
+                   Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4,0,0"/>
+        <TextBlock x:Name="ExactSizeText" Foreground="{DynamicResource MutedTextBrush}" Margin="0,2,0,12"/>
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,8,0">
+            <TextBlock Text="{Binding Texts[FolderProperties_Files]}" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"/>
+            <TextBlock x:Name="FilesText" Text="—" FontSize="18" FontWeight="SemiBold" Margin="0,4,0,0"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1">
+            <TextBlock Text="{Binding Texts[FolderProperties_Subfolders]}" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"/>
+            <TextBlock x:Name="FoldersText" Text="—" FontSize="18" FontWeight="SemiBold" Margin="0,4,0,0"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+    <ProgressBar x:Name="ScanProgress" IsIndeterminate="True" Height="3" Margin="0,12,0,0" Visibility="Collapsed"
+                 AutomationProperties.Name="{Binding Texts[FolderProperties_Scanning]}"/>
+    <TextBlock x:Name="StatusText" Margin="0,10,0,0" TextWrapping="Wrap"
+               Foreground="{DynamicResource PrimaryTextBrush}" AutomationProperties.LiveSetting="Polite"/>
+    <TextBlock Text="{Binding Texts[FolderProperties_Hint]}" Margin="0,6,0,0" TextWrapping="Wrap"
+               Foreground="{DynamicResource MutedTextBrush}"/>
+    <WrapPanel Margin="0,12,0,0">
+      <Button x:Name="ScanButton" Style="{StaticResource SecondaryButton}" Margin="0,0,8,4"
+              Content="{Binding Texts[FolderProperties_Recalculate]}" Click="Scan_Click"/>
+      <Button x:Name="CancelButton" Style="{StaticResource SecondaryButton}" Margin="0,0,8,4"
+              Content="{Binding Texts[Explorer_CancelScan]}" Click="Cancel_Click" Visibility="Collapsed"/>
+      <Button x:Name="CopyButton" Style="{StaticResource GhostButton}" Margin="0,0,0,4"
+              Content="{Binding Texts[FolderProperties_Copy]}" Click="Copy_Click" IsEnabled="False"/>
+    </WrapPanel>
+  </StackPanel>
+</UserControl>

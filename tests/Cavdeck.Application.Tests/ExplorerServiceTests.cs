@@ -8,6 +8,54 @@ namespace Cavdeck.Application.Tests;
 public sealed class ExplorerServiceTests
 {
     [Fact]
+    public async Task Folder_properties_scan_exact_pages_and_deduplicate_overlapping_roots()
+    {
+        var store = new MemoryStorage
+        {
+            Pages =
+            [
+                [new("assets", "images/a/", 0, DateTimeOffset.UtcNow, null, null),
+                 new("assets", "images/a/one.jpg", 12, DateTimeOffset.UtcNow, null, null)],
+                [new("assets", "images/a/sub/two.jpg", 28, DateTimeOffset.UtcNow, null, null),
+                 new("assets", "images/a/empty/", 0, DateTimeOffset.UtcNow, null, null),
+                 new("assets", "images/ab/not-selected.jpg", 100, DateTimeOffset.UtcNow, null, null)]
+            ]
+        };
+        var service = new ExplorerService(new SingleFactory(store));
+        var updates = new List<FolderProperties>();
+        var result = await service.GetFolderPropertiesAsync(Connection(readOnly: true), "assets",
+            [new(ObjectEntryKind.Folder, "a", "images/a/", 0, null, null),
+             new(ObjectEntryKind.Folder, "sub", "images/a/sub/", 0, null, null),
+             new(ObjectEntryKind.File, "one.jpg", "images/a/one.jpg", 12, null, null)],
+            updates.Add, default);
+        Assert.Equal(new FolderProperties(40, 2, 2, 2), result);
+        Assert.Equal(2, updates.Count);
+        Assert.Empty(store.HeadKeys);
+        Assert.Equal("images/a/", store.LastListedPrefix);
+    }
+
+    [Fact]
+    public async Task Folder_properties_reject_out_of_scope_selection_before_listing()
+    {
+        var store = new MemoryStorage();
+        var service = new ExplorerService(new SingleFactory(store));
+        await Assert.ThrowsAsync<StorageException>(() => service.GetFolderPropertiesAsync(Connection(), "assets",
+            [new(ObjectEntryKind.Folder, "outside", "outside/", 0, null, null)], null, default));
+        Assert.Null(store.LastListedPrefix);
+    }
+
+    [Fact]
+    public async Task Folder_properties_cancel_between_pages()
+    {
+        var store = new MemoryStorage { Pages = [[], []] };
+        var service = new ExplorerService(new SingleFactory(store));
+        using var stop = new CancellationTokenSource();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.GetFolderPropertiesAsync(
+            Connection(), "assets", [new(ObjectEntryKind.Folder, "images", "images/", 0, null, null)],
+            _ => stop.Cancel(), stop.Token));
+    }
+
+    [Fact]
     public async Task Uri_does_not_browse_a_normalized_alias_of_a_literal_prefix()
     {
         var store = new MemoryStorage();

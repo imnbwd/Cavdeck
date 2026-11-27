@@ -884,4 +884,17 @@
   <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck 已自动重试一次。你可以再次重试，或关闭播放器。</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>文件预览</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>无法打开预览</value></data>
+  <data name="FolderProperties_Title" xml:space="preserve"><value>属性</value></data>
+  <data name="FolderProperties_TotalSize" xml:space="preserve"><value>总大小</value></data>
+  <data name="FolderProperties_Files" xml:space="preserve"><value>文件数</value></data>
+  <data name="FolderProperties_Subfolders" xml:space="preserve"><value>子文件夹数</value></data>
+  <data name="FolderProperties_Scanning" xml:space="preserve"><value>正在计算…</value></data>
+  <data name="FolderProperties_Progress" xml:space="preserve"><value>正在计算… 已发出 {0:N0} 次列表请求</value></data>
+  <data name="FolderProperties_Complete" xml:space="preserve"><value>计算完成 · {0:N0} 次列表请求</value></data>
+  <data name="FolderProperties_Cancelled" xml:space="preserve"><value>已取消，统计结果不完整。</value></data>
+  <data name="FolderProperties_Failed" xml:space="preserve"><value>计算未完成，统计结果不完整。</value></data>
+  <data name="FolderProperties_Hint" xml:space="preserve"><value>仅统计当前对象，不含历史版本和未完成的分片上传。扫描期间数据可能变化，存储请求可能产生费用。</value></data>
+  <data name="FolderProperties_Recalculate" xml:space="preserve"><value>重新计算</value></data>
+  <data name="FolderProperties_Copy" xml:space="preserve"><value>复制结果</value></data>
+  <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} 字节</value></data>
 </root>

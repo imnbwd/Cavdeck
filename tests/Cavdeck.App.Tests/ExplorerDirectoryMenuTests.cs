@@ -27,7 +27,7 @@ public sealed class ExplorerDirectoryMenuTests
             (string?)element.Attribute(Xaml + "Key") == "CurrentDirectoryMenu");
         Assert.Equal("False", (string?)menu.Attribute(Xaml + "Shared"));
         Assert.Contains("PlacementTarget.DataContext", (string?)menu.Attribute("DataContext"));
-        Assert.Equal(new[] { "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem" },
+        Assert.Equal(new[] { "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem", "Separator", "MenuItem", "MenuItem", "MenuItem", "Separator", "MenuItem" },
             menu.Elements().Select(element => element.Name.LocalName));
 
         foreach (var (name, handler) in new[]
