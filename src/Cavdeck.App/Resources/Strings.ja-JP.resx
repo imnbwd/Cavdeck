@@ -893,4 +893,43 @@
   <data name="FolderProperties_Recalculate" xml:space="preserve"><value>再計算</value></data>
   <data name="FolderProperties_Copy" xml:space="preserve"><value>結果をコピー</value></data>
   <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} バイト</value></data>
+  <data name="Metadata_General" xml:space="preserve"><value>全般</value></data>
+  <data name="Metadata_Title" xml:space="preserve"><value>メタデータ</value></data>
+  <data name="Metadata_Http" xml:space="preserve"><value>HTTP メタデータ</value></data>
+  <data name="Metadata_Custom" xml:space="preserve"><value>カスタムメタデータ</value></data>
+  <data name="Metadata_Edit" xml:space="preserve"><value>メタデータを編集</value></data>
+  <data name="Metadata_Copy" xml:space="preserve"><value>プロパティをコピー</value></data>
+  <data name="Metadata_NotSet" xml:space="preserve"><value>未設定</value></data>
+  <data name="Metadata_Empty" xml:space="preserve"><value>カスタムメタデータはありません。</value></data>
+  <data name="Metadata_StorageClass" xml:space="preserve"><value>ストレージクラス</value></data>
+  <data name="Metadata_Encryption" xml:space="preserve"><value>暗号化</value></data>
+  <data name="Metadata_Version" xml:space="preserve"><value>バージョン ID</value></data>
+  <data name="Metadata_Save" xml:space="preserve"><value>変更を保存</value></data>
+  <data name="Metadata_SaveWarning" xml:space="preserve"><value>保存するとサーバー上でオブジェクトがコピーされ、更新日時、バージョン、料金に影響する場合があります。メタデータのみの同時変更は検出できない場合があります。CDN キャッシュは削除されません。</value></data>
+  <data name="Metadata_Discard" xml:space="preserve"><value>変更を破棄</value></data>
+  <data name="Metadata_DiscardMessage" xml:space="preserve"><value>未保存のメタデータ変更を破棄しますか？</value></data>
+  <data name="Metadata_Saved" xml:space="preserve"><value>メタデータを保存し、確認しました。</value></data>
+  <data name="Metadata_Saving" xml:space="preserve"><value>保存と確認中…</value></data>
+  <data name="Metadata_Conflict" xml:space="preserve"><value>オブジェクトが変更されました。編集を閉じて再読み込みしてください。</value></data>
+  <data name="Metadata_VerifyFailed" xml:space="preserve"><value>書き込みは成功した可能性がありますが、確認に失敗しました。閉じて再読み込みしてください。</value></data>
+  <data name="Metadata_Failed" xml:space="preserve"><value>メタデータの読み込みまたは保存に失敗しました。</value></data>
+  <data name="Metadata_UseType" xml:space="preserve"><value>{0} を使用</value></data>
+  <data name="Metadata_Preset" xml:space="preserve"><value>Cache-Control プリセット</value></data>
+  <data name="Metadata_ExpiresHint" xml:space="preserve"><value>HTTP 日付を使用してください。例: Wed, 21 Oct 2026 07:28:00 GMT。</value></data>
+  <data name="Metadata_Add" xml:space="preserve"><value>メタデータを追加</value></data>
+  <data name="Metadata_Key" xml:space="preserve"><value>キー</value></data>
+  <data name="Metadata_Value" xml:space="preserve"><value>値</value></data>
+  <data name="Metadata_Remove" xml:space="preserve"><value>削除</value></data>
+  <data name="Metadata_Block_ReadOnly" xml:space="preserve"><value>この接続は読み取り専用です。</value></data>
+  <data name="Metadata_Block_Provider" xml:space="preserve"><value>このストレージでは編集できません。</value></data>
+  <data name="Metadata_Block_LargeObject" xml:space="preserve"><value>5 GiB を超えるオブジェクトは読み取り専用です。</value></data>
+  <data name="Metadata_Block_Incomplete" xml:space="preserve"><value>完全なメタデータを安全に取得できません。</value></data>
+  <data name="Metadata_Block_ProtectedObject" xml:space="preserve"><value>暗号化、ストレージクラス、ACL または保持設定を安全に維持できません。</value></data>
+  <data name="Metadata_Block_UnverifiedPolicy" xml:space="preserve"><value>バケット設定または必要な権限を確認できないため編集できません。</value></data>
+  <data name="Metadata_Validation_InvalidHeader" xml:space="preserve"><value>制御文字を含まない印字可能な ASCII を使用してください。</value></data>
+  <data name="Metadata_Validation_InvalidKey" xml:space="preserve"><value>キーには英数字、ピリオド、下線、ハイフンを使用し、x-amz-meta- は不要です。</value></data>
+  <data name="Metadata_Validation_DuplicateKey" xml:space="preserve"><value>キーは重複できません（大文字小文字を区別しません）。</value></data>
+  <data name="Metadata_Validation_TooLarge" xml:space="preserve"><value>カスタムメタデータは 2 KB 以下にしてください。</value></data>
+  <data name="Metadata_Validation_InvalidContentType" xml:space="preserve"><value>有効なメディアタイプを入力してください。</value></data>
+  <data name="Metadata_Validation_InvalidExpires" xml:space="preserve"><value>GMT の HTTP 日付を入力してください。</value></data>
 </root>

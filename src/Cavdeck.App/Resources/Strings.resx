@@ -897,4 +897,43 @@ Repair the file and retry before changing connections.</value></data>
   <data name="FolderProperties_Recalculate" xml:space="preserve"><value>Recalculate</value></data>
   <data name="FolderProperties_Copy" xml:space="preserve"><value>Copy results</value></data>
   <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} bytes</value></data>
+  <data name="Metadata_General" xml:space="preserve"><value>General</value></data>
+  <data name="Metadata_Title" xml:space="preserve"><value>Metadata</value></data>
+  <data name="Metadata_Http" xml:space="preserve"><value>HTTP metadata</value></data>
+  <data name="Metadata_Custom" xml:space="preserve"><value>Custom metadata</value></data>
+  <data name="Metadata_Edit" xml:space="preserve"><value>Edit metadata</value></data>
+  <data name="Metadata_Copy" xml:space="preserve"><value>Copy properties</value></data>
+  <data name="Metadata_NotSet" xml:space="preserve"><value>Not set</value></data>
+  <data name="Metadata_Empty" xml:space="preserve"><value>No custom metadata.</value></data>
+  <data name="Metadata_StorageClass" xml:space="preserve"><value>Storage class</value></data>
+  <data name="Metadata_Encryption" xml:space="preserve"><value>Encryption</value></data>
+  <data name="Metadata_Version" xml:space="preserve"><value>Version ID</value></data>
+  <data name="Metadata_Save" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Metadata_SaveWarning" xml:space="preserve"><value>Saving copies the object on the server and may change its modification time, create a version or incur charges. Concurrent metadata-only changes may not be detectable. Cache changes do not purge a CDN.</value></data>
+  <data name="Metadata_Discard" xml:space="preserve"><value>Discard changes</value></data>
+  <data name="Metadata_DiscardMessage" xml:space="preserve"><value>Discard your unsaved metadata changes?</value></data>
+  <data name="Metadata_Saved" xml:space="preserve"><value>Metadata saved and verified.</value></data>
+  <data name="Metadata_Saving" xml:space="preserve"><value>Saving and verifying…</value></data>
+  <data name="Metadata_Conflict" xml:space="preserve"><value>The object changed. Close the editor and reload before editing again.</value></data>
+  <data name="Metadata_VerifyFailed" xml:space="preserve"><value>The write may have succeeded, but verification failed. Close the editor and reload; do not retry blindly.</value></data>
+  <data name="Metadata_Failed" xml:space="preserve"><value>Could not load or save metadata.</value></data>
+  <data name="Metadata_UseType" xml:space="preserve"><value>Use {0}</value></data>
+  <data name="Metadata_Preset" xml:space="preserve"><value>Cache-Control presets</value></data>
+  <data name="Metadata_ExpiresHint" xml:space="preserve"><value>Use an HTTP date, e.g. Wed, 21 Oct 2026 07:28:00 GMT.</value></data>
+  <data name="Metadata_Add" xml:space="preserve"><value>Add metadata</value></data>
+  <data name="Metadata_Key" xml:space="preserve"><value>Key</value></data>
+  <data name="Metadata_Value" xml:space="preserve"><value>Value</value></data>
+  <data name="Metadata_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Metadata_Block_ReadOnly" xml:space="preserve"><value>This connection is read-only.</value></data>
+  <data name="Metadata_Block_Provider" xml:space="preserve"><value>Editing is unavailable for this storage provider.</value></data>
+  <data name="Metadata_Block_LargeObject" xml:space="preserve"><value>Objects over 5 GiB are read-only in this editor.</value></data>
+  <data name="Metadata_Block_Incomplete" xml:space="preserve"><value>The complete metadata could not be read safely.</value></data>
+  <data name="Metadata_Block_ProtectedObject" xml:space="preserve"><value>Object encryption, storage class, ACL or retention settings cannot safely be preserved.</value></data>
+  <data name="Metadata_Block_UnverifiedPolicy" xml:space="preserve"><value>Bucket policy or required permissions could not be verified. Editing is disabled.</value></data>
+  <data name="Metadata_Validation_InvalidHeader" xml:space="preserve"><value>Use printable ASCII header values without control characters.</value></data>
+  <data name="Metadata_Validation_InvalidKey" xml:space="preserve"><value>Use letters, numbers, dots, underscores or hyphens for keys; omit x-amz-meta-.</value></data>
+  <data name="Metadata_Validation_DuplicateKey" xml:space="preserve"><value>Metadata keys must be unique (case-insensitive).</value></data>
+  <data name="Metadata_Validation_TooLarge" xml:space="preserve"><value>Custom metadata must not exceed 2 KB.</value></data>
+  <data name="Metadata_Validation_InvalidContentType" xml:space="preserve"><value>Enter a valid media type.</value></data>
+  <data name="Metadata_Validation_InvalidExpires" xml:space="preserve"><value>Enter an HTTP date in GMT.</value></data>
 </root>

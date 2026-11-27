@@ -26,6 +26,26 @@ public sealed partial class ExplorerViewModel
             : string.Format(_texts["Explorer_StatusSelected"], entries.Length);
         var location = ObjectLayout.ObjectUri(bucket, entries.Length == 1 ? entries[0].Key : _prefix);
 
+        if (entries is [{ Kind: ObjectEntryKind.File } file])
+        {
+            using var properties = new ObjectPropertiesView(_texts, _dialogs, title, connection.Name,
+                token => _explorer.ReadObjectMetadataAsync(connection, bucket, file.Key, token),
+                (expected, desired, token) => _explorer.UpdateObjectMetadataAsync(connection, expected, desired, token),
+                CopyDetailValue);
+            _dialogs.Show(null, new DialogRequest
+            {
+                Title = _texts["FolderProperties_Title"], Content = properties,
+                PrimaryText = _texts["Dialog_Close"]
+            });
+            if (properties.WriteAttempted)
+            {
+                _clipboard.PublishStorageChanged(this, connection.Id, bucket);
+                if (!_disposed && _connection?.Id == connection.Id && _bucket == bucket)
+                    RunUiOperation(() => RefreshAsync());
+            }
+            return;
+        }
+
         using var content = new FolderPropertiesView(_texts, title, connection.Name, location,
             (progress, token) => _explorer.GetFolderPropertiesAsync(connection, bucket, entries, progress, token),
             CopyDetailValue);

@@ -26,6 +26,70 @@ public sealed class PreviewCloudTests
     [PreviewCloudFact("MINIO")]
     public Task MinIO_preview_roundtrip() => VerifyAsync("MINIO", StorageProviderKind.Minio);
 
+    [PreviewCloudFact("AWS")]
+    public Task AWS_metadata_roundtrip() => VerifyMetadataAsync("AWS", StorageProviderKind.AwsS3);
+
+    [PreviewCloudFact("R2")]
+    public Task R2_metadata_roundtrip() => VerifyMetadataAsync("R2", StorageProviderKind.CloudflareR2);
+
+    [PreviewCloudFact("MINIO")]
+    public Task MinIO_metadata_roundtrip() => VerifyMetadataAsync("MINIO", StorageProviderKind.Minio);
+
+    // Dedicated cloud QA bucket/prefix only. The test bucket must be unversioned
+    // and allow the metadata policy checks (AWS ownership and lock settings;
+    // MinIO lock and encryption settings) as well as object GET/PUT/COPY/DELETE.
+    private static async Task VerifyMetadataAsync(string provider, StorageProviderKind kind)
+    {
+        var bucket = Read(provider, "BUCKET")!;
+        var prefix = Read(provider, "PREFIX")!.TrimEnd('/') + "/";
+        Assert.StartsWith("cavdeck-cli-test/", prefix, StringComparison.Ordinal);
+        var key = prefix + "metadata-" + Guid.NewGuid().ToString("N") + "/sample.txt";
+        var connection = new StorageConnection(Guid.NewGuid(), "Metadata Cloud QA", kind,
+            Read(provider, "ENDPOINT") ?? "",
+            Read(provider, "REGION") ?? (kind == StorageProviderKind.CloudflareR2 ? "auto" : "us-east-1"),
+            "metadata-tests", RestrictedBucket: bucket, KeyPrefix: prefix,
+            ForcePathStyle: kind != StorageProviderKind.AwsS3);
+        var vault = new TestVault(Read(provider, "ACCESS_KEY")!, Read(provider, "SECRET_KEY")!);
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+        var token = timeout.Token;
+        using var pool = new S3ClientLeasePool();
+        using var providers = new S3ProviderFactory(vault, pool);
+        var storage = providers.Create(kind);
+        var service = new Cavdeck.Application.Explorer.ObjectMetadataService(providers);
+        var bytes = Encoding.UTF8.GetBytes("Cavdeck metadata roundtrip");
+        try
+        {
+            using var stream = new MemoryStream(bytes, writable: false);
+            await storage.UploadAsync(connection, bucket, key, stream, "text/plain", null, token);
+            var original = await service.ReadAsync(connection, bucket, key, token);
+            Assert.Equal(MetadataEditBlock.None, original.EditBlock);
+            var desired = new ObjectMetadataValues(original.Values.Http with
+                { CacheControl = "no-cache", ContentDisposition = "inline" },
+                new Dictionary<string, string>(original.Values.Custom, StringComparer.OrdinalIgnoreCase)
+                { ["cavdeck-test"] = "first" });
+            var updated = await service.UpdateAsync(connection, original, desired, token);
+            Assert.True(updated.Values.SameAs(desired));
+            Assert.Equal(original.StorageClass, updated.StorageClass);
+            Assert.Equal(original.Encryption, updated.Encryption);
+            var stale = await Assert.ThrowsAsync<StorageException>(() =>
+                service.UpdateAsync(connection, original, desired, token));
+            Assert.Equal(StorageFailureKind.PreconditionFailed, stale.Failure.Kind);
+            var removed = new ObjectMetadataValues(updated.Values.Http with { CacheControl = "no-store" },
+                original.Values.Custom);
+            var final = await service.UpdateAsync(connection, updated, removed, token);
+            Assert.True(final.Values.SameAs(removed));
+            var body = await storage.ReadObjectAsync(connection, bucket, key, 4096, token);
+            Assert.Equal(bytes, body.Content);
+            Assert.Equal(MetadataEditBlock.ReadOnly,
+                (await service.ReadAsync(connection with { IsReadOnly = true }, bucket, key, token)).EditBlock);
+        }
+        finally
+        {
+            using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+            await storage.DeleteAsync(connection, bucket, key, cleanup.Token);
+        }
+    }
+
     private static async Task VerifyAsync(string provider, StorageProviderKind kind)
     {
         var bucket = Read(provider, "BUCKET")!;

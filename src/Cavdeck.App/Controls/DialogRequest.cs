@@ -34,5 +34,6 @@ public sealed record DialogRequest
     public string? SecondaryText { get; init; }
     public string? TertiaryText { get; init; }
     public string CloseText { get; init; } = "";
+    public Func<bool>? ConfirmDismiss { get; init; }
     public DialogTone Tone { get; init; } = DialogTone.Neutral;
 }
