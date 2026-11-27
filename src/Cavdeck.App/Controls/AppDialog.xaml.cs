@@ -19,6 +19,12 @@ public partial class AppDialog : Window
             if (Choice != DialogChoice.Primary)
                 _submission?.Cancel();
         };
+        if (request.ConfirmDismiss is { } confirmDismiss)
+            Closing += (_, args) =>
+            {
+                if (Choice != DialogChoice.Primary && !confirmDismiss())
+                    args.Cancel = true;
+            };
         Title = request.Title;
         Heading.Text = request.Title;
 

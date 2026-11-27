@@ -1187,6 +1187,9 @@
                     AutomationProperties.Name="{Binding Texts[Explorer_HideDetails]}">
               <Path Style="{StaticResource IconGlyph}" Data="{StaticResource IconClose}"/>
             </Button>
+            <Button DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Margin="0,0,4,0"
+                    Content="{Binding Texts[FolderProperties_Title]}" Command="{Binding Explorer.FolderPropertiesCommand}"
+                    Visibility="{Binding Explorer.HasSelection, Converter={StaticResource BoolVis}}"/>
           <TextBlock DockPanel.Dock="Left" Text="{Binding Texts[Explorer_Details]}" FontWeight="SemiBold"
                      VerticalAlignment="Center" FontSize="{DynamicResource FontSizeBody}">
             <TextBlock.Style>
