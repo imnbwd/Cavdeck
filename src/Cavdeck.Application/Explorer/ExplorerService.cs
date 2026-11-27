@@ -210,6 +210,14 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
             continuationToken, Math.Clamp(pageSize, 1, 1000), cancellationToken);
     }
 
+    public Task<ObjectMetadataSnapshot> ReadObjectMetadataAsync(StorageConnection connection,
+        string bucket, string key, CancellationToken token) =>
+        new ObjectMetadataService(providers, catalog).ReadAsync(connection, bucket, key, token);
+
+    public Task<ObjectMetadataSnapshot> UpdateObjectMetadataAsync(StorageConnection connection,
+        ObjectMetadataSnapshot expected, ObjectMetadataValues desired, CancellationToken token) =>
+        new ObjectMetadataService(providers, catalog).UpdateAsync(connection, expected, desired, token);
+
     public async Task<FolderProperties> GetFolderPropertiesAsync(StorageConnection connection,
         string bucket, IReadOnlyList<ObjectEntry> selection, Action<FolderProperties>? progress,
         CancellationToken cancellationToken)

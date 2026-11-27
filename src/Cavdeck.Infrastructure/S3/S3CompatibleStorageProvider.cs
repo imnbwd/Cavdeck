@@ -3,7 +3,7 @@ using Cavdeck.Domain.Storage;
 
 namespace Cavdeck.Infrastructure.S3;
 
-public sealed class S3CompatibleStorageProvider : IObjectStorageProvider
+public sealed class S3CompatibleStorageProvider : IObjectStorageProvider, IObjectMetadataProvider
 {
     private readonly ICredentialVault _vault;
     private readonly IS3Gateway _gateway;
@@ -160,6 +160,20 @@ public sealed class S3CompatibleStorageProvider : IObjectStorageProvider
         var session = await OpenAsync(connection, cancellationToken);
         return await _gateway.ReplaceObjectAsync(
             session, bucket, key, content, contentType, ifMatchETag, cancellationToken);
+    }
+
+    public async Task<ObjectMetadataSnapshot> ReadMetadataAsync(StorageConnection connection,
+        string bucket, string key, CancellationToken token)
+    {
+        EnsureObject(connection, bucket, key, false);
+        return await _gateway.ReadMetadataAsync(await OpenAsync(connection, token), connection, bucket, key, token);
+    }
+
+    public async Task<ObjectMetadataSnapshot> UpdateMetadataAsync(StorageConnection connection,
+        ObjectMetadataSnapshot expected, ObjectMetadataValues desired, CancellationToken token)
+    {
+        EnsureObject(connection, expected.Head.Bucket, expected.Head.Key, true);
+        return await _gateway.UpdateMetadataAsync(await OpenAsync(connection, token), connection, expected, desired, token);
     }
 
     private async Task<S3Session> OpenAsync(StorageConnection connection, CancellationToken cancellationToken)

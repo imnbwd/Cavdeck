@@ -32,6 +32,10 @@ internal interface IS3Gateway
         string expectedETag, CancellationToken cancellationToken) =>
         throw new NotSupportedException("This adapter does not implement conditional deletion.");
     Task<ObjectHead> HeadObjectAsync(S3Session session, string bucket, string key, CancellationToken cancellationToken);
+    Task<ObjectMetadataSnapshot> ReadMetadataAsync(S3Session session, StorageConnection connection,
+        string bucket, string key, CancellationToken token) => throw new NotSupportedException();
+    Task<ObjectMetadataSnapshot> UpdateMetadataAsync(S3Session session, StorageConnection connection,
+        ObjectMetadataSnapshot expected, ObjectMetadataValues desired, CancellationToken token) => throw new NotSupportedException();
     Task<ObjectBody> ReadObjectAsync(
         S3Session session, string bucket, string key, int maxBytes, CancellationToken cancellationToken);
     Task<ObjectHead> ReplaceObjectAsync(
@@ -41,7 +45,7 @@ internal interface IS3Gateway
 
 // One S3 client covers AWS, R2 and MinIO. Checksums stay off unless the API
 // requires them: the SDK default breaks R2 and MinIO signatures.
-internal sealed class AwsS3Gateway : IS3Gateway, IDisposable
+internal sealed partial class AwsS3Gateway : IS3Gateway, IDisposable
 {
     private readonly long _singleCopyLimit;
     private readonly S3ClientLeasePool _clients;

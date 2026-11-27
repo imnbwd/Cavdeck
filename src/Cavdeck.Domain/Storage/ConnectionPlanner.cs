@@ -9,7 +9,7 @@ public static class ConnectionPlanner
         StorageProviderKind.AwsS3 => new(true, true, true, true, true, true),
         // R2 can presign and copy on its S3 API host. Versioning and the AWS bucket
         // settings surface are not the same product, so those stay off.
-        StorageProviderKind.CloudflareR2 => new(true, true, false, false, true, false),
+        StorageProviderKind.CloudflareR2 => new(true, true, false, true, true, false),
         StorageProviderKind.Minio => new(true, true, true, true, true, false),
         _ => new(true, true, false, false, true, false)
     };
