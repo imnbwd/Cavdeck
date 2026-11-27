@@ -210,6 +210,15 @@ public sealed class ExplorerService(IObjectStorageProviderFactory providers, ICo
             continuationToken, Math.Clamp(pageSize, 1, 1000), cancellationToken);
     }
 
+    public async Task<FolderProperties> GetFolderPropertiesAsync(StorageConnection connection,
+        string bucket, IReadOnlyList<ObjectEntry> selection, Action<FolderProperties>? progress,
+        CancellationToken cancellationToken)
+    {
+        connection = await ConnectionAccess.ResolveAsync(catalog, connection, cancellationToken);
+        return await FolderPropertiesScanner.ScanAsync(Provider(connection), connection, bucket,
+            selection, progress, cancellationToken);
+    }
+
     public async Task<ObjectHead> HeadAsync(StorageConnection connection, string bucket, string key,
         CancellationToken cancellationToken)
     {

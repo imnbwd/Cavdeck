@@ -35,6 +35,7 @@ Browse buckets, drag and drop files, manage transfers, and preview content witho
 ## Features
 
 - **Connect to your storage.** Manage Amazon S3, Cloudflare R2, MinIO, and custom S3-compatible endpoints side by side. Save multiple connections, test credentials, and optionally limit access to a specific bucket or prefix.
+- **Inspect folder properties.** Calculate current-object size, file count, and logical subfolder count on demand, including bucket roots and multi-selection. Cancel large scans or copy completed results.
 - **Browse and organize.** Explore buckets with tabs and breadcrumbs, switch between detailed lists and icon views, and quickly find objects with sorting and search. Create folders or text files, rename objects, and remove items with confirmation.
 - **Manage transfers.** Upload files or folders by dragging and dropping, and download individual objects or entire folders. Monitor concurrent transfers, including progress, pause, resume, retry, and failure details.
 - **Copy and move files.** Use familiar clipboard shortcuts or **Copy to…** to work within or across connections and buckets. Choose **Skip**, **Keep Both**, or **Overwrite** for conflicts, and track cross-connection operations in **Transfers**.

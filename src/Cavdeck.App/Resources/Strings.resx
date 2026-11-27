@@ -884,4 +884,17 @@ Repair the file and retry before changing connections.</value></data>
   <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck retried once. Try again, or close the player.</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Preview</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Couldn't open this preview</value></data>
+  <data name="FolderProperties_Title" xml:space="preserve"><value>Properties</value></data>
+  <data name="FolderProperties_TotalSize" xml:space="preserve"><value>Total size</value></data>
+  <data name="FolderProperties_Files" xml:space="preserve"><value>Files</value></data>
+  <data name="FolderProperties_Subfolders" xml:space="preserve"><value>Subfolders</value></data>
+  <data name="FolderProperties_Scanning" xml:space="preserve"><value>Calculating…</value></data>
+  <data name="FolderProperties_Progress" xml:space="preserve"><value>Calculating… {0:N0} list requests</value></data>
+  <data name="FolderProperties_Complete" xml:space="preserve"><value>Complete · {0:N0} list requests</value></data>
+  <data name="FolderProperties_Cancelled" xml:space="preserve"><value>Cancelled. Totals are partial.</value></data>
+  <data name="FolderProperties_Failed" xml:space="preserve"><value>Could not finish calculating. Totals are partial.</value></data>
+  <data name="FolderProperties_Hint" xml:space="preserve"><value>Current objects only; excludes historical versions and unfinished multipart uploads. Results may change during scanning. Storage requests may incur charges.</value></data>
+  <data name="FolderProperties_Recalculate" xml:space="preserve"><value>Recalculate</value></data>
+  <data name="FolderProperties_Copy" xml:space="preserve"><value>Copy results</value></data>
+  <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} bytes</value></data>
 </root>

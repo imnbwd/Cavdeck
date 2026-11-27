@@ -880,4 +880,17 @@
   <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck は一度自動的に再試行しました。もう一度試すか、プレーヤーを閉じてください。</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>プレビュー</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>プレビューを開けません</value></data>
+  <data name="FolderProperties_Title" xml:space="preserve"><value>プロパティ</value></data>
+  <data name="FolderProperties_TotalSize" xml:space="preserve"><value>合計サイズ</value></data>
+  <data name="FolderProperties_Files" xml:space="preserve"><value>ファイル数</value></data>
+  <data name="FolderProperties_Subfolders" xml:space="preserve"><value>サブフォルダー数</value></data>
+  <data name="FolderProperties_Scanning" xml:space="preserve"><value>計算中…</value></data>
+  <data name="FolderProperties_Progress" xml:space="preserve"><value>計算中… 一覧リクエスト {0:N0} 回</value></data>
+  <data name="FolderProperties_Complete" xml:space="preserve"><value>完了 · 一覧リクエスト {0:N0} 回</value></data>
+  <data name="FolderProperties_Cancelled" xml:space="preserve"><value>キャンセルしました。集計は不完全です。</value></data>
+  <data name="FolderProperties_Failed" xml:space="preserve"><value>計算を完了できませんでした。集計は不完全です。</value></data>
+  <data name="FolderProperties_Hint" xml:space="preserve"><value>現在のオブジェクトのみを集計します。過去のバージョンと未完了のマルチパートアップロードは含みません。スキャン中にデータが変化する場合があり、リクエストには料金が発生する場合があります。</value></data>
+  <data name="FolderProperties_Recalculate" xml:space="preserve"><value>再計算</value></data>
+  <data name="FolderProperties_Copy" xml:space="preserve"><value>結果をコピー</value></data>
+  <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} バイト</value></data>
 </root>

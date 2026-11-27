@@ -880,4 +880,17 @@ Bitte reparieren Sie die Datei und versuchen Sie es erneut, bevor Sie Verbindung
   <data name="Media_OpenTimeoutDescription" xml:space="preserve"><value>Cavdeck hat es einmal automatisch erneut versucht. Versuche es noch einmal oder schließe den Player.</value></data>
   <data name="Preview_FeedbackTitle" xml:space="preserve"><value>Vorschau</value></data>
   <data name="Preview_FeedbackErrorTitle" xml:space="preserve"><value>Vorschau konnte nicht geöffnet werden</value></data>
+  <data name="FolderProperties_Title" xml:space="preserve"><value>Eigenschaften</value></data>
+  <data name="FolderProperties_TotalSize" xml:space="preserve"><value>Gesamtgröße</value></data>
+  <data name="FolderProperties_Files" xml:space="preserve"><value>Dateien</value></data>
+  <data name="FolderProperties_Subfolders" xml:space="preserve"><value>Unterordner</value></data>
+  <data name="FolderProperties_Scanning" xml:space="preserve"><value>Berechnung läuft…</value></data>
+  <data name="FolderProperties_Progress" xml:space="preserve"><value>Berechnung läuft… {0:N0} Listenanfragen</value></data>
+  <data name="FolderProperties_Complete" xml:space="preserve"><value>Abgeschlossen · {0:N0} Listenanfragen</value></data>
+  <data name="FolderProperties_Cancelled" xml:space="preserve"><value>Abgebrochen. Die Summen sind unvollständig.</value></data>
+  <data name="FolderProperties_Failed" xml:space="preserve"><value>Berechnung fehlgeschlagen. Die Summen sind unvollständig.</value></data>
+  <data name="FolderProperties_Hint" xml:space="preserve"><value>Nur aktuelle Objekte, ohne frühere Versionen und unvollständige mehrteilige Uploads. Daten können sich während der Abfrage ändern. Speicheranfragen können Kosten verursachen.</value></data>
+  <data name="FolderProperties_Recalculate" xml:space="preserve"><value>Neu berechnen</value></data>
+  <data name="FolderProperties_Copy" xml:space="preserve"><value>Ergebnisse kopieren</value></data>
+  <data name="FolderProperties_Bytes" xml:space="preserve"><value>{0:N0} Bytes</value></data>
 </root>
